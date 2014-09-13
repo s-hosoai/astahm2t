@@ -1,0 +1,67 @@
+#include "${u.className}.h"
+${u.className}::${u.className}(Roomba* create){
+  this->create=create;
+
+//  ${u.stateInstance}=${u.initialState};
+  ${u.eventInstance}=E_${u.className}_None;
+}
+${u.className}::~${u.className}(){}
+
+<%if(u.stateMachine){%>\
+void ${u.className}::transition(){
+  switch(${u.stateInstance}){
+<%for(state in u.states){%>\
+  case ${u.getStateName(state)}:
+<%for(t in state.outgoings){%>\
+    if(<%if(t.guard.trim()!="") {out<<t.guard+" && "}%><%if(u.getEventName(t.event)=="true") { out<<"true" } else {%>${u.eventInstance} == ${u.getEventName(t.event)}<%}%>){
+<%if(state.exit.trim()!="") {%>\
+      ${state.exit}; // ${state.name} exit action;
+<%}%>\
+<%if(t.action.trim()!="") {%>\
+      ${t.action}; // ${t.name} transition action;
+<%}%>\
+      ${u.stateInstance} = ${u.getStateName(t.target)};
+<%if(t.target.entry.trim()!=""){%>\
+      ${t.target.entry}; // ${u.getStateName(t.target)} entry action;
+<%}%>\
+    }
+<%}%>\
+    break;
+<%}%>\
+  default:
+    break;
+  }
+  ${u.eventInstance}=E_${u.className}_None;
+}
+<%}%>\
+
+<%if(u.stateMachine){%>\
+void ${u.className}::doAction(){
+  switch(${u.stateInstance}){
+<%for(state in u.states){%>\
+  case ${u.getStateName(state)}:
+<%if(state.doActivity.trim()!=""){%>\
+    ${state.doActivity};
+<%}%>\
+    break;
+<%}%>\
+  default:
+    break;
+  }
+  ${u.eventInstance}=E_${u.className}_None;
+}
+<%}%>\
+
+<%for(event in u.getEvents()){%>\
+void ${u.className}::${event}(){
+	${u.eventInstance}=E_${u.className}_${event};
+}
+<%}%>\
+
+<%for(op in model.operations){%>\
+${op.returnType.name} ${u.className}::${op.name}(<%=op.parameters.collect{it.typeExpression+" "+it.name}.join(", ")%>){
+<%for(body in op.definition.split("\n")){%>\
+  ${body}
+<%}%>\
+}
+<%}%>\
