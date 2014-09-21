@@ -13,7 +13,7 @@ import java.awt.GridBagConstraints;
 import javax.swing.JLabel;
 import java.awt.Insets;
 
-public class AddGeneratorDialog extends JDialog {
+public class AddGeneratorDialog extends JPanel {
 	private static final long serialVersionUID = -3641427986233657814L;
 	private final JPanel contentPanel = new JPanel();
 	private JTextField textField;
@@ -23,9 +23,9 @@ public class AddGeneratorDialog extends JDialog {
 	 */
 	public AddGeneratorDialog() {
 		setBounds(100, 100, 450, 123);
-		getContentPane().setLayout(new BorderLayout());
+		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));
-		getContentPane().add(contentPanel, BorderLayout.CENTER);
+		add(contentPanel, BorderLayout.CENTER);
 		GridBagLayout gbl_contentPanel = new GridBagLayout();
 		gbl_contentPanel.columnWidths = new int[]{169, 96, 0};
 		gbl_contentPanel.rowHeights = new int[]{19, 0, 0};
@@ -55,7 +55,7 @@ public class AddGeneratorDialog extends JDialog {
 		{
 			JPanel buttonPane = new JPanel();
 			buttonPane.setLayout(new FlowLayout(FlowLayout.RIGHT));
-			getContentPane().add(buttonPane, BorderLayout.SOUTH);
+			add(buttonPane, BorderLayout.SOUTH);
 			{
 				JButton okButton = new JButton("OK");
 				okButton.setActionCommand("OK");
@@ -69,5 +69,4 @@ public class AddGeneratorDialog extends JDialog {
 			}
 		}
 	}
-
 }

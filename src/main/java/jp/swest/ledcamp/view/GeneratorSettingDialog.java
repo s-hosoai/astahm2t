@@ -13,6 +13,7 @@ import javax.swing.border.EmptyBorder;
 import javax.swing.JComboBox;
 import javax.swing.JTextField;
 
+import java.awt.Container;
 import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
@@ -42,13 +43,13 @@ public class GeneratorSettingDialog extends JPanel {
 	private JTextField text_ModelCollectorPath;
 	private JTextField text_FileGeneratorPath;
 	private JTable table_Templates;
-	private final JPanel parent;
+	private final Container parent;
 	private final JComboBox<String> combo_GeneratorType;
 	/**
 	 * Create the dialog.
 	 */
-	public GeneratorSettingDialog() {
-		parent = this;
+	public GeneratorSettingDialog(Container main) {
+		this.parent = main;
 		settings = SettingManager.getInstance();
 		setBounds(100, 100, 450, 300);
 		setLayout(new BorderLayout());

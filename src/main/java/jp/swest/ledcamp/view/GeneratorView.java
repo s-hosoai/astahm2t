@@ -83,7 +83,7 @@ public class GeneratorView extends JPanel implements IPluginExtraTabView, Projec
 		JButton btnNewButton_1 = new JButton("Generator Setting");
 		btnNewButton_1.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				GeneratorSettingDialog dialog = new GeneratorSettingDialog();
+				GeneratorSettingDialog dialog = new GeneratorSettingDialog(parent);
 				if(JOptionPane.OK_OPTION == 
 					JOptionPane.showConfirmDialog(parent, dialog, "Generator Setting", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE)){
 					settings.saveProperties();
