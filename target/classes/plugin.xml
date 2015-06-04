@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin>
+   <extension point="com.change_vision.astah.ui.actionSets">
+     <view id="AstahM2T" type="extraTab" class="jp.swest.ledcamp.view.GeneratorView"/>
+   </extension>
+</plugin>

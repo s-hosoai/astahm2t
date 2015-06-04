@@ -1,0 +1,35 @@
+<% for(clazz in models){ %>\
+#include "${u.getClassName(clazz)}.h"
+<%}%>\
+#include <SoftwareSerial.h>
+#include <CreateDataSDWriter.h>
+#include <SD.h>
+#include <Roomba.h>
+
+// iRobot Create
+SoftwareSerial createSerial(2,3);
+Roomba create(&createSerial);
+
+<% for(clazz in models){ %>\
+${u.getClassName(clazz)} ${u.getInstanceName(clazz)}(&create);
+<%}%>\
+
+void setup()
+{
+	SD.begin(4);
+	CreateDataSDWriter.init();
+
+	create.start();
+	create.fullMode();
+	delay(2000);
+}
+
+void loop()
+{
+<% for(clazz in models){%>\
+  ${u.getInstanceName(clazz)}.transition();
+<%}%>\
+<% for(clazz in models){%>\
+  ${u.getInstanceName(clazz)}.doAction();
+<%}%>\
+}
