@@ -1,39 +1,27 @@
 package jp.swest.ledcamp.view;
 
-import groovy.util.ResourceException;
-import groovy.util.ScriptException;
-
 import java.awt.Component;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextField;
 
-import com.change_vision.jude.api.inf.AstahAPI;
-import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
+import jp.swest.ledcamp.generator.CodeGenerator;
+import jp.swest.ledcamp.setting.SettingManager;
+
 import com.change_vision.jude.api.inf.project.ProjectEvent;
 import com.change_vision.jude.api.inf.project.ProjectEventListener;
 import com.change_vision.jude.api.inf.ui.IPluginExtraTabView;
 import com.change_vision.jude.api.inf.ui.ISelectionListener;
-
-import java.awt.GridBagLayout;
-
-import javax.swing.JComboBox;
-
-import java.awt.GridBagConstraints;
-import java.awt.Insets;
-
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JTextField;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-
-import java.awt.event.ActionListener;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.io.IOException;
-
-import jp.swest.ledcamp.CodeGenerator;
-import jp.swest.ledcamp.SettingManager;
 
 public class GeneratorView extends JPanel implements IPluginExtraTabView, ProjectEventListener{	
 	private static final long serialVersionUID = 7712896306186370181L;
@@ -175,8 +163,8 @@ public class GeneratorView extends JPanel implements IPluginExtraTabView, Projec
 						throw new IllegalArgumentException();
 					}
 					
-					//generate
-					generator.generate(targetDir, projectName, settings.getGeneratorType((String)combo_GeneratorType.getSelectedItem()));
+//TODO delete		//generate
+/*					generator.generate(targetDir, projectName, settings.getGeneratorType((String)combo_GeneratorType.getSelectedItem()));
 					JOptionPane.showMessageDialog(parent, "Generated in "+text_TargetDir.getText()+"/"+text_ProjectName.getText());
 					
 					// save targetDir
@@ -198,7 +186,7 @@ public class GeneratorView extends JPanel implements IPluginExtraTabView, Projec
 				} catch (ScriptException e1) {
 					JOptionPane.showMessageDialog(parent, "ScriptException in generate");
 					e1.printStackTrace();
-				} catch (IllegalArgumentException iae){
+				*/} catch (IllegalArgumentException iae){
 					JOptionPane.showMessageDialog(parent, "Prease Enter forms.");
 				}
 			}

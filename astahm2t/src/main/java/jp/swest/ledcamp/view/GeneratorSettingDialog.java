@@ -1,36 +1,31 @@
 package jp.swest.ledcamp.view;
 
 import java.awt.BorderLayout;
-import java.awt.FlowLayout;
-
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JDialog;
-import javax.swing.JFileChooser;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.border.EmptyBorder;
-import javax.swing.JComboBox;
-import javax.swing.JTextField;
-
-import java.awt.GridBagLayout;
 import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Insets;
-
-import javax.swing.JLabel;
-import javax.swing.JTable;
-
-import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.Set;
 
-import jp.swest.ledcamp.FileMapping;
-import jp.swest.ledcamp.GeneratorType;
-import jp.swest.ledcamp.SettingManager;
+import javax.swing.JButton;
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.border.EmptyBorder;
+
+import jp.swest.ledcamp.setting.FileMapping;
+import jp.swest.ledcamp.setting.GeneratorType;
+import jp.swest.ledcamp.setting.SettingManager;
 
 public class GeneratorSettingDialog extends JPanel {
 	private static final long serialVersionUID = 5098273628201593688L;
@@ -100,6 +95,13 @@ public class GeneratorSettingDialog extends JPanel {
 			gbc_btnGeneralSettings.gridx = 3;
 			gbc_btnGeneralSettings.gridy = 0;
 			contentPanel.add(btnGeneralSettings, gbc_btnGeneralSettings);
+			btnGeneralSettings.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					
+					
+				}
+			});
 		}
 		{
 			JLabel lblModelCollector = new JLabel("Model Collector");

@@ -8,9 +8,9 @@ import java.io.IOException;
 import java.util.Map.Entry;
 import java.util.Properties;
 
-import jp.swest.ledcamp.FileMapping;
-import jp.swest.ledcamp.GeneratorType;
-import jp.swest.ledcamp.SettingManager;
+import jp.swest.ledcamp.setting.FileMapping;
+import jp.swest.ledcamp.setting.GeneratorType;
+import jp.swest.ledcamp.setting.SettingManager;
 
 public class AccessProperties {
 	public static void main(String[] args) throws Exception {

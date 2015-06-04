@@ -1,0 +1,6 @@
+\#include "${c.name}.h"
+${c.name}::${c.name}(Roomba* create){
+  this->create=create;
+}
+${c}::~${c.name}(){}
+
