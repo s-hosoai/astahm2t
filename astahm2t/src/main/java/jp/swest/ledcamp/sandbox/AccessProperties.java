@@ -10,14 +10,14 @@ import java.util.Properties;
 
 import jp.swest.ledcamp.setting.FileMapping;
 import jp.swest.ledcamp.setting.GeneratorType;
-import jp.swest.ledcamp.setting.SettingManager;
+import jp.swest.ledcamp.setting.SettingManager_;
 
 public class AccessProperties {
 	public static void main(String[] args) throws Exception {
 		AccessProperties main = new AccessProperties();
 //		main.run();
 		
-		SettingManager manager = SettingManager.getInstance();
+		SettingManager_ manager = SettingManager_.getInstance();
 		String userFolder = System.getProperty("user.home");
 		String m2tPluginFolderPath = userFolder+"/.astah/plugins/m2t/";
 		manager.addGeneratorType(new GeneratorType("ArduinoCreate", "ModelCollector.groovy", "FileGenerator.groovy"));

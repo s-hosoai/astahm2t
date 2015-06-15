@@ -1,87 +1,71 @@
 package jp.swest.ledcamp.generator;
 
-import java.awt.HeadlessException;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Hashtable;
-import java.util.Properties;
-
-import javax.swing.JOptionPane;
-
-import jp.swest.ledcamp.setting.SettingManager;
-
-import org.apache.velocity.Template;
-import org.apache.velocity.VelocityContext;
-import org.apache.velocity.app.Velocity;
-
-import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.exception.InvalidUsingException;
 import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IClass;
-import com.change_vision.jude.api.inf.model.IDiagram;
-import com.change_vision.jude.api.inf.model.IElement;
-import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.IStateMachine;
-import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
-import com.change_vision.jude.api.inf.project.ProjectAccessor;
+import com.google.common.base.Objects;
+import java.awt.HeadlessException;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import jp.swest.ledcamp.generator.GeneratorUtils;
+import jp.swest.ledcamp.generator.GroovyGenerator;
+import jp.swest.ledcamp.setting.GenerateSetting;
+import jp.swest.ledcamp.setting.GenerateType;
+import jp.swest.ledcamp.setting.SettingManager;
+import jp.swest.ledcamp.setting.TemplateMap;
+import org.eclipse.xtext.xbase.lib.Functions.Function2;
+import org.eclipse.xtext.xbase.lib.InputOutput;
+import org.eclipse.xtext.xbase.lib.MapExtensions;
 
+@SuppressWarnings("all")
 public class CodeGenerator {
-	public static void generate() throws ClassNotFoundException, ProjectNotFoundException, IOException, HeadlessException, InvalidUsingException {
-		AstahAPI api = AstahAPI.getAstahAPI();
-        ProjectAccessor projectAccessor = api.getProjectAccessor();
-		IModel projectRoot = projectAccessor.getProject(); // exist project?
-		SettingManager setting = SettingManager.getInstance();
-		
-		// Collect classes and statemachines.
-		ArrayList<IClass> classes = new ArrayList<IClass>();
-		Hashtable<IClass, IStateMachine> statemachines = new Hashtable<IClass, IStateMachine>();
-		for(IElement element : projectRoot.getOwnedElements()){
-			if(element instanceof IClass){
-				IClass iClass = (IClass)element;
-				classes.add(iClass);
-				for(IDiagram diagram : iClass.getDiagrams()){
-					if(diagram instanceof IStateMachineDiagram){
-						statemachines.put(iClass, ((IStateMachineDiagram)diagram).getStateMachine());
-					}
-				}
-			}
-		}
-		
-		// code generate
-		for(IClass iClass : classes){
-			//iClass.getStereotypes();	// 後々 ステレオタイプごとに生成ルールを変える
-			Properties p = new Properties();  
-			p.setProperty("input.encoding", "UTF-8");
-			p.setProperty("file.resource.loader.path","C:/Users/hosoai/git/astahm2t-github/astahm2t/template/");
-			Velocity.init(p); 
-
-			VelocityContext ctx = new VelocityContext();
-			ctx.put("c", iClass);
-			ctx.put("s", statemachines.get(iClass));
-
-			Template template = Velocity.getTemplate("sample.vm");
-			FileWriter writer = new FileWriter("C:/Users/hosoai/git/astahm2t-github/astahm2t/out/sample.cpp");
-			template.merge(ctx, writer);
-			writer.flush();
-			writer.close();
-		}
-		JOptionPane.showMessageDialog(projectAccessor.getViewManager().getMainFrame(), "Generate Finish");
-/*		
-		GroovyScriptEngine gse;
-		Binding binding = new Binding();
-		binding.setVariable("projectaccessor", projectAccessor);
-
-		// Collect models from project
-		gse = new GroovyScriptEngine(setting.getScriptPath());
-		gse.run(generatorType.getModelCollectorPath(),binding);
-		
-		// Generate Files
-		binding.setVariable("targetDir", targetDir);
-		binding.setVariable("project", projectName);
-		binding.setVariable("settings", setting);
-		binding.setVariable("generatorType", generatorType);
-		gse.run(generatorType.getFileGeneratorPath(), binding);		
-*/
-	}	
+  public static void generate() throws ClassNotFoundException, ProjectNotFoundException, IOException, HeadlessException, InvalidUsingException {
+    final GroovyGenerator generator = new GroovyGenerator();
+    final SettingManager settingManager = SettingManager.getInstance();
+    final GenerateSetting setting = settingManager.get("test");
+    final HashMap<String, Object> map = new HashMap<String, Object>();
+    final GeneratorUtils utils = new GeneratorUtils();
+    List<IClass> _classes = utils.getClasses();
+    for (final IClass iClass : _classes) {
+      {
+        utils.setIclass(iClass);
+        HashMap<IClass, IStateMachine> _statemachines = utils.getStatemachines();
+        IStateMachine _get = _statemachines.get(iClass);
+        utils.setStatemachine(_get);
+        IStateMachine _statemachine = utils.getStatemachine();
+        boolean _equals = Objects.equal(_statemachine, null);
+        InputOutput.<Boolean>println(Boolean.valueOf(_equals));
+        map.put("u", utils);
+        HashMap<String, TemplateMap> _mapping = setting.getMapping();
+        final Function2<String, TemplateMap, Boolean> _function = new Function2<String, TemplateMap, Boolean>() {
+          public Boolean apply(final String k, final TemplateMap v) {
+            GenerateType _generateType = v.getGenerateType();
+            return Boolean.valueOf(Objects.equal(_generateType, GenerateType.Default));
+          }
+        };
+        Map<String, TemplateMap> _filter = MapExtensions.<String, TemplateMap>filter(_mapping, _function);
+        Collection<TemplateMap> _values = _filter.values();
+        for (final TemplateMap mapping : _values) {
+          String _targetPath = setting.getTargetPath();
+          String _name = iClass.getName();
+          String _plus = (_targetPath + _name);
+          String _plus_1 = (_plus + ".");
+          String _fileExtension = mapping.getFileExtension();
+          String _plus_2 = (_plus_1 + _fileExtension);
+          String _templatePath = setting.getTemplatePath();
+          String _templateFile = mapping.getTemplateFile();
+          String _plus_3 = (_templatePath + _templateFile);
+          generator.doGenerate(map, _plus_2, _plus_3);
+        }
+      }
+    }
+    JFrame _frame = utils.getFrame();
+    JOptionPane.showMessageDialog(_frame, "Generate Finish");
+  }
 }

@@ -1,6 +1,11 @@
+#include <stdio.h>
 #include "Create2.h"
-Create2::Create2(Roomba* create){
-  this->create=create;
-}
-Create2::~Create2(){}
+#include "Controller.h"
 
+int main(int argc, char** args){
+	Controller* controller = Controller::getInstance();
+	controller->doAction();
+	controller->transition(Controller::PushButton);
+	controller->transition(Controller::PushBumpper);
+	controller->transition(Controller::True);
+}

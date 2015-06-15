@@ -25,12 +25,12 @@ import javax.swing.border.EmptyBorder;
 
 import jp.swest.ledcamp.setting.FileMapping;
 import jp.swest.ledcamp.setting.GeneratorType;
-import jp.swest.ledcamp.setting.SettingManager;
+import jp.swest.ledcamp.setting.SettingManager_;
 
 public class GeneratorSettingDialog extends JPanel {
 	private static final long serialVersionUID = 5098273628201593688L;
 	
-	private SettingManager settings;
+	private SettingManager_ settings;
 	private String currentType = null;
 	/* UI Components */
 	private final JPanel contentPanel = new JPanel();
@@ -44,7 +44,7 @@ public class GeneratorSettingDialog extends JPanel {
 	 */
 	public GeneratorSettingDialog() {
 		parent = this;
-		settings = SettingManager.getInstance();
+		settings = SettingManager_.getInstance();
 		setBounds(100, 100, 450, 300);
 		setLayout(new BorderLayout());
 		contentPanel.setBorder(new EmptyBorder(5, 5, 5, 5));

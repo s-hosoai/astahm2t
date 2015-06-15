@@ -1,0 +1,13 @@
+#ifndef ${c.name}_H
+#define ${c.name}_H
+#include <arduino.h>
+#include <Roomba.h>
+/* class declaration */
+class ${c.name}
+{
+public:
+/* events and states enums */
+  enum ${c.name}_State_T{
+  }instance;
+  
+#endif //${c.name}_H

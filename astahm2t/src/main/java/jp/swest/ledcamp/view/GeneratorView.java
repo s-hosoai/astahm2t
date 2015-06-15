@@ -16,7 +16,7 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 
 import jp.swest.ledcamp.generator.CodeGenerator;
-import jp.swest.ledcamp.setting.SettingManager;
+import jp.swest.ledcamp.setting.SettingManager_;
 
 import com.change_vision.jude.api.inf.project.ProjectEvent;
 import com.change_vision.jude.api.inf.project.ProjectEventListener;
@@ -29,7 +29,7 @@ public class GeneratorView extends JPanel implements IPluginExtraTabView, Projec
 	private final JPanel parent;
 	private final JComboBox<String> combo_GeneratorType;
 
-	private final SettingManager settings;
+	private final SettingManager_ settings;
 	private final CodeGenerator generator;
 	private JTextField text_ProjectName;
 
@@ -38,7 +38,7 @@ public class GeneratorView extends JPanel implements IPluginExtraTabView, Projec
 	 */
 	public GeneratorView() {
 		parent = this;
-		settings = SettingManager.getInstance();
+		settings = SettingManager_.getInstance();
 		generator = new CodeGenerator();
 		GridBagLayout gridBagLayout = new GridBagLayout();
 		gridBagLayout.columnWidths = new int[]{0, 0, 0, 0, 0};
