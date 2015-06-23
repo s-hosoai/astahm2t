@@ -27,16 +27,6 @@ public class TemplateMap {
   public TemplateMap() {
   }
   
-  /**
-   * new (String key, TemplateType generateType, String templateFile, String fileName, String fileExtension, String stereotype){
-   * this.key = key
-   * this.generateType = generateType
-   * this.templateFile = templateFile
-   * this.fileName = fileName
-   * this.fileExtension = fileExtension
-   * this.stereotype = stereotype
-   * }
-   */
   public static TemplateMap newGlobalTemplateMap(final String templateFile, final String fileName) {
     final TemplateMap globalTemplateMap = new TemplateMap();
     globalTemplateMap.templateFile = templateFile;

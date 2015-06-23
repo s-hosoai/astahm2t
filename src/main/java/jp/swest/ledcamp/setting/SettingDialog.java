@@ -350,12 +350,13 @@ public class SettingDialog extends JDialog {
       EmptyBorder _emptyBorder = new EmptyBorder(5, 5, 5, 5);
       this.contentPanel.setBorder(_emptyBorder);
       root.add(this.contentPanel, BorderLayout.CENTER);
-      GridBagLayout gbl = new GridBagLayout();
+      final GridBagLayout gbl = new GridBagLayout();
       gbl.columnWeights = new double[] { 0, 0, 0, 0 };
       gbl.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
       gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
       gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
       this.contentPanel.setLayout(gbl);
+      final Insets insets = new Insets(0, 0, 5, 5);
       {
         JComboBox<String> _jComboBox = new JComboBox<String>();
         this.combo_templateSet = _jComboBox;
@@ -368,65 +369,73 @@ public class SettingDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.anchor = GridBagConstraints.ABOVE_BASELINE;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 0;
         gbc.gridy = 0;
         this.contentPanel.add(this.combo_templateSet, gbc);
       }
       {
-        JButton _jButton = new JButton("Add");
-        this.btnAddSet = _jButton;
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
-            boolean _notEquals = (!Objects.equal(setName, null));
-            if (_notEquals) {
-              SettingDialog.this.combo_templateSet.addItem(setName);
-              SettingDialog.this.combo_templateSet.setSelectedItem(setName);
-              final GenerateSetting generateSetting = new GenerateSetting();
-              SettingDialog.this.manager.put(setName, generateSetting);
-              SettingDialog.this.manager.setCurrentSetting(generateSetting);
-              SettingDialog.this.enableAll();
-            }
-          }
-        };
-        this.btnAddSet.addActionListener(_function);
+        JPanel paneButton = new JPanel();
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
         gbc.gridx = 1;
         gbc.gridy = 0;
-        this.contentPanel.add(this.btnAddSet, gbc);
-      }
-      {
-        final JButton btnRemoveSet = new JButton("Remove");
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            final Object selectedSet = SettingDialog.this.combo_templateSet.getSelectedItem();
-            SettingDialog.this.combo_templateSet.removeItem(selectedSet);
-            SettingDialog.this.manager.remove(selectedSet);
-            final Object afterSelectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
-            boolean _notEquals = (!Objects.equal(afterSelectedItem, null));
-            if (_notEquals) {
-              Object _selectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
-              GenerateSetting _get = SettingDialog.this.manager.get(_selectedItem);
-              SettingDialog.this.manager.setCurrentSetting(_get);
-            } else {
-              SettingDialog.this.manager.setCurrentSetting(null);
-              SettingDialog.this.disableAll();
-            }
-          }
-        };
-        btnRemoveSet.addActionListener(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = insets;
         gbc.anchor = GridBagConstraints.WEST;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
-        gbc.gridx = 2;
-        gbc.gridy = 0;
-        this.contentPanel.add(btnRemoveSet, gbc);
+        this.contentPanel.add(paneButton, gbc);
+        {
+          JButton _jButton = new JButton("Add");
+          this.btnAddSet = _jButton;
+          final ActionListener _function = new ActionListener() {
+            public void actionPerformed(final ActionEvent it) {
+              String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
+              boolean _notEquals = (!Objects.equal(setName, null));
+              if (_notEquals) {
+                SettingDialog.this.combo_templateSet.addItem(setName);
+                SettingDialog.this.combo_templateSet.setSelectedItem(setName);
+                final GenerateSetting generateSetting = new GenerateSetting();
+                SettingDialog.this.manager.put(setName, generateSetting);
+                SettingDialog.this.manager.setCurrentSetting(generateSetting);
+                SettingDialog.this.enableAll();
+              }
+            }
+          };
+          this.btnAddSet.addActionListener(_function);
+          GridBagConstraints _gridBagConstraints = new GridBagConstraints();
+          gbc = _gridBagConstraints;
+          gbc.anchor = GridBagConstraints.WEST;
+          gbc.insets = insets;
+          gbc.gridx = 1;
+          gbc.gridy = 0;
+          paneButton.add(this.btnAddSet, gbc);
+        }
+        {
+          final JButton btnRemoveSet = new JButton("Remove");
+          final ActionListener _function = new ActionListener() {
+            public void actionPerformed(final ActionEvent it) {
+              final Object selectedSet = SettingDialog.this.combo_templateSet.getSelectedItem();
+              SettingDialog.this.combo_templateSet.removeItem(selectedSet);
+              SettingDialog.this.manager.remove(selectedSet);
+              final Object afterSelectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
+              boolean _notEquals = (!Objects.equal(afterSelectedItem, null));
+              if (_notEquals) {
+                Object _selectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
+                GenerateSetting _get = SettingDialog.this.manager.get(_selectedItem);
+                SettingDialog.this.manager.setCurrentSetting(_get);
+              } else {
+                SettingDialog.this.manager.setCurrentSetting(null);
+                SettingDialog.this.disableAll();
+              }
+            }
+          };
+          btnRemoveSet.addActionListener(_function);
+          GridBagConstraints _gridBagConstraints = new GridBagConstraints();
+          gbc = _gridBagConstraints;
+          gbc.anchor = GridBagConstraints.WEST;
+          gbc.insets = insets;
+          gbc.gridx = 2;
+          gbc.gridy = 0;
+          paneButton.add(btnRemoveSet, gbc);
+        }
       }
       {
         final JLabel lblTemplateEngine = new JLabel("Template Engine");
@@ -471,8 +480,7 @@ public class SettingDialog extends JDialog {
         this.textTemplateDir = _jTextField;
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 1;
         gbc.gridy = 2;
         this.contentPanel.add(this.textTemplateDir, gbc);
@@ -488,8 +496,7 @@ public class SettingDialog extends JDialog {
         };
         btnTempDirBrowse.addActionListener(_function);
         GridBagConstraints gbc = new GridBagConstraints();
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 2;
         gbc.gridy = 2;
         this.contentPanel.add(btnTempDirBrowse, gbc);
@@ -509,8 +516,7 @@ public class SettingDialog extends JDialog {
         this.textDestinationPath = _jTextField;
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 1;
         gbc.gridy = 3;
         this.contentPanel.add(this.textDestinationPath, gbc);
@@ -524,8 +530,7 @@ public class SettingDialog extends JDialog {
         };
         btnDestBrowse.addActionListener(_function);
         GridBagConstraints gbc = new GridBagConstraints();
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 2;
         gbc.gridy = 3;
         this.contentPanel.add(btnDestBrowse, gbc);
@@ -535,8 +540,7 @@ public class SettingDialog extends JDialog {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.BOTH;
         gbc.gridwidth = 3;
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 0;
         gbc.gridy = 4;
         this.contentPanel.add(scrollPane, gbc);
@@ -559,8 +563,7 @@ public class SettingDialog extends JDialog {
         };
         btnAddTemplate.addActionListener(_function);
         GridBagConstraints gbc = new GridBagConstraints();
-        Insets _insets = new Insets(0, 0, 5, 5);
-        gbc.insets = _insets;
+        gbc.insets = insets;
         gbc.gridx = 0;
         gbc.gridy = 5;
         this.contentPanel.add(btnAddTemplate, gbc);

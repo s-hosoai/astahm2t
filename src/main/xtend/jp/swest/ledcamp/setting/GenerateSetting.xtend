@@ -15,20 +15,12 @@ class GenerateSetting {
 }
 class TemplateMap {
         @Accessors String key
-        @Accessors TemplateType generateType // enum : stereotype, global, default
+        @Accessors TemplateType generateType 
         @Accessors String templateFile
-        @Accessors String fileName // if filename is null, {Classname}+fileExtension
+        @Accessors String fileName
         @Accessors String fileExtension
         @Accessors String stereotype
         new(){}
-/*        new (String key, TemplateType generateType, String templateFile, String fileName, String fileExtension, String stereotype){
-            this.key = key
-            this.generateType = generateType
-            this.templateFile = templateFile
-            this.fileName = fileName
-            this.fileExtension = fileExtension
-            this.stereotype = stereotype
-        }*/
         static def newGlobalTemplateMap(String templateFile, String fileName){
             val globalTemplateMap = new TemplateMap
             globalTemplateMap.templateFile = templateFile
@@ -54,13 +46,5 @@ enum TemplateType{
     Stereotype, Default, Global
 }
 enum TemplateEngine{
-    Groovy, Velocity
+    Groovy //, Velocity
 }
-/* persist sample
-
-<templates>
- <template name=id, engine=engine, targetPath=path, templatePath=path>
-  <map key=key, generateType=type, templateFile=file, filename=name, fileExtension=name />
- </template>
-<templates>
- */
