@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<settingManager>
+    <map>
+        <entry>
+            <key>test</key>
+            <value>
+                <mapping>
+                    <entry>
+                        <key>cpp</key>
+                        <value>
+                            <fileExtension>cpp</fileExtension>
+                            <generateType>Default</generateType>
+                            <key>cpp</key>
+                            <templateFile>cpp.template</templateFile>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>header</key>
+                        <value>
+                            <fileExtension>h</fileExtension>
+                            <generateType>Default</generateType>
+                            <key>header</key>
+                            <templateFile>header.template</templateFile>
+                        </value>
+                    </entry>
+                    <entry>
+                        <key>ino</key>
+                        <value>
+                            <fileExtension>ino</fileExtension>
+                            <generateType>Global</generateType>
+                            <key>ino</key>
+                            <templateFile>arduino.template</templateFile>
+                        </value>
+                    </entry>
+                </mapping>
+                <targetPath>C:/Users/hosoai/git/astahm2t-github/astahm2t/out/</targetPath>
+                <templateEngine>groovy</templateEngine>
+                <templateID>test</templateID>
+                <templatePath>C:/Users/hosoai/git/astahm2t-github/astahm2t/template/</templatePath>
+            </value>
+        </entry>
+    </map>
+</settingManager>

@@ -1,3 +1,8 @@
 *.class
 *.bak
 *.lock
+/target/
+/target/
+/target/
+/target/
+/target/
