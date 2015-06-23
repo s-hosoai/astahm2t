@@ -10,7 +10,7 @@ public class TemplateMap {
   private String key;
   
   @Accessors
-  private TemplateType generateType;
+  private TemplateType templateType;
   
   @Accessors
   private String templateFile;
@@ -59,12 +59,12 @@ public class TemplateMap {
   }
   
   @Pure
-  public TemplateType getGenerateType() {
-    return this.generateType;
+  public TemplateType getTemplateType() {
+    return this.templateType;
   }
   
-  public void setGenerateType(final TemplateType generateType) {
-    this.generateType = generateType;
+  public void setTemplateType(final TemplateType templateType) {
+    this.templateType = templateType;
   }
   
   @Pure

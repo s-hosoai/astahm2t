@@ -2,20 +2,21 @@ package jp.swest.ledcamp.setting
 
 import java.util.HashMap
 import org.eclipse.xtend.lib.annotations.Accessors
+import java.util.HashSet
 
 class GenerateSetting {
     @Accessors String templateID
     @Accessors TemplateEngine templateEngine
     @Accessors String targetPath
     @Accessors String templatePath
-    @Accessors HashMap<String, TemplateMap> mapping
+    @Accessors HashSet<TemplateMap> mapping
     new(){
-        mapping = new HashMap
+        mapping = new HashSet
     }
 }
 class TemplateMap {
         @Accessors String key
-        @Accessors TemplateType generateType 
+        @Accessors TemplateType templateType 
         @Accessors String templateFile
         @Accessors String fileName
         @Accessors String fileExtension

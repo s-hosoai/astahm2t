@@ -25,6 +25,8 @@ import javax.swing.border.EmptyBorder
 import org.eclipse.xtend.lib.annotations.Accessors
 import java.awt.GridLayout
 import javax.swing.JOptionPane
+import javax.swing.event.DocumentListener
+import javax.swing.event.DocumentEvent
 
 class SettingDialog extends JDialog {
 	private SettingManager manager = SettingManager.getInstance
@@ -74,17 +76,17 @@ class SettingDialog extends JDialog {
 			gbc.insets = insets
 			gbc.anchor = GridBagConstraints.WEST
 			contentPanel.add(paneButton, gbc)
-
 			{
 				btnAddSet = new JButton("Add")
 				btnAddSet.addActionListener [
-					var setName = JOptionPane.showInputDialog(this, "please input templateSet name")
+					val setName = JOptionPane.showInputDialog(this, "please input templateSet name")
 					if (setName != null) {
-						combo_templateSet.addItem(setName)
-						combo_templateSet.selectedItem = setName
 						val generateSetting = new GenerateSetting
 						manager.put(setName, generateSetting)
 						manager.currentSetting = generateSetting
+						manager.currentSetting.templateID = setName
+						combo_templateSet.addItem(setName)
+						combo_templateSet.selectedItem = setName
 						enableAll
 					}
 				]
@@ -147,6 +149,7 @@ class SettingDialog extends JDialog {
 		}
 		{
 			textTemplateDir = new JTextField
+			new TextBinding(textTemplateDir, [manager.currentSetting.setTemplatePath(it)])
 			var gbc = new GridBagConstraints
 			gbc.fill = GridBagConstraints.HORIZONTAL
 			gbc.insets = insets
@@ -156,8 +159,8 @@ class SettingDialog extends JDialog {
 		}
 		{
 			val btnTempDirBrowse = new JButton("...")
-			btnTempDirBrowse.addActionListener[
-				browseDirectory(System.getProperty("user.home") + "/.astah/plugins/m2t/", textTemplateDir)]
+			btnTempDirBrowse.addActionListener[ println(manager.currentSetting)]//.templatePath)]
+//				browseDirectory(System.getProperty("user.home") + "/.astah/plugins/m2t/", textTemplateDir)]
 			var gbc = new GridBagConstraints
 			gbc.insets = insets
 			gbc.gridx = 2
@@ -175,6 +178,7 @@ class SettingDialog extends JDialog {
 		}
 		{
 			textDestinationPath = new JTextField
+			new TextBinding(textDestinationPath, [manager.currentSetting.setTargetPath(it)])
 			var gbc = new GridBagConstraints
 			gbc.fill = GridBagConstraints.HORIZONTAL
 			gbc.insets = insets
@@ -210,7 +214,9 @@ class SettingDialog extends JDialog {
 			val btnAddTemplate = new JButton("Add template")
 			btnAddTemplate.addActionListener(
 				[
-					val template = new TemplatePanel(this)
+					val map = new TemplateMap
+					val template = new TemplatePanel(this, map)
+					manager.currentSetting.mapping.add(map)
 					templatePanel.add(template)
 					templatePanel.revalidate
 				])
@@ -266,12 +272,18 @@ class SettingDialog extends JDialog {
 		if (templateSet == null) {
 			return
 		}
-		val c = manager.get(templateSet)
+		val c = manager.get(templateSet as String)
 		manager.currentSetting = c
 		textTemplateDir.text = c?.templatePath
 		textDestinationPath.text = c?.targetPath
-		c?.mapping?.forEach [ key, map |
+		templatePanel.removeAll
+		templatePanel.revalidate
+		templatePanel.repaint
+		println(c.mapping)
+		c?.mapping?.forEach [ map |
 			templatePanel.add(new TemplatePanel(this, map))
+			templatePanel.revalidate
+			templatePanel.repaint
 		]
 	}
 
@@ -288,44 +300,83 @@ class SettingDialog extends JDialog {
 	}
 
 	static class TemplatePanel extends JPanel {
+		private SettingDialog settingDialog
+		private TemplateMap map
 		private JComboBox<TemplateType> comboType
 		private JPanel cardPane
 		private CardLayout typeCardLayout
-		private JTextField templateFile
+		private JTextField templateFile_G
+		private JTextField templateFile_D
+		private JTextField templateFile_S
 		private JTextField fileName
-		private JTextField fileExtension
+		private JTextField fileExtension_D
+		private JTextField fileExtension_S
 		private JTextField stereotype
 
-		new(SettingDialog settingDialog) {
-			initComponent(settingDialog)
-		}
-
 		new(SettingDialog settingDialog, TemplateMap map) {
-			this(settingDialog)
-			comboType.selectedItem = map.generateType
-			templateFile.text = map.templateFile
-			switch (map.generateType) {
-				case TemplateType.Global:
+			this.settingDialog = settingDialog
+			this.map = map
+			initComponent(settingDialog)
+			println("map templatetype "+map.templateType)
+
+			if(map.templateType!=null){
+				comboType.selectedItem = map.templateType
+				println(comboType.selectedItem)
+			}else{
+				comboType.selectedItem = TemplateType.Default
+			}
+			switch (map.getTemplateType) {
+				case Global: {
+					templateFile_G.text = map.templateFile
+					templateFile_G.foreground = Color.BLACK
 					fileName.text = map.fileName
-				case TemplateType.Default:
-					fileExtension.text = map.fileExtension
-				case Stereotype: {
-					stereotype.text = map.stereotype
-					fileExtension.text = map.fileExtension
+					fileName.foreground = Color.BLACK
 				}
+				case Default: {
+					templateFile_D.text = map.templateFile
+					templateFile_D.foreground = Color.BLACK
+					fileExtension_D.text = map.fileExtension
+					fileExtension_D.foreground = Color.BLACK
+				}
+				case Stereotype: {
+					templateFile_S.text = map.templateFile
+					templateFile_S.foreground = Color.BLACK
+					stereotype.text = map.stereotype
+					fileExtension_S.text = map.fileExtension
+					stereotype.foreground = Color.BLACK
+					fileExtension_S.foreground = Color.BLACK
+				}
+				default:
+					println("select default")
 			}
 		}
 
+		override getPreferredSize() {
+			return new Dimension(settingDialog.templatePanel.getSize().width - 10, 30)
+		}
+
+		override getMaximumSize() {
+			return new Dimension(settingDialog.templatePanel.getSize().width, 30)
+		}
+
+		override getMinimumSize() {
+			return new Dimension(settingDialog?.templatePanel?.getSize().width, 30)
+		}
+
 		def initComponent(SettingDialog settingDialog) {
-			println(settingDialog.contentPanel.width)
-			this.layout = new BorderLayout()
-			this.maximumSize = new Dimension(settingDialog.contentPanel.width, 30);
+			this.layout = new BorderLayout();
 			{
 				comboType = new JComboBox
 				typeCardLayout = new CardLayout
 				TemplateType.values.forEach[comboType.addItem(it)]
 				comboType.addActionListener [
-					typeCardLayout.show(cardPane, comboType.getItemAt(comboType.selectedIndex).name)
+					if(comboType.selectedIndex != -1){
+						val item = comboType.getItemAt(comboType.selectedIndex)
+						typeCardLayout.show(cardPane, item.name)
+						println(map.templateType +"->"+item )
+						map.templateType = item
+						println("setted" + map.templateType)
+					}
 				]
 				add(comboType, BorderLayout.WEST)
 			}
@@ -339,63 +390,65 @@ class SettingDialog extends JDialog {
 					cardPane.add(globalCard, TemplateType.Global.name)
 					{
 						fileName = new JTextField("file name")
+						new TextBinding(fileName, [map.fileName = it])
 						fileName.foreground = Color.GRAY
 						fileName.addFocusListener(clearField(fileName))
 						globalCard.add(fileName)
 					}
 					{
-						templateFile = new JTextField("template file path")
-						templateFile.foreground = Color.GRAY
-						templateFile.addFocusListener(browseFile(settingDialog.textTemplateDir.getText(), templateFile))
-						globalCard.add(templateFile)
+						templateFile_G = new JTextField("template file path")
+						new TextBinding(templateFile_G, [map.templateFile = it])
+						templateFile_G.foreground = Color.GRAY
+						templateFile_G.addFocusListener(
+							browseFile(settingDialog.textTemplateDir.getText(), templateFile_G))
+						globalCard.add(templateFile_G)
 					}
 				}
 				{ // Default Card
 					val defaultCard = new JPanel
 					defaultCard.layout = new GridLayout(1, 2)
-
-					//new BoxLayout(defaultCard, BoxLayout.X_AXIS)
 					cardPane.add(defaultCard, TemplateType.Default.name)
 					{
-						fileExtension = new JTextField("file extension")
-						fileExtension.foreground = Color.GRAY
-						fileExtension.addFocusListener(clearField(fileExtension))
-						defaultCard.add(fileExtension)
+						fileExtension_D = new JTextField("file extension")
+						new TextBinding(fileExtension_D, [map.fileExtension = it])
+						fileExtension_D.foreground = Color.GRAY
+						fileExtension_D.addFocusListener(clearField(fileExtension_D))
+						defaultCard.add(fileExtension_D)
 					}
 					{
-						templateFile = new JTextField("template file path")
-						templateFile.foreground = Color.GRAY
-						templateFile.addFocusListener(browseFile(settingDialog.textTemplateDir.getText(), templateFile))
-						defaultCard.add(templateFile)
+						templateFile_D = new JTextField("template file path")
+						new TextBinding(templateFile_D, [map.templateFile = it])
+						templateFile_D.foreground = Color.GRAY
+						templateFile_D.addFocusListener(
+							browseFile(settingDialog.textTemplateDir.getText(), templateFile_D))
+						defaultCard.add(templateFile_D)
 					}
-
 				}
 				{ // Stereotype Card                    
 					val stereotypeCard = new JPanel
 					stereotypeCard.layout = new GridLayout(1, 3)
-
-					//new BoxLayout(stereotypeCard, BoxLayout.X_AXIS)
 					cardPane.add(stereotypeCard, TemplateType.Stereotype.name)
 					{
 						stereotype = new JTextField("stereotype")
+						new TextBinding(templateFile_G, [map.templateFile = it])
 						stereotype.foreground = Color.GRAY
 						stereotype.addFocusListener(clearField(stereotype))
 						stereotypeCard.add(stereotype)
 					}
 					{
-						fileExtension = new JTextField("file extension")
-						fileExtension.foreground = Color.GRAY
-						fileExtension.addFocusListener(clearField(fileExtension))
-						stereotypeCard.add(fileExtension)
+						fileExtension_S = new JTextField("file extension")
+						fileExtension_S.foreground = Color.GRAY
+						fileExtension_S.addFocusListener(clearField(fileExtension_S))
+						stereotypeCard.add(fileExtension_S)
 					}
 					{
-						templateFile = new JTextField("template file path")
-						templateFile.foreground = Color.GRAY
-						templateFile.addFocusListener(browseFile(settingDialog.textTemplateDir.getText(), templateFile))
-						stereotypeCard.add(templateFile)
+						templateFile_S = new JTextField("template file path")
+						templateFile_S.foreground = Color.GRAY
+						templateFile_S.addFocusListener(
+							browseFile(settingDialog.textTemplateDir.getText(), templateFile_S))
+						stereotypeCard.add(templateFile_S)
 					}
 				}
-				comboType.selectedItem = TemplateType.Default
 			}
 			{
 				val btnRemove = new JButton("x")
@@ -403,26 +456,13 @@ class SettingDialog extends JDialog {
 				btnRemove.addActionListener(
 					[
 						val owner = thisPanel.parent
+						settingDialog.manager.currentSetting.mapping.remove(thisPanel.map)
 						owner.remove(thisPanel)
 						owner.revalidate
 						owner.repaint
 					])
 				add(btnRemove, BorderLayout.EAST)
 			}
-		}
-
-		def getMapping() {
-			var TemplateMap map = null
-			switch (comboType.getItemAt(comboType.selectedIndex)) {
-				case Global:
-					map = TemplateMap.newGlobalTemplateMap(templateFile.text, fileName.text)
-				case Default:
-					map = TemplateMap.newDefaultTemplateMap(templateFile.text, fileExtension.text)
-				case Stereotype:
-					map = TemplateMap.newStereotypeTemplateMap(templateFile.text,
-						fileExtension.text, stereotype.text)
-			}
-			return map
 		}
 
 		private def browseFile(String path, JTextField field) {
@@ -465,4 +505,26 @@ class SettingDialog extends JDialog {
 			}
 		}
 	}
+}
+
+class TextBinding implements DocumentListener {
+	private Consumer setterFunction
+	private JTextField field
+
+	new(JTextField field, Consumer setterFunction) {
+		field.document.addDocumentListener(this)
+		this.field = field
+		this.setterFunction = setterFunction
+	}
+
+	override changedUpdate(DocumentEvent e) {}
+	override insertUpdate(DocumentEvent e) {
+		setterFunction.accespt(field.text)
+	}
+	override removeUpdate(DocumentEvent e) {
+		setterFunction.accespt(field.text)
+	}
+}
+interface Consumer<T>{
+	def void accespt(T a)
 }

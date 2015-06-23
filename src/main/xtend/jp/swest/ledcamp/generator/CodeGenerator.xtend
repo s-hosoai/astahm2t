@@ -22,7 +22,7 @@ class CodeGenerator {
             utils.statemachine = utils.statemachines.get(iClass)
             println(utils.statemachine==null)
             map.put("u", utils)
-            for(mapping : setting.mapping.filter[k,v|v.generateType==TemplateType::Default].values){
+            for(mapping : setting.mapping.filter[v|v.templateType==TemplateType::Default]){
                 generator.doGenerate(map, setting.targetPath+iClass.name+"."+mapping.fileExtension, setting.templatePath+mapping.templateFile)
             }
         }

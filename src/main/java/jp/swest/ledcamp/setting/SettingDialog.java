@@ -17,7 +17,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Set;
 import javax.swing.BoxLayout;
@@ -33,78 +33,127 @@ import javax.swing.JRootPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.border.EmptyBorder;
+import jp.swest.ledcamp.setting.Consumer;
 import jp.swest.ledcamp.setting.GenerateSetting;
 import jp.swest.ledcamp.setting.SettingManager;
 import jp.swest.ledcamp.setting.TemplateEngine;
 import jp.swest.ledcamp.setting.TemplateMap;
 import jp.swest.ledcamp.setting.TemplateType;
+import jp.swest.ledcamp.setting.TextBinding;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
-import org.eclipse.xtext.xbase.lib.MapExtensions;
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure2;
 import org.eclipse.xtext.xbase.lib.Pure;
 
 @SuppressWarnings("all")
 public class SettingDialog extends JDialog {
   public static class TemplatePanel extends JPanel {
+    private SettingDialog settingDialog;
+    
+    private TemplateMap map;
+    
     private JComboBox<TemplateType> comboType;
     
     private JPanel cardPane;
     
     private CardLayout typeCardLayout;
     
-    private JTextField templateFile;
+    private JTextField templateFile_G;
+    
+    private JTextField templateFile_D;
+    
+    private JTextField templateFile_S;
     
     private JTextField fileName;
     
-    private JTextField fileExtension;
+    private JTextField fileExtension_D;
+    
+    private JTextField fileExtension_S;
     
     private JTextField stereotype;
     
-    public TemplatePanel(final SettingDialog settingDialog) {
-      this.initComponent(settingDialog);
-    }
-    
     public TemplatePanel(final SettingDialog settingDialog, final TemplateMap map) {
-      this(settingDialog);
-      TemplateType _generateType = map.getGenerateType();
-      this.comboType.setSelectedItem(_generateType);
-      String _templateFile = map.getTemplateFile();
-      this.templateFile.setText(_templateFile);
-      TemplateType _generateType_1 = map.getGenerateType();
-      if (_generateType_1 != null) {
-        switch (_generateType_1) {
+      this.settingDialog = settingDialog;
+      this.map = map;
+      this.initComponent(settingDialog);
+      TemplateType _templateType = map.getTemplateType();
+      String _plus = ("map templatetype " + _templateType);
+      InputOutput.<String>println(_plus);
+      TemplateType _templateType_1 = map.getTemplateType();
+      boolean _notEquals = (!Objects.equal(_templateType_1, null));
+      if (_notEquals) {
+        TemplateType _templateType_2 = map.getTemplateType();
+        this.comboType.setSelectedItem(_templateType_2);
+        Object _selectedItem = this.comboType.getSelectedItem();
+        InputOutput.<Object>println(_selectedItem);
+      } else {
+        this.comboType.setSelectedItem(TemplateType.Default);
+      }
+      TemplateType _templateType_3 = map.getTemplateType();
+      if (_templateType_3 != null) {
+        switch (_templateType_3) {
           case Global:
+            String _templateFile = map.getTemplateFile();
+            this.templateFile_G.setText(_templateFile);
+            this.templateFile_G.setForeground(Color.BLACK);
             String _fileName = map.getFileName();
             this.fileName.setText(_fileName);
+            this.fileName.setForeground(Color.BLACK);
             break;
           case Default:
+            String _templateFile_1 = map.getTemplateFile();
+            this.templateFile_D.setText(_templateFile_1);
+            this.templateFile_D.setForeground(Color.BLACK);
             String _fileExtension = map.getFileExtension();
-            this.fileExtension.setText(_fileExtension);
+            this.fileExtension_D.setText(_fileExtension);
+            this.fileExtension_D.setForeground(Color.BLACK);
             break;
           case Stereotype:
+            String _templateFile_2 = map.getTemplateFile();
+            this.templateFile_S.setText(_templateFile_2);
+            this.templateFile_S.setForeground(Color.BLACK);
             String _stereotype = map.getStereotype();
             this.stereotype.setText(_stereotype);
             String _fileExtension_1 = map.getFileExtension();
-            this.fileExtension.setText(_fileExtension_1);
+            this.fileExtension_S.setText(_fileExtension_1);
+            this.stereotype.setForeground(Color.BLACK);
+            this.fileExtension_S.setForeground(Color.BLACK);
             break;
           default:
+            InputOutput.<String>println("select default");
             break;
         }
+      } else {
+        InputOutput.<String>println("select default");
       }
     }
     
+    public Dimension getPreferredSize() {
+      return new Dimension((this.settingDialog.templatePanel.getSize().width - 10), 30);
+    }
+    
+    public Dimension getMaximumSize() {
+      Dimension _size = this.settingDialog.templatePanel.getSize();
+      return new Dimension(_size.width, 30);
+    }
+    
+    public Dimension getMinimumSize() {
+      JPanel _templatePanel = null;
+      if (this.settingDialog!=null) {
+        _templatePanel=this.settingDialog.templatePanel;
+      }
+      Dimension _size = null;
+      if (_templatePanel!=null) {
+        _size=_templatePanel.getSize();
+      }
+      return new Dimension(_size.width, 30);
+    }
+    
     public void initComponent(final SettingDialog settingDialog) {
-      int _width = settingDialog.contentPanel.getWidth();
-      InputOutput.<Integer>println(Integer.valueOf(_width));
       BorderLayout _borderLayout = new BorderLayout();
       this.setLayout(_borderLayout);
-      int _width_1 = settingDialog.contentPanel.getWidth();
-      Dimension _dimension = new Dimension(_width_1, 30);
-      this.setMaximumSize(_dimension);
       {
         JComboBox<TemplateType> _jComboBox = new JComboBox<TemplateType>();
         this.comboType = _jComboBox;
@@ -120,9 +169,21 @@ public class SettingDialog extends JDialog {
         final ActionListener _function_1 = new ActionListener() {
           public void actionPerformed(final ActionEvent it) {
             int _selectedIndex = TemplatePanel.this.comboType.getSelectedIndex();
-            TemplateType _itemAt = TemplatePanel.this.comboType.getItemAt(_selectedIndex);
-            String _name = _itemAt.name();
-            TemplatePanel.this.typeCardLayout.show(TemplatePanel.this.cardPane, _name);
+            boolean _notEquals = (_selectedIndex != (-1));
+            if (_notEquals) {
+              int _selectedIndex_1 = TemplatePanel.this.comboType.getSelectedIndex();
+              final TemplateType item = TemplatePanel.this.comboType.getItemAt(_selectedIndex_1);
+              String _name = item.name();
+              TemplatePanel.this.typeCardLayout.show(TemplatePanel.this.cardPane, _name);
+              TemplateType _templateType = TemplatePanel.this.map.getTemplateType();
+              String _plus = (_templateType + "->");
+              String _plus_1 = (_plus + item);
+              InputOutput.<String>println(_plus_1);
+              TemplatePanel.this.map.setTemplateType(item);
+              TemplateType _templateType_1 = TemplatePanel.this.map.getTemplateType();
+              String _plus_2 = ("setted" + _templateType_1);
+              InputOutput.<String>println(_plus_2);
+            }
           }
         };
         this.comboType.addActionListener(_function_1);
@@ -142,6 +203,12 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("file name");
             this.fileName = _jTextField;
+            final Consumer<String> _function = new Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setFileName(it);
+              }
+            };
+            new TextBinding(this.fileName, _function);
             this.fileName.setForeground(Color.GRAY);
             FocusAdapter _clearField = this.clearField(this.fileName);
             this.fileName.addFocusListener(_clearField);
@@ -149,12 +216,18 @@ public class SettingDialog extends JDialog {
           }
           {
             JTextField _jTextField = new JTextField("template file path");
-            this.templateFile = _jTextField;
-            this.templateFile.setForeground(Color.GRAY);
+            this.templateFile_G = _jTextField;
+            final Consumer<String> _function = new Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setTemplateFile(it);
+              }
+            };
+            new TextBinding(this.templateFile_G, _function);
+            this.templateFile_G.setForeground(Color.GRAY);
             String _text = settingDialog.textTemplateDir.getText();
-            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile);
-            this.templateFile.addFocusListener(_browseFile);
-            globalCard.add(this.templateFile);
+            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile_G);
+            this.templateFile_G.addFocusListener(_browseFile);
+            globalCard.add(this.templateFile_G);
           }
         }
         {
@@ -165,20 +238,32 @@ public class SettingDialog extends JDialog {
           this.cardPane.add(defaultCard, _name);
           {
             JTextField _jTextField = new JTextField("file extension");
-            this.fileExtension = _jTextField;
-            this.fileExtension.setForeground(Color.GRAY);
-            FocusAdapter _clearField = this.clearField(this.fileExtension);
-            this.fileExtension.addFocusListener(_clearField);
-            defaultCard.add(this.fileExtension);
+            this.fileExtension_D = _jTextField;
+            final Consumer<String> _function = new Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setFileExtension(it);
+              }
+            };
+            new TextBinding(this.fileExtension_D, _function);
+            this.fileExtension_D.setForeground(Color.GRAY);
+            FocusAdapter _clearField = this.clearField(this.fileExtension_D);
+            this.fileExtension_D.addFocusListener(_clearField);
+            defaultCard.add(this.fileExtension_D);
           }
           {
             JTextField _jTextField = new JTextField("template file path");
-            this.templateFile = _jTextField;
-            this.templateFile.setForeground(Color.GRAY);
+            this.templateFile_D = _jTextField;
+            final Consumer<String> _function = new Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setTemplateFile(it);
+              }
+            };
+            new TextBinding(this.templateFile_D, _function);
+            this.templateFile_D.setForeground(Color.GRAY);
             String _text = settingDialog.textTemplateDir.getText();
-            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile);
-            this.templateFile.addFocusListener(_browseFile);
-            defaultCard.add(this.templateFile);
+            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile_D);
+            this.templateFile_D.addFocusListener(_browseFile);
+            defaultCard.add(this.templateFile_D);
           }
         }
         {
@@ -190,6 +275,12 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("stereotype");
             this.stereotype = _jTextField;
+            final Consumer<String> _function = new Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setTemplateFile(it);
+              }
+            };
+            new TextBinding(this.templateFile_G, _function);
             this.stereotype.setForeground(Color.GRAY);
             FocusAdapter _clearField = this.clearField(this.stereotype);
             this.stereotype.addFocusListener(_clearField);
@@ -197,23 +288,22 @@ public class SettingDialog extends JDialog {
           }
           {
             JTextField _jTextField = new JTextField("file extension");
-            this.fileExtension = _jTextField;
-            this.fileExtension.setForeground(Color.GRAY);
-            FocusAdapter _clearField = this.clearField(this.fileExtension);
-            this.fileExtension.addFocusListener(_clearField);
-            stereotypeCard.add(this.fileExtension);
+            this.fileExtension_S = _jTextField;
+            this.fileExtension_S.setForeground(Color.GRAY);
+            FocusAdapter _clearField = this.clearField(this.fileExtension_S);
+            this.fileExtension_S.addFocusListener(_clearField);
+            stereotypeCard.add(this.fileExtension_S);
           }
           {
             JTextField _jTextField = new JTextField("template file path");
-            this.templateFile = _jTextField;
-            this.templateFile.setForeground(Color.GRAY);
+            this.templateFile_S = _jTextField;
+            this.templateFile_S.setForeground(Color.GRAY);
             String _text = settingDialog.textTemplateDir.getText();
-            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile);
-            this.templateFile.addFocusListener(_browseFile);
-            stereotypeCard.add(this.templateFile);
+            FocusAdapter _browseFile = this.browseFile(_text, this.templateFile_S);
+            this.templateFile_S.addFocusListener(_browseFile);
+            stereotypeCard.add(this.templateFile_S);
           }
         }
-        this.comboType.setSelectedItem(TemplateType.Default);
       }
       {
         final JButton btnRemove = new JButton("x");
@@ -221,6 +311,9 @@ public class SettingDialog extends JDialog {
         final ActionListener _function = new ActionListener() {
           public void actionPerformed(final ActionEvent it) {
             final Container owner = thisPanel.getParent();
+            GenerateSetting _currentSetting = settingDialog.manager.getCurrentSetting();
+            HashSet<TemplateMap> _mapping = _currentSetting.getMapping();
+            _mapping.remove(thisPanel.map);
             owner.remove(thisPanel);
             owner.revalidate();
             owner.repaint();
@@ -229,38 +322,6 @@ public class SettingDialog extends JDialog {
         btnRemove.addActionListener(_function);
         this.add(btnRemove, BorderLayout.EAST);
       }
-    }
-    
-    public TemplateMap getMapping() {
-      TemplateMap map = null;
-      int _selectedIndex = this.comboType.getSelectedIndex();
-      TemplateType _itemAt = this.comboType.getItemAt(_selectedIndex);
-      if (_itemAt != null) {
-        switch (_itemAt) {
-          case Global:
-            String _text = this.templateFile.getText();
-            String _text_1 = this.fileName.getText();
-            TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap(_text, _text_1);
-            map = _newGlobalTemplateMap;
-            break;
-          case Default:
-            String _text_2 = this.templateFile.getText();
-            String _text_3 = this.fileExtension.getText();
-            TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap(_text_2, _text_3);
-            map = _newDefaultTemplateMap;
-            break;
-          case Stereotype:
-            String _text_4 = this.templateFile.getText();
-            String _text_5 = this.fileExtension.getText();
-            String _text_6 = this.stereotype.getText();
-            TemplateMap _newStereotypeTemplateMap = TemplateMap.newStereotypeTemplateMap(_text_4, _text_5, _text_6);
-            map = _newStereotypeTemplateMap;
-            break;
-          default:
-            break;
-        }
-      }
-      return map;
     }
     
     private FocusAdapter browseFile(final String path, final JTextField field) {
@@ -387,14 +448,16 @@ public class SettingDialog extends JDialog {
           this.btnAddSet = _jButton;
           final ActionListener _function = new ActionListener() {
             public void actionPerformed(final ActionEvent it) {
-              String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
+              final String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
               boolean _notEquals = (!Objects.equal(setName, null));
               if (_notEquals) {
-                SettingDialog.this.combo_templateSet.addItem(setName);
-                SettingDialog.this.combo_templateSet.setSelectedItem(setName);
                 final GenerateSetting generateSetting = new GenerateSetting();
                 SettingDialog.this.manager.put(setName, generateSetting);
                 SettingDialog.this.manager.setCurrentSetting(generateSetting);
+                GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+                _currentSetting.setTemplateID(setName);
+                SettingDialog.this.combo_templateSet.addItem(setName);
+                SettingDialog.this.combo_templateSet.setSelectedItem(setName);
                 SettingDialog.this.enableAll();
               }
             }
@@ -478,6 +541,13 @@ public class SettingDialog extends JDialog {
       {
         JTextField _jTextField = new JTextField();
         this.textTemplateDir = _jTextField;
+        final Consumer<String> _function = new Consumer<String>() {
+          public void accespt(final String it) {
+            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+            _currentSetting.setTemplatePath(it);
+          }
+        };
+        new TextBinding(this.textTemplateDir, _function);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = insets;
@@ -489,9 +559,8 @@ public class SettingDialog extends JDialog {
         final JButton btnTempDirBrowse = new JButton("...");
         final ActionListener _function = new ActionListener() {
           public void actionPerformed(final ActionEvent it) {
-            String _property = System.getProperty("user.home");
-            String _plus = (_property + "/.astah/plugins/m2t/");
-            SettingDialog.this.browseDirectory(_plus, SettingDialog.this.textTemplateDir);
+            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+            InputOutput.<GenerateSetting>println(_currentSetting);
           }
         };
         btnTempDirBrowse.addActionListener(_function);
@@ -514,6 +583,13 @@ public class SettingDialog extends JDialog {
       {
         JTextField _jTextField = new JTextField();
         this.textDestinationPath = _jTextField;
+        final Consumer<String> _function = new Consumer<String>() {
+          public void accespt(final String it) {
+            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+            _currentSetting.setTargetPath(it);
+          }
+        };
+        new TextBinding(this.textDestinationPath, _function);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = insets;
@@ -556,7 +632,11 @@ public class SettingDialog extends JDialog {
         final JButton btnAddTemplate = new JButton("Add template");
         final ActionListener _function = new ActionListener() {
           public void actionPerformed(final ActionEvent it) {
-            final SettingDialog.TemplatePanel template = new SettingDialog.TemplatePanel(SettingDialog.this);
+            final TemplateMap map = new TemplateMap();
+            final SettingDialog.TemplatePanel template = new SettingDialog.TemplatePanel(SettingDialog.this, map);
+            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+            HashSet<TemplateMap> _mapping = _currentSetting.getMapping();
+            _mapping.add(map);
             SettingDialog.this.templatePanel.add(template);
             SettingDialog.this.templatePanel.revalidate();
           }
@@ -649,7 +729,7 @@ public class SettingDialog extends JDialog {
     if (_equals) {
       return;
     }
-    final GenerateSetting c = this.manager.get(templateSet);
+    final GenerateSetting c = this.manager.get(((String) templateSet));
     this.manager.setCurrentSetting(c);
     String _templatePath = null;
     if (c!=null) {
@@ -661,18 +741,25 @@ public class SettingDialog extends JDialog {
       _targetPath=c.getTargetPath();
     }
     this.textDestinationPath.setText(_targetPath);
-    HashMap<String, TemplateMap> _mapping = null;
+    this.templatePanel.removeAll();
+    this.templatePanel.revalidate();
+    this.templatePanel.repaint();
+    HashSet<TemplateMap> _mapping = c.getMapping();
+    InputOutput.<HashSet<TemplateMap>>println(_mapping);
+    HashSet<TemplateMap> _mapping_1 = null;
     if (c!=null) {
-      _mapping=c.getMapping();
+      _mapping_1=c.getMapping();
     }
-    if (_mapping!=null) {
-      final Procedure2<String, TemplateMap> _function = new Procedure2<String, TemplateMap>() {
-        public void apply(final String key, final TemplateMap map) {
+    if (_mapping_1!=null) {
+      final Procedure1<TemplateMap> _function = new Procedure1<TemplateMap>() {
+        public void apply(final TemplateMap map) {
           SettingDialog.TemplatePanel _templatePanel = new SettingDialog.TemplatePanel(SettingDialog.this, map);
           SettingDialog.this.templatePanel.add(_templatePanel);
+          SettingDialog.this.templatePanel.revalidate();
+          SettingDialog.this.templatePanel.repaint();
         }
       };
-      MapExtensions.<String, TemplateMap>forEach(_mapping, _function);
+      IterableExtensions.<TemplateMap>forEach(_mapping_1, _function);
     }
   }
   

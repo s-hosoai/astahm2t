@@ -7,10 +7,9 @@ import com.change_vision.jude.api.inf.model.IStateMachine;
 import com.google.common.base.Objects;
 import java.awt.HeadlessException;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import jp.swest.ledcamp.generator.GeneratorUtils;
@@ -19,9 +18,9 @@ import jp.swest.ledcamp.setting.GenerateSetting;
 import jp.swest.ledcamp.setting.SettingManager;
 import jp.swest.ledcamp.setting.TemplateMap;
 import jp.swest.ledcamp.setting.TemplateType;
-import org.eclipse.xtext.xbase.lib.Functions.Function2;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.InputOutput;
-import org.eclipse.xtext.xbase.lib.MapExtensions;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 @SuppressWarnings("all")
 public class CodeGenerator {
@@ -42,16 +41,15 @@ public class CodeGenerator {
         boolean _equals = Objects.equal(_statemachine, null);
         InputOutput.<Boolean>println(Boolean.valueOf(_equals));
         map.put("u", utils);
-        HashMap<String, TemplateMap> _mapping = setting.getMapping();
-        final Function2<String, TemplateMap, Boolean> _function = new Function2<String, TemplateMap, Boolean>() {
-          public Boolean apply(final String k, final TemplateMap v) {
-            TemplateType _generateType = v.getGenerateType();
-            return Boolean.valueOf(Objects.equal(_generateType, TemplateType.Default));
+        HashSet<TemplateMap> _mapping = setting.getMapping();
+        final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+          public Boolean apply(final TemplateMap v) {
+            TemplateType _templateType = v.getTemplateType();
+            return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
           }
         };
-        Map<String, TemplateMap> _filter = MapExtensions.<String, TemplateMap>filter(_mapping, _function);
-        Collection<TemplateMap> _values = _filter.values();
-        for (final TemplateMap mapping : _values) {
+        Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(_mapping, _function);
+        for (final TemplateMap mapping : _filter) {
           String _targetPath = setting.getTargetPath();
           String _name = iClass.getName();
           String _plus = (_targetPath + _name);

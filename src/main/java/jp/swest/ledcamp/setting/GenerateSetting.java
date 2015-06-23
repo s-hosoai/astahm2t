@@ -1,6 +1,6 @@
 package jp.swest.ledcamp.setting;
 
-import java.util.HashMap;
+import java.util.HashSet;
 import jp.swest.ledcamp.setting.TemplateEngine;
 import jp.swest.ledcamp.setting.TemplateMap;
 import org.eclipse.xtend.lib.annotations.Accessors;
@@ -21,11 +21,11 @@ public class GenerateSetting {
   private String templatePath;
   
   @Accessors
-  private HashMap<String, TemplateMap> mapping;
+  private HashSet<TemplateMap> mapping;
   
   public GenerateSetting() {
-    HashMap<String, TemplateMap> _hashMap = new HashMap<String, TemplateMap>();
-    this.mapping = _hashMap;
+    HashSet<TemplateMap> _hashSet = new HashSet<TemplateMap>();
+    this.mapping = _hashSet;
   }
   
   @Pure
@@ -65,11 +65,11 @@ public class GenerateSetting {
   }
   
   @Pure
-  public HashMap<String, TemplateMap> getMapping() {
+  public HashSet<TemplateMap> getMapping() {
     return this.mapping;
   }
   
-  public void setMapping(final HashMap<String, TemplateMap> mapping) {
+  public void setMapping(final HashSet<TemplateMap> mapping) {
     this.mapping = mapping;
   }
 }
