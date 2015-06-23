@@ -1,6 +1,0 @@
-\#include "${c.className}.h"
-${c.className}::${c.className}(Roomba* create){
-  this->create=create;
-}
-${c.className}::~${c.className}(){}
-

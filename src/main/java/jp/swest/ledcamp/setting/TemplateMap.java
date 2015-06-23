@@ -29,24 +29,27 @@ public class TemplateMap {
   
   public static TemplateMap newGlobalTemplateMap(final String templateFile, final String fileName) {
     final TemplateMap globalTemplateMap = new TemplateMap();
+    globalTemplateMap.templateType = TemplateType.Global;
     globalTemplateMap.templateFile = templateFile;
     globalTemplateMap.fileName = fileName;
     return globalTemplateMap;
   }
   
   public static TemplateMap newDefaultTemplateMap(final String templateFile, final String fileExtension) {
-    final TemplateMap globalTemplateMap = new TemplateMap();
-    globalTemplateMap.templateFile = templateFile;
-    globalTemplateMap.fileExtension = fileExtension;
-    return globalTemplateMap;
+    final TemplateMap defaultTemplateMap = new TemplateMap();
+    defaultTemplateMap.templateType = TemplateType.Default;
+    defaultTemplateMap.templateFile = templateFile;
+    defaultTemplateMap.fileExtension = fileExtension;
+    return defaultTemplateMap;
   }
   
   public static TemplateMap newStereotypeTemplateMap(final String templateFile, final String fileExtension, final String stereotype) {
-    final TemplateMap globalTemplateMap = new TemplateMap();
-    globalTemplateMap.stereotype = stereotype;
-    globalTemplateMap.templateFile = templateFile;
-    globalTemplateMap.fileExtension = fileExtension;
-    return globalTemplateMap;
+    final TemplateMap stereotypeTemplateMap = new TemplateMap();
+    stereotypeTemplateMap.templateType = TemplateType.Stereotype;
+    stereotypeTemplateMap.stereotype = stereotype;
+    stereotypeTemplateMap.templateFile = templateFile;
+    stereotypeTemplateMap.fileExtension = fileExtension;
+    return stereotypeTemplateMap;
   }
   
   @Pure

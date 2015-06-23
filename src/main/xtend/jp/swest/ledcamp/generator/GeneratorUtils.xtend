@@ -1,28 +1,21 @@
 package jp.swest.ledcamp.generator
 
-import com.change_vision.jude.api.inf.model.IClass
-import com.change_vision.jude.api.inf.model.IStateMachine
 import com.change_vision.jude.api.inf.AstahAPI
-import com.change_vision.jude.api.inf.model.IPackage
-import com.change_vision.jude.api.inf.model.IModel
-import java.util.List
-import java.util.ArrayList
-import org.eclipse.xtend.lib.annotations.Accessors
-import com.change_vision.jude.api.inf.project.ProjectAccessor
-import jp.swest.ledcamp.setting.SettingManager
-import java.util.Hashtable
-import com.change_vision.jude.api.inf.model.IStateMachineDiagram
-import java.util.HashMap
-import com.change_vision.jude.api.inf.model.IState
-import com.change_vision.jude.api.inf.model.IPseudostate
-import java.awt.event.FocusAdapter
-import java.awt.event.FocusListener
-import java.awt.event.FocusEvent
-import javax.swing.JOptionPane
+import com.change_vision.jude.api.inf.model.IClass
 import com.change_vision.jude.api.inf.model.IFinalState
-import com.change_vision.jude.api.inf.model.IVertex
-import java.util.Arrays
+import com.change_vision.jude.api.inf.model.IModel
+import com.change_vision.jude.api.inf.model.IPackage
+import com.change_vision.jude.api.inf.model.IPseudostate
+import com.change_vision.jude.api.inf.model.IState
+import com.change_vision.jude.api.inf.model.IStateMachine
+import com.change_vision.jude.api.inf.model.IStateMachineDiagram
 import com.change_vision.jude.api.inf.model.ITransition
+import com.change_vision.jude.api.inf.model.IVertex
+import com.change_vision.jude.api.inf.project.ProjectAccessor
+import java.util.ArrayList
+import java.util.HashMap
+import java.util.List
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -36,7 +29,6 @@ class GeneratorUtils {
     new(){
         api = AstahAPI.getAstahAPI()
         projectAccessor = api.getProjectAccessor()
-        projectAccessor.open("Create2.asta");
         projectRoot = projectAccessor.getProject() // exist project?
 
         // Collect classes and statemachines.
@@ -59,6 +51,10 @@ class GeneratorUtils {
         iclass.name.toFirstLower
     }
     
+    def getInstanceName(IClass c){
+        c.name.toFirstLower
+    }
+    
     def getAllReferenceClasses(){
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
@@ -72,13 +68,13 @@ class GeneratorUtils {
         return allStates
     }
     
-    private def getStates(IStateMachine m){
+    private def void getStates(IStateMachine m){
         val substates = m.vertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
         allStates.addAll(substates)
         substates.forEach[sub|getStates(sub)]
     }
     
-    private def getStates(IState state){
+    private def void getStates(IState state){
         val substates = state.subvertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
         allStates.addAll(substates)
         substates.forEach[sub|getStates(sub)]
@@ -127,11 +123,11 @@ class GeneratorUtils {
         return classes.filter[c|!c.stereotypes.contains(stereotype)]
     }
     
-    private def recursiveClassCollect(IModel model, List<IClass> classes){
+    private def void recursiveClassCollect(IModel model, List<IClass> classes){
         classes.addAll(model.ownedElements.filter(IClass))
         model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]        
     }
-    private def recursiveClassCollect(IPackage model, List<IClass> classes){
+    private def void recursiveClassCollect(IPackage model, List<IClass> classes){
         classes.addAll(model.ownedElements.filter(IClass))
         model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
     }
@@ -154,7 +150,6 @@ class GeneratorUtils {
     }
     
     def test(){
-//        this.classes = new ArrayList<IClass>()
         var api = AstahAPI.getAstahAPI();
         var pa = api.getProjectAccessor();
         pa.open("Create2.asta");

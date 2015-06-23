@@ -11,19 +11,25 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import java.io.IOException
-
+// Singleton
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
     @XmlTransient @Accessors private static String settingFilePath
     @Accessors private GenerateSetting currentSetting
+    @XmlTransient private String userFolder = System.getProperty("user.home")
+    @XmlTransient private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
 
     private new() {
         super()
+        val userFolder = System.getProperty("user.home")
+        val m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
+        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
     }
 
     static def getInstance() {
         if (instance == null) {
             instance = new SettingManager
+            instance.load
         }
         return instance
     }
@@ -34,11 +40,11 @@ class SettingManager extends HashMap<String, GenerateSetting> {
 
     def load() {
         // load property file
-        val userFolder = System.getProperty("user.home")
-        val m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
+        userFolder = System.getProperty("user.home")
+        m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
         settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
         val asgenPluginFolder = new File(m2tPluginFolderPath);
-        if (!asgenPluginFolder.exists()) {  // install setting files.
+        if (!(asgenPluginFolder.exists())) {  // install setting files.
             try {
                 asgenPluginFolder.getParentFile().mkdirs();
                 val zipFile = File.createTempFile("astahm2t", "templeatezip");
@@ -58,13 +64,32 @@ class SettingManager extends HashMap<String, GenerateSetting> {
             }
         }
         try {
-            var settings = JAXB.unmarshal(new File(settingFilePath), SettingManager)
-            instance.clear
-            instance.putAll(settings)
+            val settingFile = new File(settingFilePath)
+            if(settingFile.exists){
+                val settings = JAXB.unmarshal(new File(settingFilePath), SettingManager)
+                instance.clear
+                instance.putAll(settings)
+                instance.currentSetting = settings.currentSetting
+            }else{
+                createDefaultSetting
+                save
+            }
         } catch (Exception e) {
             e.printStackTrace
             // load fail. 
         }
+    }
+    
+    private def createDefaultSetting(){
+        val sampleGenerateSetting = new GenerateSetting
+        sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/").absolutePath
+        sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
+        sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("cpp.template", "cpp"))
+        sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("header.template", "h"))
+        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("arduino.template", "Sketch.cpp"))
+        instance.put("sample", sampleGenerateSetting)
+        instance.currentSetting = sampleGenerateSetting
     }
 
     def getMap() {
@@ -109,17 +134,4 @@ class SettingManager extends HashMap<String, GenerateSetting> {
             bos.write(bs);
         }
     }
-
-/*
-    private def testSetting(){
-        var setting = new GenerateSetting
-        setting.templateID = "test"
-        setting.templateEngine = "groovy"
-        setting.templatePath = "C:/Users/hosoai/git/astahm2t-github/astahm2t/template/"
-        setting.targetPath = "C:/Users/hosoai/git/astahm2t-github/astahm2t/out/"
-        setting.mapping.put("cpp", new TemplateMap("cpp", GenerateType.Default, "cpp.template", null, "cpp"))
-        setting.mapping.put("header", new TemplateMap("header", GenerateType.Default, "header.template", null, "h"))
-        setting.mapping.put("ino", new TemplateMap("ino", GenerateType.Global, "arduino.template", null, "ino"))
-        put("test", setting)
-    }*/
 }

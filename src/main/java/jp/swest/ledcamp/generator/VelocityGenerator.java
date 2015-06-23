@@ -1,33 +1,40 @@
 package jp.swest.ledcamp.generator;
 
+import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
+import java.util.function.BiConsumer;
 import jp.swest.ledcamp.generator.ITemplateEngine;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.Velocity;
 import org.eclipse.xtext.xbase.lib.Exceptions;
-import org.eclipse.xtext.xbase.lib.MapExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure2;
 
 @SuppressWarnings("all")
 public class VelocityGenerator implements ITemplateEngine {
-  public void doGenerate(final Map<String, Object> mapping, final String output, final String templateFile) {
+  public void doGenerate(final Map<String, Object> mapping, final Path output, final Path templatePath) {
     try {
       Properties p = new Properties();
       p.setProperty("input.encoding", "UTF-8");
-      p.setProperty("file.resource.loader.path", "C:/Users/hosoai/git/astahm2t-github/astahm2t/template/");
+      Path _parent = templatePath.getParent();
+      Path _absolutePath = _parent.toAbsolutePath();
+      String _string = _absolutePath.toString();
+      p.setProperty("file.resource.loader.path", _string);
       Velocity.init(p);
       final VelocityContext ctx = new VelocityContext();
-      final Procedure2<String, Object> _function = new Procedure2<String, Object>() {
-        public void apply(final String k, final Object v) {
+      final BiConsumer<String, Object> _function = new BiConsumer<String, Object>() {
+        public void accept(final String k, final Object v) {
           ctx.put(k, v);
         }
       };
-      MapExtensions.<String, Object>forEach(mapping, _function);
-      Template template = Velocity.getTemplate(templateFile);
-      FileWriter writer = new FileWriter(output);
+      mapping.forEach(_function);
+      Path _fileName = templatePath.getFileName();
+      String _string_1 = _fileName.toString();
+      Template template = Velocity.getTemplate(_string_1);
+      File _file = output.toFile();
+      FileWriter writer = new FileWriter(_file);
       template.merge(ctx, writer);
       writer.flush();
       writer.close();

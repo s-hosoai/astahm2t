@@ -22,6 +22,8 @@ import com.google.common.collect.Iterables;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javax.swing.JFrame;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.CollectionExtensions;
@@ -31,9 +33,6 @@ import org.eclipse.xtext.xbase.lib.Functions.Function1;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
-import org.eclipse.xtext.xbase.lib.MapExtensions;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
-import org.eclipse.xtext.xbase.lib.Procedures.Procedure2;
 import org.eclipse.xtext.xbase.lib.Pure;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 
@@ -66,7 +65,6 @@ public class GeneratorUtils {
       this.api = _astahAPI;
       ProjectAccessor _projectAccessor = this.api.getProjectAccessor();
       this.projectAccessor = _projectAccessor;
-      this.projectAccessor.open("Create2.asta");
       IModel _project = this.projectAccessor.getProject();
       this.projectRoot = _project;
       ArrayList<IClass> _arrayList = new ArrayList<IClass>();
@@ -97,6 +95,11 @@ public class GeneratorUtils {
   
   public String getInstanceName() {
     String _name = this.iclass.getName();
+    return StringExtensions.toFirstLower(_name);
+  }
+  
+  public String getInstanceName(final IClass c) {
+    String _name = c.getName();
     return StringExtensions.toFirstLower(_name);
   }
   
@@ -139,12 +142,12 @@ public class GeneratorUtils {
     Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(_vertexes)), _function);
     final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
     CollectionExtensions.<IState>addAll(this.allStates, substates);
-    final Procedure1<IState> _function_1 = new Procedure1<IState>() {
-      public void apply(final IState sub) {
+    final Consumer<IState> _function_1 = new Consumer<IState>() {
+      public void accept(final IState sub) {
         GeneratorUtils.this.getStates(sub);
       }
     };
-    IterableExtensions.<IState>forEach(((Iterable<IState>)Conversions.doWrapArray(substates)), _function_1);
+    ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
   
   private void getStates(final IState state) {
@@ -157,12 +160,12 @@ public class GeneratorUtils {
     Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(_subvertexes)), _function);
     final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
     CollectionExtensions.<IState>addAll(this.allStates, substates);
-    final Procedure1<IState> _function_1 = new Procedure1<IState>() {
-      public void apply(final IState sub) {
+    final Consumer<IState> _function_1 = new Consumer<IState>() {
+      public void accept(final IState sub) {
         GeneratorUtils.this.getStates(sub);
       }
     };
-    IterableExtensions.<IState>forEach(((Iterable<IState>)Conversions.doWrapArray(substates)), _function_1);
+    ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
   
   public Iterable<String> getEvents() {
@@ -233,14 +236,14 @@ public class GeneratorUtils {
         String _name = s.getName();
         table.put(_name, eventToNextState);
         ITransition[] _allParentTransitions = this.getAllParentTransitions(s);
-        final Procedure1<ITransition> _function = new Procedure1<ITransition>() {
-          public void apply(final ITransition e) {
+        final Consumer<ITransition> _function = new Consumer<ITransition>() {
+          public void accept(final ITransition e) {
             String _event = e.getEvent();
             IVertex _target = e.getTarget();
             eventToNextState.put(_event, _target);
           }
         };
-        IterableExtensions.<ITransition>forEach(((Iterable<ITransition>)Conversions.doWrapArray(_allParentTransitions)), _function);
+        ((List<ITransition>)Conversions.doWrapArray(_allParentTransitions)).forEach(_function);
       }
     }
     return table;
@@ -280,19 +283,18 @@ public class GeneratorUtils {
     return IterableExtensions.<IClass>filter(classes, _function);
   }
   
-  private Object recursiveClassCollect(final IModel model, final List<IClass> classes) {
+  private void recursiveClassCollect(final IModel model, final List<IClass> classes) {
     INamedElement[] _ownedElements = model.getOwnedElements();
     Iterable<IClass> _filter = Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(_ownedElements)), IClass.class);
     Iterables.<IClass>addAll(classes, _filter);
     INamedElement[] _ownedElements_1 = model.getOwnedElements();
     Iterable<IPackage> _filter_1 = Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(_ownedElements_1)), IPackage.class);
-    final Procedure1<IPackage> _function = new Procedure1<IPackage>() {
-      public void apply(final IPackage p) {
+    final Consumer<IPackage> _function = new Consumer<IPackage>() {
+      public void accept(final IPackage p) {
         GeneratorUtils.this.recursiveClassCollect(p, classes);
       }
     };
-    IterableExtensions.<IPackage>forEach(_filter_1, _function);
-    return null;
+    _filter_1.forEach(_function);
   }
   
   private void recursiveClassCollect(final IPackage model, final List<IClass> classes) {
@@ -301,12 +303,12 @@ public class GeneratorUtils {
     Iterables.<IClass>addAll(classes, _filter);
     INamedElement[] _ownedElements_1 = model.getOwnedElements();
     Iterable<IPackage> _filter_1 = Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(_ownedElements_1)), IPackage.class);
-    final Procedure1<IPackage> _function = new Procedure1<IPackage>() {
-      public void apply(final IPackage p) {
+    final Consumer<IPackage> _function = new Consumer<IPackage>() {
+      public void accept(final IPackage p) {
         GeneratorUtils.this.recursiveClassCollect(p, classes);
       }
     };
-    IterableExtensions.<IPackage>forEach(_filter_1, _function);
+    _filter_1.forEach(_function);
   }
   
   public static void main(final String[] args) {
@@ -319,29 +321,29 @@ public class GeneratorUtils {
         String _name = c.getName();
         InputOutput.<String>println(_name);
         Iterable<IClass> _allReferenceClasses = utils.getAllReferenceClasses();
-        final Procedure1<IClass> _function = new Procedure1<IClass>() {
-          public void apply(final IClass r) {
+        final Consumer<IClass> _function = new Consumer<IClass>() {
+          public void accept(final IClass r) {
             String _name = r.getName();
             String _plus = (" reference:" + _name);
             InputOutput.<String>println(_plus);
           }
         };
-        IterableExtensions.<IClass>forEach(_allReferenceClasses, _function);
+        _allReferenceClasses.forEach(_function);
         boolean _notEquals = (!Objects.equal(utils.statemachine, null));
         if (_notEquals) {
           HashMap<String, HashMap<String, IVertex>> table = utils.generateStateTable();
-          final Procedure2<String, HashMap<String, IVertex>> _function_1 = new Procedure2<String, HashMap<String, IVertex>>() {
-            public void apply(final String state, final HashMap<String, IVertex> map) {
+          final BiConsumer<String, HashMap<String, IVertex>> _function_1 = new BiConsumer<String, HashMap<String, IVertex>>() {
+            public void accept(final String state, final HashMap<String, IVertex> map) {
               InputOutput.<String>println(state);
-              final Procedure2<String, IVertex> _function = new Procedure2<String, IVertex>() {
-                public void apply(final String event, final IVertex next) {
+              final BiConsumer<String, IVertex> _function = new BiConsumer<String, IVertex>() {
+                public void accept(final String event, final IVertex next) {
                   InputOutput.<String>println((((" " + event) + "->") + next));
                 }
               };
-              MapExtensions.<String, IVertex>forEach(map, _function);
+              map.forEach(_function);
             }
           };
-          MapExtensions.<String, HashMap<String, IVertex>>forEach(table, _function_1);
+          table.forEach(_function_1);
         }
       }
     }
@@ -355,12 +357,12 @@ public class GeneratorUtils {
       IModel _project = pa.getProject();
       this.recursiveClassCollect(_project, this.classes);
       Iterable<IClass> _stereotypeNotFilter = this.stereotypeNotFilter(this.classes, "library");
-      final Procedure1<IClass> _function = new Procedure1<IClass>() {
-        public void apply(final IClass c) {
+      final Consumer<IClass> _function = new Consumer<IClass>() {
+        public void accept(final IClass c) {
           InputOutput.<IClass>println(c);
         }
       };
-      IterableExtensions.<IClass>forEach(_stereotypeNotFilter, _function);
+      _stereotypeNotFilter.forEach(_function);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
     }

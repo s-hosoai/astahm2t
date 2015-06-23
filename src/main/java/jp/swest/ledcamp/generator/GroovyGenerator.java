@@ -5,6 +5,7 @@ import groovy.text.SimpleTemplateEngine;
 import groovy.text.Template;
 import java.io.File;
 import java.io.FileWriter;
+import java.nio.file.Path;
 import java.util.Map;
 import jp.swest.ledcamp.generator.ITemplateEngine;
 import org.eclipse.xtext.xbase.lib.Exceptions;
@@ -18,11 +19,12 @@ public class GroovyGenerator implements ITemplateEngine {
     this.engine = _simpleTemplateEngine;
   }
   
-  public void doGenerate(final Map<String, Object> map, final String output, final String templateFile) {
+  public void doGenerate(final Map<String, Object> map, final Path output, final Path templateFile) {
     try {
-      File _file = new File(templateFile);
+      File _file = templateFile.toFile();
       Template template = this.engine.createTemplate(_file);
-      FileWriter writer = new FileWriter(output);
+      File _file_1 = output.toFile();
+      FileWriter writer = new FileWriter(_file_1);
       Writable _make = template.make(map);
       _make.writeTo(writer);
       writer.close();

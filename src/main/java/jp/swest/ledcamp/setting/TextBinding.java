@@ -8,11 +8,11 @@ import jp.swest.ledcamp.setting.Consumer;
 
 @SuppressWarnings("all")
 public class TextBinding implements DocumentListener {
-  private Consumer setterFunction;
+  private Consumer<String> setterFunction;
   
   private JTextField field;
   
-  public TextBinding(final JTextField field, final Consumer setterFunction) {
+  public TextBinding(final JTextField field, final Consumer<String> setterFunction) {
     Document _document = field.getDocument();
     _document.addDocumentListener(this);
     this.field = field;
