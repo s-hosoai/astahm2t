@@ -3,3 +3,8 @@
 /.VelocityGenerator.java._trace
 /.ITemplateEngine.java._trace
 /.GroovyGenerator.java._trace
+/CodeGenerator.java
+/GeneratorUtils.java
+/GroovyGenerator.java
+/ITemplateEngine.java
+/VelocityGenerator.java

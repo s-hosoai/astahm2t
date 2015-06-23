@@ -18,11 +18,8 @@ import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
 import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -44,6 +41,10 @@ import jp.swest.ledcamp.setting.TemplateType;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.InputOutput;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
+import org.eclipse.xtext.xbase.lib.MapExtensions;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1;
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure2;
 import org.eclipse.xtext.xbase.lib.Pure;
 
 @SuppressWarnings("all")
@@ -110,12 +111,12 @@ public class SettingDialog extends JDialog {
         CardLayout _cardLayout = new CardLayout();
         this.typeCardLayout = _cardLayout;
         TemplateType[] _values = TemplateType.values();
-        final Consumer<TemplateType> _function = new Consumer<TemplateType>() {
-          public void accept(final TemplateType it) {
+        final Procedure1<TemplateType> _function = new Procedure1<TemplateType>() {
+          public void apply(final TemplateType it) {
             TemplatePanel.this.comboType.addItem(it);
           }
         };
-        ((List<TemplateType>)Conversions.doWrapArray(_values)).forEach(_function);
+        IterableExtensions.<TemplateType>forEach(((Iterable<TemplateType>)Conversions.doWrapArray(_values)), _function);
         final ActionListener _function_1 = new ActionListener() {
           public void actionPerformed(final ActionEvent it) {
             int _selectedIndex = TemplatePanel.this.comboType.getSelectedIndex();
@@ -441,12 +442,12 @@ public class SettingDialog extends JDialog {
         JComboBox<TemplateEngine> _jComboBox = new JComboBox<TemplateEngine>();
         this.combo_templateEngine = _jComboBox;
         TemplateEngine[] _values = TemplateEngine.values();
-        final Consumer<TemplateEngine> _function = new Consumer<TemplateEngine>() {
-          public void accept(final TemplateEngine it) {
+        final Procedure1<TemplateEngine> _function = new Procedure1<TemplateEngine>() {
+          public void apply(final TemplateEngine it) {
             SettingDialog.this.combo_templateEngine.addItem(it);
           }
         };
-        ((List<TemplateEngine>)Conversions.doWrapArray(_values)).forEach(_function);
+        IterableExtensions.<TemplateEngine>forEach(((Iterable<TemplateEngine>)Conversions.doWrapArray(_values)), _function);
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.anchor = GridBagConstraints.WEST;
         Insets _insets = new Insets(0, 10, 5, 10);
@@ -605,12 +606,12 @@ public class SettingDialog extends JDialog {
   
   private void load() {
     Set<String> _keySet = this.manager.keySet();
-    final Consumer<String> _function = new Consumer<String>() {
-      public void accept(final String it) {
+    final Procedure1<String> _function = new Procedure1<String>() {
+      public void apply(final String it) {
         SettingDialog.this.combo_templateSet.addItem(it);
       }
     };
-    _keySet.forEach(_function);
+    IterableExtensions.<String>forEach(_keySet, _function);
     int _itemCount = this.combo_templateSet.getItemCount();
     boolean _equals = (_itemCount == 0);
     if (_equals) {
@@ -620,23 +621,23 @@ public class SettingDialog extends JDialog {
   
   private void disableAll() {
     Component[] _components = this.contentPanel.getComponents();
-    final Consumer<Component> _function = new Consumer<Component>() {
-      public void accept(final Component it) {
+    final Procedure1<Component> _function = new Procedure1<Component>() {
+      public void apply(final Component it) {
         it.setEnabled(false);
       }
     };
-    ((List<Component>)Conversions.doWrapArray(_components)).forEach(_function);
+    IterableExtensions.<Component>forEach(((Iterable<Component>)Conversions.doWrapArray(_components)), _function);
     this.btnAddSet.setEnabled(true);
   }
   
   private void enableAll() {
     Component[] _components = this.contentPanel.getComponents();
-    final Consumer<Component> _function = new Consumer<Component>() {
-      public void accept(final Component it) {
+    final Procedure1<Component> _function = new Procedure1<Component>() {
+      public void apply(final Component it) {
         it.setEnabled(true);
       }
     };
-    ((List<Component>)Conversions.doWrapArray(_components)).forEach(_function);
+    IterableExtensions.<Component>forEach(((Iterable<Component>)Conversions.doWrapArray(_components)), _function);
   }
   
   private void changeTemplateSet() {
@@ -662,13 +663,13 @@ public class SettingDialog extends JDialog {
       _mapping=c.getMapping();
     }
     if (_mapping!=null) {
-      final BiConsumer<String, TemplateMap> _function = new BiConsumer<String, TemplateMap>() {
-        public void accept(final String key, final TemplateMap map) {
+      final Procedure2<String, TemplateMap> _function = new Procedure2<String, TemplateMap>() {
+        public void apply(final String key, final TemplateMap map) {
           SettingDialog.TemplatePanel _templatePanel = new SettingDialog.TemplatePanel(SettingDialog.this, map);
           SettingDialog.this.templatePanel.add(_templatePanel);
         }
       };
-      _mapping.forEach(_function);
+      MapExtensions.<String, TemplateMap>forEach(_mapping, _function);
     }
   }
   

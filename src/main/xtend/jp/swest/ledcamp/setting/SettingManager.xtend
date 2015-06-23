@@ -11,7 +11,6 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import java.io.IOException
-import javafx.beans.value.ObservableBooleanValue
 
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;

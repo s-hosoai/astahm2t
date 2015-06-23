@@ -7,3 +7,9 @@
 /.GeneratorEngine.java._trace
 /.TemplateEngine.java._trace
 /.TemplatePanel.java._trace
+/GenerateSetting.java
+/SettingDialog.java
+/SettingManager.java
+/TemplateEngine.java
+/TemplateMap.java
+/TemplateType.java
