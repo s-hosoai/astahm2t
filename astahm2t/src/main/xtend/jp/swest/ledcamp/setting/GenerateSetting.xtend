@@ -5,33 +5,56 @@ import org.eclipse.xtend.lib.annotations.Accessors
 
 class GenerateSetting {
     @Accessors String templateID
-    @Accessors String templateEngine
+    @Accessors TemplateEngine templateEngine
     @Accessors String targetPath
     @Accessors String templatePath
     @Accessors HashMap<String, TemplateMap> mapping
     new(){
         mapping = new HashMap
     }
-    
 }
 class TemplateMap {
         @Accessors String key
-        @Accessors GenerateType generateType // enum : stereotype, global, default
+        @Accessors TemplateType generateType // enum : stereotype, global, default
         @Accessors String templateFile
         @Accessors String fileName // if filename is null, {Classname}+fileExtension
         @Accessors String fileExtension
+        @Accessors String stereotype
         new(){}
-        new (String key, GenerateType generateType, String templateFile, String fileName, String fileExtension){
+/*        new (String key, TemplateType generateType, String templateFile, String fileName, String fileExtension, String stereotype){
             this.key = key
             this.generateType = generateType
             this.templateFile = templateFile
             this.fileName = fileName
             this.fileExtension = fileExtension
+            this.stereotype = stereotype
+        }*/
+        static def newGlobalTemplateMap(String templateFile, String fileName){
+            val globalTemplateMap = new TemplateMap
+            globalTemplateMap.templateFile = templateFile
+            globalTemplateMap.fileName = fileName
+            return globalTemplateMap
+        }
+        static def newDefaultTemplateMap(String templateFile, String fileExtension){
+            val globalTemplateMap = new TemplateMap
+            globalTemplateMap.templateFile = templateFile
+            globalTemplateMap.fileExtension = fileExtension
+            return globalTemplateMap
+        }
+        static def newStereotypeTemplateMap(String templateFile, String fileExtension, String stereotype){
+            val globalTemplateMap = new TemplateMap
+            globalTemplateMap.stereotype = stereotype
+            globalTemplateMap.templateFile = templateFile
+            globalTemplateMap.fileExtension = fileExtension
+            return globalTemplateMap
         }
 }
 
-enum GenerateType{
+enum TemplateType{
     Stereotype, Default, Global
+}
+enum TemplateEngine{
+    Groovy, Velocity
 }
 /* persist sample
 

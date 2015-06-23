@@ -1,10 +1,8 @@
 package jp.swest.ledcamp.setting;
 
 @SuppressWarnings("all")
-public enum GenerateType {
-  Stereotype,
+public enum TemplateEngine {
+  Groovy,
   
-  Default,
-  
-  Global;
+  Velocity;
 }

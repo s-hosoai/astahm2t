@@ -27,6 +27,9 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   @Accessors
   private static String settingFilePath;
   
+  @Accessors
+  private GenerateSetting currentSetting;
+  
   private SettingManager() {
     super();
   }
@@ -162,5 +165,14 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   public static void setSettingFilePath(final String settingFilePath) {
     SettingManager.settingFilePath = settingFilePath;
+  }
+  
+  @Pure
+  public GenerateSetting getCurrentSetting() {
+    return this.currentSetting;
+  }
+  
+  public void setCurrentSetting(final GenerateSetting currentSetting) {
+    this.currentSetting = currentSetting;
   }
 }

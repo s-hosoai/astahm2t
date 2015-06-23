@@ -1,19 +1,25 @@
 package jp.swest.ledcamp.actions;
 
+import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.ui.IPluginActionDelegate;
 import com.change_vision.jude.api.inf.ui.IWindow;
-import java.awt.Window;
-import javax.swing.JOptionPane;
-import jp.swest.ledcamp.view.GeneratorSettingDialog;
+import com.change_vision.jude.api.inf.view.IViewManager;
+import javax.swing.JFrame;
+import jp.swest.ledcamp.setting.SettingDialog;
+import org.eclipse.xtext.xbase.lib.Exceptions;
 
 @SuppressWarnings("all")
 public class SettingAction implements IPluginActionDelegate {
   public Object run(final IWindow window) throws IPluginActionDelegate.UnExpectedException {
-    GeneratorSettingDialog dialog = new GeneratorSettingDialog();
-    Window _parent = window.getParent();
-    int result = JOptionPane.showConfirmDialog(_parent, dialog, "Generator Setting", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
-    if ((result == JOptionPane.OK_OPTION)) {
+    try {
+      AstahAPI _astahAPI = AstahAPI.getAstahAPI();
+      IViewManager _viewManager = _astahAPI.getViewManager();
+      JFrame _mainFrame = _viewManager.getMainFrame();
+      SettingDialog dialog = new SettingDialog(_mainFrame);
+      dialog.setVisible(true);
+      return null;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
-    return null;
   }
 }

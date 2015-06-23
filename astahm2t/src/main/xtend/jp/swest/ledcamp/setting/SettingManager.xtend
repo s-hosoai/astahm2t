@@ -11,10 +11,12 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import java.io.IOException
+import javafx.beans.value.ObservableBooleanValue
 
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
     @XmlTransient @Accessors private static String settingFilePath
+    @Accessors private GenerateSetting currentSetting
 
     private new() {
         super()
@@ -26,7 +28,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         }
         return instance
     }
-
+    
     def save() {
         JAXB.marshal(instance, new File(settingFilePath))
     }

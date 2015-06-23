@@ -16,9 +16,9 @@ import javax.swing.JOptionPane;
 import jp.swest.ledcamp.generator.GeneratorUtils;
 import jp.swest.ledcamp.generator.GroovyGenerator;
 import jp.swest.ledcamp.setting.GenerateSetting;
-import jp.swest.ledcamp.setting.GenerateType;
 import jp.swest.ledcamp.setting.SettingManager;
 import jp.swest.ledcamp.setting.TemplateMap;
+import jp.swest.ledcamp.setting.TemplateType;
 import org.eclipse.xtext.xbase.lib.Functions.Function2;
 import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.MapExtensions;
@@ -45,8 +45,8 @@ public class CodeGenerator {
         HashMap<String, TemplateMap> _mapping = setting.getMapping();
         final Function2<String, TemplateMap, Boolean> _function = new Function2<String, TemplateMap, Boolean>() {
           public Boolean apply(final String k, final TemplateMap v) {
-            GenerateType _generateType = v.getGenerateType();
-            return Boolean.valueOf(Objects.equal(_generateType, GenerateType.Default));
+            TemplateType _generateType = v.getGenerateType();
+            return Boolean.valueOf(Objects.equal(_generateType, TemplateType.Default));
           }
         };
         Map<String, TemplateMap> _filter = MapExtensions.<String, TemplateMap>filter(_mapping, _function);

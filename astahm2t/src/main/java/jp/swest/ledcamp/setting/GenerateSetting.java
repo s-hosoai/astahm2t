@@ -1,6 +1,7 @@
 package jp.swest.ledcamp.setting;
 
 import java.util.HashMap;
+import jp.swest.ledcamp.setting.TemplateEngine;
 import jp.swest.ledcamp.setting.TemplateMap;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Pure;
@@ -11,7 +12,7 @@ public class GenerateSetting {
   private String templateID;
   
   @Accessors
-  private String templateEngine;
+  private TemplateEngine templateEngine;
   
   @Accessors
   private String targetPath;
@@ -37,11 +38,11 @@ public class GenerateSetting {
   }
   
   @Pure
-  public String getTemplateEngine() {
+  public TemplateEngine getTemplateEngine() {
     return this.templateEngine;
   }
   
-  public void setTemplateEngine(final String templateEngine) {
+  public void setTemplateEngine(final TemplateEngine templateEngine) {
     this.templateEngine = templateEngine;
   }
   

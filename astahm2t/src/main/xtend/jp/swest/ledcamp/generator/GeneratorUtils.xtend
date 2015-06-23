@@ -19,6 +19,10 @@ import java.awt.event.FocusAdapter
 import java.awt.event.FocusListener
 import java.awt.event.FocusEvent
 import javax.swing.JOptionPane
+import com.change_vision.jude.api.inf.model.IFinalState
+import com.change_vision.jude.api.inf.model.IVertex
+import java.util.Arrays
+import com.change_vision.jude.api.inf.model.ITransition
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -32,13 +36,8 @@ class GeneratorUtils {
     new(){
         api = AstahAPI.getAstahAPI()
         projectAccessor = api.getProjectAccessor()
-//        projectAccessor.open("Create2.asta");
+        projectAccessor.open("Create2.asta");
         projectRoot = projectAccessor.getProject() // exist project?
-        api.viewManager.mainFrame.addFocusListener(new FocusAdapter(){            
-            override focusGained(FocusEvent e) {
-                JOptionPane.showConfirmDialog(api.viewManager.mainFrame,"hello");
-            }
-            });
 
         // Collect classes and statemachines.
         classes = new ArrayList<IClass>()
@@ -60,10 +59,31 @@ class GeneratorUtils {
         iclass.name.toFirstLower
     }
     
-    // for statemachine utility
-    def getStates(){
-        return statemachine?.vertexes.filter[s|!(s instanceof IPseudostate)]
+    def getAllReferenceClasses(){
+        iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
+        
+    // for statemachine utility
+    private ArrayList<IState> allStates
+    def getStates(){
+        if(statemachine==null){return null}
+        allStates = new ArrayList
+        getStates(statemachine)
+        return allStates
+    }
+    
+    private def getStates(IStateMachine m){
+        val substates = m.vertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
+        allStates.addAll(substates)
+        substates.forEach[sub|getStates(sub)]
+    }
+    
+    private def getStates(IState state){
+        val substates = state.subvertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
+        allStates.addAll(substates)
+        substates.forEach[sub|getStates(sub)]
+    }
+    
     def getEvents(){
         statemachine?.transitions.map[t|t.event].filter[e|e.trim.length>1]
     }
@@ -71,6 +91,24 @@ class GeneratorUtils {
     def getInitialState(){
         var initialPseudo = statemachine?.vertexes?.filter(IPseudostate).filter[s|s.isInitialPseudostate].get(0)
         return initialPseudo?.outgoings.get(0).target.name
+    }
+        def ITransition[] getAllParentTransitions(IState state){
+        if(state.container instanceof IState){
+            return state.outgoings + (getAllParentTransitions(state.container as IState) as ITransition[]);
+        }else{
+            return state.outgoings
+        }
+    }
+    
+    def generateStateTable(){
+        var table = new HashMap<String, HashMap<String, IVertex>>
+        for(o : states){
+            val s = o as IState
+            val eventToNextState = new HashMap<String, IVertex>
+            table.put(s.name, eventToNextState)
+            getAllParentTransitions(s).forEach[e|eventToNextState.put(e.event, e.target)]
+        }
+        return table
     }
     
     // for global generate
@@ -97,23 +135,26 @@ class GeneratorUtils {
         classes.addAll(model.ownedElements.filter(IClass))
         model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
     }
-    
+        
     def static void main(String[] args) {
-        var utils = new GeneratorUtils
+        val utils = new GeneratorUtils
 //        utils.test
         for(c : utils.classes){
             utils.iclass = c
             utils.statemachine = utils.statemachines.get(c)
             println(c.name)
-            println(utils.initialState)
-            for(s : utils.events){
-                println("  "+s)
-            }
+            utils.allReferenceClasses.forEach[r|println(" reference:"+r.name)]
+            if(utils.statemachine!=null){
+            var table = utils.generateStateTable()
+            table.forEach[state, map|
+                println(state);
+                map.forEach[event, next| println(" "+event+"->"+next)]
+            ]}
         }
     }
     
     def test(){
-        this.classes = new ArrayList<IClass>()
+//        this.classes = new ArrayList<IClass>()
         var api = AstahAPI.getAstahAPI();
         var pa = api.getProjectAccessor();
         pa.open("Create2.asta");

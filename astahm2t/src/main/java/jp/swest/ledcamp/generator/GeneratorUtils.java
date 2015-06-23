@@ -1,28 +1,32 @@
 package jp.swest.ledcamp.generator;
 
 import com.change_vision.jude.api.inf.AstahAPI;
+import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IDiagram;
+import com.change_vision.jude.api.inf.model.IElement;
+import com.change_vision.jude.api.inf.model.IFinalState;
 import com.change_vision.jude.api.inf.model.IModel;
 import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IPseudostate;
+import com.change_vision.jude.api.inf.model.IState;
 import com.change_vision.jude.api.inf.model.IStateMachine;
 import com.change_vision.jude.api.inf.model.IStateMachineDiagram;
 import com.change_vision.jude.api.inf.model.ITransition;
 import com.change_vision.jude.api.inf.model.IVertex;
 import com.change_vision.jude.api.inf.project.ProjectAccessor;
 import com.change_vision.jude.api.inf.view.IViewManager;
+import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
-import java.awt.event.FocusAdapter;
-import java.awt.event.FocusEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import org.eclipse.xtend.lib.annotations.Accessors;
+import org.eclipse.xtext.xbase.lib.CollectionExtensions;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
@@ -61,21 +65,9 @@ public class GeneratorUtils {
       this.api = _astahAPI;
       ProjectAccessor _projectAccessor = this.api.getProjectAccessor();
       this.projectAccessor = _projectAccessor;
+      this.projectAccessor.open("Create2.asta");
       IModel _project = this.projectAccessor.getProject();
       this.projectRoot = _project;
-      IViewManager _viewManager = this.api.getViewManager();
-      JFrame _mainFrame = _viewManager.getMainFrame();
-      _mainFrame.addFocusListener(new FocusAdapter() {
-        public void focusGained(final FocusEvent e) {
-          try {
-            IViewManager _viewManager = GeneratorUtils.this.api.getViewManager();
-            JFrame _mainFrame = _viewManager.getMainFrame();
-            JOptionPane.showConfirmDialog(_mainFrame, "hello");
-          } catch (Throwable _e) {
-            throw Exceptions.sneakyThrow(_e);
-          }
-        }
-      });
       ArrayList<IClass> _arrayList = new ArrayList<IClass>();
       this.classes = _arrayList;
       HashMap<IClass, IStateMachine> _hashMap = new HashMap<IClass, IStateMachine>();
@@ -107,17 +99,69 @@ public class GeneratorUtils {
     return StringExtensions.toFirstLower(_name);
   }
   
-  public Iterable<IVertex> getStates() {
-    IVertex[] _vertexes = null;
-    if (this.statemachine!=null) {
-      _vertexes=this.statemachine.getVertexes();
-    }
-    final Function1<IVertex, Boolean> _function = new Function1<IVertex, Boolean>() {
-      public Boolean apply(final IVertex s) {
-        return Boolean.valueOf((!(s instanceof IPseudostate)));
+  public Iterable<IClass> getAllReferenceClasses() {
+    IAttribute[] _attributes = this.iclass.getAttributes();
+    final Function1<IAttribute, IClass> _function = new Function1<IAttribute, IClass>() {
+      public IClass apply(final IAttribute e) {
+        return e.getType();
       }
     };
-    return IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(_vertexes)), _function);
+    List<IClass> _map = ListExtensions.<IAttribute, IClass>map(((List<IAttribute>)Conversions.doWrapArray(_attributes)), _function);
+    final Function1<IClass, Boolean> _function_1 = new Function1<IClass, Boolean>() {
+      public Boolean apply(final IClass e) {
+        return Boolean.valueOf(GeneratorUtils.this.classes.contains(e));
+      }
+    };
+    return IterableExtensions.<IClass>filter(_map, _function_1);
+  }
+  
+  private ArrayList<IState> allStates;
+  
+  public ArrayList<IState> getStates() {
+    boolean _equals = Objects.equal(this.statemachine, null);
+    if (_equals) {
+      return null;
+    }
+    ArrayList<IState> _arrayList = new ArrayList<IState>();
+    this.allStates = _arrayList;
+    this.getStates(this.statemachine);
+    return this.allStates;
+  }
+  
+  private void getStates(final IStateMachine m) {
+    IVertex[] _vertexes = m.getVertexes();
+    final Function1<IVertex, Boolean> _function = new Function1<IVertex, Boolean>() {
+      public Boolean apply(final IVertex s) {
+        return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
+      }
+    };
+    Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(_vertexes)), _function);
+    final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
+    CollectionExtensions.<IState>addAll(this.allStates, substates);
+    final Consumer<IState> _function_1 = new Consumer<IState>() {
+      public void accept(final IState sub) {
+        GeneratorUtils.this.getStates(sub);
+      }
+    };
+    ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
+  }
+  
+  private void getStates(final IState state) {
+    IVertex[] _subvertexes = state.getSubvertexes();
+    final Function1<IVertex, Boolean> _function = new Function1<IVertex, Boolean>() {
+      public Boolean apply(final IVertex s) {
+        return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
+      }
+    };
+    Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(_subvertexes)), _function);
+    final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
+    CollectionExtensions.<IState>addAll(this.allStates, substates);
+    final Consumer<IState> _function_1 = new Consumer<IState>() {
+      public void accept(final IState sub) {
+        GeneratorUtils.this.getStates(sub);
+      }
+    };
+    ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
   
   public Iterable<String> getEvents() {
@@ -164,6 +208,41 @@ public class GeneratorUtils {
     ITransition _get = _outgoings[0];
     IVertex _target = _get.getTarget();
     return _target.getName();
+  }
+  
+  public ITransition[] getAllParentTransitions(final IState state) {
+    IElement _container = state.getContainer();
+    if ((_container instanceof IState)) {
+      ITransition[] _outgoings = state.getOutgoings();
+      IElement _container_1 = state.getContainer();
+      ITransition[] _allParentTransitions = this.getAllParentTransitions(((IState) _container_1));
+      return ((ITransition[])Conversions.unwrapArray(Iterables.<ITransition>concat(((Iterable<? extends ITransition>)Conversions.doWrapArray(_outgoings)), ((Iterable<? extends ITransition>)Conversions.doWrapArray(((ITransition[]) _allParentTransitions)))), ITransition.class));
+    } else {
+      return state.getOutgoings();
+    }
+  }
+  
+  public HashMap<String, HashMap<String, IVertex>> generateStateTable() {
+    HashMap<String, HashMap<String, IVertex>> table = new HashMap<String, HashMap<String, IVertex>>();
+    ArrayList<IState> _states = this.getStates();
+    for (final IState o : _states) {
+      {
+        final IState s = ((IState) o);
+        final HashMap<String, IVertex> eventToNextState = new HashMap<String, IVertex>();
+        String _name = s.getName();
+        table.put(_name, eventToNextState);
+        ITransition[] _allParentTransitions = this.getAllParentTransitions(s);
+        final Consumer<ITransition> _function = new Consumer<ITransition>() {
+          public void accept(final ITransition e) {
+            String _event = e.getEvent();
+            IVertex _target = e.getTarget();
+            eventToNextState.put(_event, _target);
+          }
+        };
+        ((List<ITransition>)Conversions.doWrapArray(_allParentTransitions)).forEach(_function);
+      }
+    }
+    return table;
   }
   
   public List<IClass> getClasses() {
@@ -230,7 +309,7 @@ public class GeneratorUtils {
   }
   
   public static void main(final String[] args) {
-    GeneratorUtils utils = new GeneratorUtils();
+    final GeneratorUtils utils = new GeneratorUtils();
     for (final IClass c : utils.classes) {
       {
         utils.iclass = c;
@@ -238,11 +317,30 @@ public class GeneratorUtils {
         utils.statemachine = _get;
         String _name = c.getName();
         InputOutput.<String>println(_name);
-        String _initialState = utils.getInitialState();
-        InputOutput.<String>println(_initialState);
-        Iterable<String> _events = utils.getEvents();
-        for (final String s : _events) {
-          InputOutput.<String>println(("  " + s));
+        Iterable<IClass> _allReferenceClasses = utils.getAllReferenceClasses();
+        final Consumer<IClass> _function = new Consumer<IClass>() {
+          public void accept(final IClass r) {
+            String _name = r.getName();
+            String _plus = (" reference:" + _name);
+            InputOutput.<String>println(_plus);
+          }
+        };
+        _allReferenceClasses.forEach(_function);
+        boolean _notEquals = (!Objects.equal(utils.statemachine, null));
+        if (_notEquals) {
+          HashMap<String, HashMap<String, IVertex>> table = utils.generateStateTable();
+          final BiConsumer<String, HashMap<String, IVertex>> _function_1 = new BiConsumer<String, HashMap<String, IVertex>>() {
+            public void accept(final String state, final HashMap<String, IVertex> map) {
+              InputOutput.<String>println(state);
+              final BiConsumer<String, IVertex> _function = new BiConsumer<String, IVertex>() {
+                public void accept(final String event, final IVertex next) {
+                  InputOutput.<String>println((((" " + event) + "->") + next));
+                }
+              };
+              map.forEach(_function);
+            }
+          };
+          table.forEach(_function_1);
         }
       }
     }
@@ -250,8 +348,6 @@ public class GeneratorUtils {
   
   public void test() {
     try {
-      ArrayList<IClass> _arrayList = new ArrayList<IClass>();
-      this.classes = _arrayList;
       AstahAPI api = AstahAPI.getAstahAPI();
       ProjectAccessor pa = api.getProjectAccessor();
       pa.open("Create2.asta");
