@@ -103,6 +103,14 @@ public class GeneratorUtils {
     return StringExtensions.toFirstLower(_name);
   }
   
+  public String toFirstUpperCase(final String str) {
+    return StringExtensions.toFirstUpper(str);
+  }
+  
+  public String toFirstLowerCase(final String str) {
+    return StringExtensions.toFirstLower(str);
+  }
+  
   public Iterable<IClass> getAllReferenceClasses() {
     IAttribute[] _attributes = this.iclass.getAttributes();
     final Function1<IAttribute, IClass> _function = new Function1<IAttribute, IClass>() {

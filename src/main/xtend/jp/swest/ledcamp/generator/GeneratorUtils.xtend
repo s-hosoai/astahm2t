@@ -54,6 +54,12 @@ class GeneratorUtils {
     def getInstanceName(IClass c){
         c.name.toFirstLower
     }
+    def toFirstUpperCase(String str){
+        str.toFirstUpper
+    }
+    def toFirstLowerCase(String str){
+        str.toFirstLower
+    }
     
     def getAllReferenceClasses(){
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
