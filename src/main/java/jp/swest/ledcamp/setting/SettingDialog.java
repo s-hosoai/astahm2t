@@ -258,10 +258,10 @@ public class SettingDialog extends JDialog {
             this.stereotype = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
-                TemplatePanel.this.map.setTemplateFile(it);
+                TemplatePanel.this.map.setStereotype(it);
               }
             };
-            new TextBinding(this.templateFile_G, _function);
+            new TextBinding(this.stereotype, _function);
             this.stereotype.setForeground(Color.GRAY);
             FocusAdapter _clearField = this.clearField(this.stereotype);
             this.stereotype.addFocusListener(_clearField);
@@ -270,6 +270,12 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("file extension");
             this.fileExtension_S = _jTextField;
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setFileExtension(it);
+              }
+            };
+            new TextBinding(this.fileExtension_S, _function);
             this.fileExtension_S.setForeground(Color.GRAY);
             FocusAdapter _clearField = this.clearField(this.fileExtension_S);
             this.fileExtension_S.addFocusListener(_clearField);
@@ -278,6 +284,12 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_S = _jTextField;
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              public void accespt(final String it) {
+                TemplatePanel.this.map.setTemplateFile(it);
+              }
+            };
+            new TextBinding(this.templateFile_S, _function);
             this.templateFile_S.setForeground(Color.GRAY);
             String _text = settingDialog.textTemplateDir.getText();
             FocusAdapter _browseFile = this.browseFile(_text, this.templateFile_S);

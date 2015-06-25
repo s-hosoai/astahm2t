@@ -422,19 +422,21 @@ class SettingDialog extends JDialog {
                     cardPane.add(stereotypeCard, TemplateType.Stereotype.name)
                     {
                         stereotype = new JTextField("stereotype")
-                        new TextBinding(templateFile_G, [map.templateFile = it])
+                        new TextBinding(stereotype, [map.stereotype = it])
                         stereotype.foreground = Color.GRAY
                         stereotype.addFocusListener(clearField(stereotype))
                         stereotypeCard.add(stereotype)
                     }
                     {
                         fileExtension_S = new JTextField("file extension")
+                        new TextBinding(fileExtension_S, [map.fileExtension = it])
                         fileExtension_S.foreground = Color.GRAY
                         fileExtension_S.addFocusListener(clearField(fileExtension_S))
                         stereotypeCard.add(fileExtension_S)
                     }
                     {
                         templateFile_S = new JTextField("template file path")
+                        new TextBinding(templateFile_S, [map.templateFile = it])
                         templateFile_S.foreground = Color.GRAY
                         templateFile_S.addFocusListener(
                             browseFile(settingDialog.textTemplateDir.getText(), templateFile_S))
