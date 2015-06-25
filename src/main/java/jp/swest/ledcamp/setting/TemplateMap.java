@@ -24,6 +24,9 @@ public class TemplateMap {
   @Accessors
   private String stereotype;
   
+  @Accessors
+  private String helper;
+  
   public TemplateMap() {
   }
   
@@ -50,6 +53,15 @@ public class TemplateMap {
     stereotypeTemplateMap.templateFile = templateFile;
     stereotypeTemplateMap.fileExtension = fileExtension;
     return stereotypeTemplateMap;
+  }
+  
+  public static String newHelperTemplateMap(final String helperFile) {
+    String _xblockexpression = null;
+    {
+      final TemplateMap helperMap = new TemplateMap();
+      _xblockexpression = helperMap.helper = helperFile;
+    }
+    return _xblockexpression;
   }
   
   @Pure
@@ -104,5 +116,14 @@ public class TemplateMap {
   
   public void setStereotype(final String stereotype) {
     this.stereotype = stereotype;
+  }
+  
+  @Pure
+  public String getHelper() {
+    return this.helper;
+  }
+  
+  public void setHelper(final String helper) {
+    this.helper = helper;
   }
 }

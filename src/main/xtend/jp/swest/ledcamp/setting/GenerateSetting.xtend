@@ -20,6 +20,7 @@ class TemplateMap {
         @Accessors String fileName
         @Accessors String fileExtension
         @Accessors String stereotype
+        @Accessors String helper
         new(){}
         static def newGlobalTemplateMap(String templateFile, String fileName){
             val globalTemplateMap = new TemplateMap
@@ -43,10 +44,14 @@ class TemplateMap {
             stereotypeTemplateMap.fileExtension = fileExtension
             return stereotypeTemplateMap
         }
+        static def newHelperTemplateMap(String helperFile){
+            val helperMap = new TemplateMap
+            helperMap.helper = helperFile
+        }
 }
 
 enum TemplateType{
-    Stereotype, Default, Global
+    Stereotype, Default, Global, Helper
 }
 enum TemplateEngine{
     Groovy //, Velocity

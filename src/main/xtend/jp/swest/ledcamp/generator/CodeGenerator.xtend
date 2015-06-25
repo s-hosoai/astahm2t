@@ -8,10 +8,11 @@ import java.util.HashMap
 import javax.swing.JOptionPane
 import jp.swest.ledcamp.setting.SettingManager
 import jp.swest.ledcamp.setting.TemplateType
-import java.io.File
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.nio.file.LinkOption
+import groovy.util.ScriptException
+import groovy.lang.MissingPropertyException
 
 class CodeGenerator {
     static def generate() throws ClassNotFoundException, ProjectNotFoundException, IOException, HeadlessException, InvalidUsingException {
@@ -31,7 +32,15 @@ class CodeGenerator {
             utils.statemachine = utils.statemachines.get(iClass)
             map.put("u", utils)
             for(mapping : setting.mapping.filter[v|v.templateType==TemplateType::Default]){
-                generator.doGenerate(map, targetPath.resolve(iClass.name+"."+mapping.fileExtension), templatePath.resolve(mapping.templateFile))
+                try{
+                    generator.doGenerate(map, targetPath.resolve(iClass.name+"."+mapping.fileExtension), templatePath.resolve(mapping.templateFile))
+                }catch(Exception e){
+                    switch(e){
+                        case MissingPropertyException : JOptionPane.showMessageDialog(utils.frame, "Cannot found property :"+e.message+". model : "+iClass.name)
+                        default :JOptionPane.showMessageDialog(utils.frame, e.message+".\n in model : "+iClass.name)
+                    }
+                    return
+                }
             }
         }
         for(mapping : setting.mapping.filter[v|v.templateType==TemplateType::Global]){

@@ -4,17 +4,18 @@ import java.util.Map
 import java.io.FileWriter
 import groovy.text.SimpleTemplateEngine
 import java.nio.file.Path
+import static jp.swest.ledcamp.xtendhelper.Using.*
 
-class GroovyGenerator implements ITemplateEngine {
+class GroovyGenerator {
     private SimpleTemplateEngine engine
     new(){
         engine = new SimpleTemplateEngine
     }
     
-    override doGenerate(Map<String, Object> map, Path output, Path templateFile) {
-        var template = engine.createTemplate(templateFile.toFile)
-        var writer = new FileWriter(output.toFile)
-        template.make(map).writeTo(writer)
-        writer.close()
+    def doGenerate(Map<String, Object> map, Path output, Path templateFile) throws Exception{
+        val template = engine.createTemplate(templateFile.toFile)
+        using(new FileWriter(output.toFile))[
+            template.make(map).writeTo(it)
+        ]
     }
 }

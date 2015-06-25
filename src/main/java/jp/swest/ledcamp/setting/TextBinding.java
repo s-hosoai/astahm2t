@@ -4,7 +4,7 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.Document;
-import jp.swest.ledcamp.setting.Consumer;
+import jp.swest.ledcamp.xtendhelper.Consumer;
 
 @SuppressWarnings("all")
 public class TextBinding implements DocumentListener {

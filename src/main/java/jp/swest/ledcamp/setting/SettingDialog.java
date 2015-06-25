@@ -184,7 +184,7 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("file name");
             this.fileName = _jTextField;
-            final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
                 TemplatePanel.this.map.setFileName(it);
               }
@@ -198,7 +198,7 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_G = _jTextField;
-            final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -220,7 +220,7 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("file extension");
             this.fileExtension_D = _jTextField;
-            final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
                 TemplatePanel.this.map.setFileExtension(it);
               }
@@ -234,7 +234,7 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_D = _jTextField;
-            final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -256,7 +256,7 @@ public class SettingDialog extends JDialog {
           {
             JTextField _jTextField = new JTextField("stereotype");
             this.stereotype = _jTextField;
-            final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+            final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -531,7 +531,7 @@ public class SettingDialog extends JDialog {
       {
         JTextField _jTextField = new JTextField();
         this.textTemplateDir = _jTextField;
-        final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+        final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
           public void accespt(final String it) {
             GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
             _currentSetting.setTemplatePath(it);
@@ -574,7 +574,7 @@ public class SettingDialog extends JDialog {
       {
         JTextField _jTextField = new JTextField();
         this.textDestinationPath = _jTextField;
-        final jp.swest.ledcamp.setting.Consumer<String> _function = new jp.swest.ledcamp.setting.Consumer<String>() {
+        final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
           public void accespt(final String it) {
             GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
             _currentSetting.setTargetPath(it);

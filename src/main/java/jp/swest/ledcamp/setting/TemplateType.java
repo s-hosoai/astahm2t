@@ -6,5 +6,7 @@ public enum TemplateType {
   
   Default,
   
-  Global;
+  Global,
+  
+  Helper;
 }

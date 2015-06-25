@@ -27,6 +27,7 @@ import java.awt.GridLayout
 import javax.swing.JOptionPane
 import javax.swing.event.DocumentListener
 import javax.swing.event.DocumentEvent
+import jp.swest.ledcamp.xtendhelper.Consumer
 
 class SettingDialog extends JDialog {
     private SettingManager manager = SettingManager.getInstance
@@ -520,8 +521,4 @@ class TextBinding implements DocumentListener {
     override removeUpdate(DocumentEvent e) {
         setterFunction.accespt(field.text)
     }
-}
-
-interface Consumer<T> {
-    def void accespt(T a)
 }
