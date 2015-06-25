@@ -9,11 +9,16 @@
 
 ## 概要
 Astahで汎用的なコード生成を行うためのプラグインです．
-AstahプラグインからGroovyスクリプトを呼び出す形でコード生成を制御します．
-また，コードテンプレートはGroovyのGStringTemplateEngineを利用しています．
+GroovyのSimpleTemplateEngineを利用してコード生成を行います．
+コード生成のパターンは以下の3種類を用意しています．基本的にプロジェクトが持つ全クラスを対象に生成が行われます．
+条件にマッチするクラスに対して，GroovyのSimpleTemplateEngineの記法に沿ったテンプレートファイルを指定します．
 
-## 使用方法
-### プラグインの追加
+ - Default      ：　ステレオタイプの無いクラスを対象にコード生成を行います．
+ - Stereotype   ：　ステレオタイプごとにテンプレートを指定します．
+ - Global       :　クラスごとではなく，プロジェクトに共通のコードを生成します．
+
+## インストール
+### プラグインのインストール
  - ヘルプ＞プラグイン一覧
   + ＋インストール
   + →プラグインファイルを選択 (astahm2t/target/～.jar）
@@ -21,66 +26,107 @@ AstahプラグインからGroovyスクリプトを呼び出す形でコード生
 
 Astah再起動
 
-### 設定ファイルの追加
-
-初回の起動時に下記フォルダが生成される．
+### 設定フォルダ・設定ファイルの生成
+プラグイン用のフォルダが生成されていない場合，初回の起動時に下記フォルダとサンプル類が生成されます．
 
  - Windows
 　C:/Users/{username}/.astah/plugins/m2t/
  - Mac
 　UserHome?/.astah/plugins/m2t/
 
-上記のフォルダに，
-`astahm2t/groovy/*`
-のファイルをすべてコピー
+## 利用方法
+プラグインがインストールされると，ツールメニューの一番下にm2tメニューが追加されます．
+m2tメニューには，Generate（現在の設定でコード生成）とSettings（コード生成の設定）が含まれます．
 
-設定ファイル(m2t.properties)のパスを自身の環境のものに変更
-`5 : generator_ArduinoCreate=C:\\Users\\hosoai`
+### 設定
+Settingを開いて，コード生成の設定を行いましょう．
+![Astahm2tSetting.png](Astahm2tSetting.png)
 
-　# 今後，自動的にサンプルのファイル一緒に作成するようにします・・．
-
-Astah再起動
+設定名の箇所で，現在の生成設定を指定します．新たに追加する場合はAdd, 現在の設定を削除する場合はRemoveをクリックしてください．  
+テンプレートフォルダはデフォルトでは上記の設定フォルダ下のtemplates/になっています．別途指定したい場合は変更してください．（複数のテンプレートを管理する場合は，templatesフォルダ下に
+設定ごとのフォルダを作成して，テンプレートを保存した方がよいでしょう）    
+生成先はデフォルトではユーザディレクトリとなっています．生成したいディレクトリに変更してください．  
+テンプレートのマッピングは，ステレオタイプを指定しないものは，Default，指定するものはStereotype, プロジェクトに共通のファイルはGlobalで指定します．    
 
 ### 生成テスト
-サンプルのUMLを開く（led-sample.asta等）
-AstahM2T Generator Viewで，
-Generator Type : Arduino Create
-Project : 適当に
-Target Dir : 適当に
-と設定し，Generate
-現状何も反応がないのですが，，ターゲットディレクトリにファイルが生成されてるはず
+~/.astah/plugins/m2t/sampleDiagram下にサンプルのAstahファイルがあります．
+とりあえず試してみたい場合は，こちらを試してみてください．
+
+一応どのファイルと設定の組み合わせでも生成は可能ですが，以下の組み合わせを想定しています．
+・JavaSample -> 設定名Java  
+・Sample -> 設定名LED-Camp
+
+## テンプレートファイルの作成
+テンプレートの作成は，GroovyのSimpleTemplateEngineの記法で行います．
+[http://www.groovy-lang.org/templating.html#_simpletemplateengine](http://www.groovy-lang.org/templating.html#_simpletemplateengine)
+
+またテンプレートファイルには，以下の変数が渡されています．
+
+・u : Utility Class(クラスやその他もろもろを詰め込んだユーティリティクラスです．）
+ユーティリティからは下記の各属性にアクセスできます．
+
+例えば，クラス名を生成したい場合は，${u.name}と記述します．Java風にクラス定義を記述するのであれば，
+java.template
+
+    public class ${u.name} {
+    
+    }
+
+とすれば，クラスのひな形が生成されます．
+
+### 変数アクセス
+変数に含まれる文字列を展開する場合，${変数名}といった記法でアクセスします．
+getterメソッドがある場合は，getを省略した形でアクセスすることができます．  
+例えばgetName()といったメソッドを持っていた場合，nameとしてアクセスできます．
+
+ユーティリティクラスには，主要な要素にアクセスするためのGetterメソッドを用意しています．
+それ以外の要素にアクセスする場合は，iclass（クラスインスタンス）やapi, projectAccessor等の変数を利用してください．
+[http://members.change-vision.com/javadoc/astah-api/6_9_0/api/ja/doc/javadoc/index.html](http://members.change-vision.com/javadoc/astah-api/6_9_0/api/ja/doc/javadoc/index.html)
+
+iclassは[IClass](http://members.change-vision.com/javadoc/astah-api/6_9_0/api/ja/doc/javadoc/com/change_vision/jude/api/inf/model/IClass.html)を参照してください．
+例えば，抽象クラスか否か判断して，abstractキーワードを記述する場合は以下のようになります
+Abstract sample
+
+    public <% if(u.iclass.isAbstract){%>abstract<%}%> class ${u.name} {
 
 
+### 制御構文
+以下主要な制御構文についてです．
 
-## 生成の流れ
-プラグインを実行すると，プラグインからModelCollector, FileGeneratorのGroovyコードがコールされます．
-ModelCollectorはAstah APIで現在のプロジェクトからコード生成に用いるモデルを集め，
-FileGeneratorは集めたモデルに応じて，テンプレートを選択しファイルを生成します．
-Groovyコードには，bindingを用いてオブジェクトを渡します．
-ModelCollectorには，ProjectAccessor(Binding名：projectaccessor)が渡されています．
-また，集めたモデルは同じくbinding.putでFileGeneratorに渡します．
+#### if
+    <%if(condition){%>
+      // condition is true
+    <%}else{%>
+      // condition is false
+    <%}%>
 
-両者を分けている理由として，再利用性を高める意図があります．
-例えば，クラスとステートマシンからJavaコードを生成する場合と，同じくクラスとステートマシンからCコードを生成する場合では，
-ModelCollectorは同様のものが利用出来ます．
-一方FileGeneratorでは，各言語に応じてテンプレートの切り替えや，モデルの参照方法が異なるため，言語ごとのものを
-作成する必要があります．
+#### for
+    <% for(variable in listVariable) {%>
+        ${variable}
+    <%}%>
 
-テンプレートは，Groovyのテンプレートエンジンを利用しています．
-テンプレート単体では，少々機能的に心許ないため，モデル操作のためのUtilクラスも一緒に利用出来るようにしています．
-例えばステートマシンで初期状態のモデルを参照したい場合など，テンプレート内に処理を書いてしまうとテンプレートが複雑になってしまう
-ため，初期状態を得るためのメソッドをUtilクラスに追加し，利用するようにします．
+メソッドの定義をするのであれば，以下のような感じです．（アクセス修飾子，パラメータ展開を除く. Astahのメソッドの”定義”にメソッド内処理を記述しているとする）
 
-### 参照ファイル
-コード生成用の設定ファイルやスクリプト，テンプレートはデフォルトでは，ユーザディレクトリ/.astah下を指定しています．
+Java Method sample
 
-- ユーザディレクトリ/.astah/plugins/
-- ユーザディレクトリ/.astah/plugins/m2t/
- - ModelCollector.groovy : astahから必要なモデルを集めるスクリプト
- - FileGenerator.groovy ： modelに応じたテンプレートを用いてファイルを生成するスクリプト
- - ClassUtils.groovy : クラス図の要素を扱う際に便利なUtils
- - StateUtils.groovy : ステートマシン図 〃
-- ユーザディレクトリ/.astah/plugins/m2t/template
- - cpp.template : C言語のソースファイル用テンプレート
- - header.template : C言語のヘッダファイル用テンプレート
- - arduino.template : Arduinoソースファイル用テンプレート
+    <%for(method in u.iclass.operations) {%>
+    ${method.returnType} ${method.name}(){
+        ${method.definition}
+    }
+    <%}%>
+
+
+### ヘルパーメソッドの定義
+<% ~　%>の間はGroovyスクリプトとして解釈されます．このため，<% def func(param){} %>といった記法でヘルパーメソッドを追加できます．  
+例えば，上記のAbstractの例は，一文で書くには少々冗長です． 下記のようにヘルパーを作成すれば，テンプレート部を（多少）簡潔にできます．
+
+Abstract sample with helper
+
+    <% def isAbstract(c){ if(c.isAbstract){return "abstract"} %>'''
+    public ${isAbstract(u.iclass)} class ${u.name} {
+
+
+## For Developer
+本プラグインはXtendにて作成しています．src/main/javaのコードはすべて生成コードです．
+変更を加える場合は，src/main/xtendのコードを変更してください．
+（Plugin APIがJava8に対応した場合は，Javaに戻すかもしれませんが．）
