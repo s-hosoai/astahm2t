@@ -289,8 +289,11 @@ class SettingDialog extends JDialog {
 
     private def browseDirectory(String path, JTextField field) {
         val pluginPath = new File(path)
+        val file = new File(field.text)
         val dirChooser = new JFileChooser
-        if (pluginPath.exists) {
+        if (file.exists){
+            dirChooser.currentDirectory = file
+        }else if (pluginPath.exists) {
             dirChooser.currentDirectory = pluginPath
         }
         dirChooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
@@ -467,8 +470,11 @@ class SettingDialog extends JDialog {
                 override focusGained(FocusEvent e) {
                     if (first) {
                         val fileChooser = new JFileChooser()
+                        val file = new File(path+"/"+field.text)
                         val dir = new File(path)
-                        if (dir.exists) {
+                        if (file.exists){
+                            fileChooser.currentDirectory = file                            
+                        }else if (dir.exists) {
                             fileChooser.currentDirectory = dir
                         }
                         if (JFileChooser.APPROVE_OPTION == fileChooser.showOpenDialog(parent)) {

@@ -326,10 +326,18 @@ public class SettingDialog extends JDialog {
         public void focusGained(final FocusEvent e) {
           if (this.first) {
             final JFileChooser fileChooser = new JFileChooser();
+            String _text = field.getText();
+            String _plus = ((path + "/") + _text);
+            final File file = new File(_plus);
             final File dir = new File(path);
-            boolean _exists = dir.exists();
+            boolean _exists = file.exists();
             if (_exists) {
-              fileChooser.setCurrentDirectory(dir);
+              fileChooser.setCurrentDirectory(file);
+            } else {
+              boolean _exists_1 = dir.exists();
+              if (_exists_1) {
+                fileChooser.setCurrentDirectory(dir);
+              }
             }
             Container _parent = TemplatePanel.this.getParent();
             int _showOpenDialog = fileChooser.showOpenDialog(_parent);
@@ -755,10 +763,17 @@ public class SettingDialog extends JDialog {
   
   private void browseDirectory(final String path, final JTextField field) {
     final File pluginPath = new File(path);
+    String _text = field.getText();
+    final File file = new File(_text);
     final JFileChooser dirChooser = new JFileChooser();
-    boolean _exists = pluginPath.exists();
+    boolean _exists = file.exists();
     if (_exists) {
-      dirChooser.setCurrentDirectory(pluginPath);
+      dirChooser.setCurrentDirectory(file);
+    } else {
+      boolean _exists_1 = pluginPath.exists();
+      if (_exists_1) {
+        dirChooser.setCurrentDirectory(pluginPath);
+      }
     }
     dirChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
     Container _parent = this.getParent();
