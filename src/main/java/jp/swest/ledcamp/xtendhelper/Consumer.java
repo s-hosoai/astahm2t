@@ -1,4 +1,4 @@
-package jp.swest.ledcamp.setting;
+package jp.swest.ledcamp.xtendhelper;
 
 @SuppressWarnings("all")
 public interface Consumer<T extends Object> {
