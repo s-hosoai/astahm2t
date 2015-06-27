@@ -30,7 +30,7 @@ class GeneratorUtils {
         api = AstahAPI.getAstahAPI()
         projectAccessor = api.getProjectAccessor()
         projectRoot = projectAccessor.getProject() // exist project?
-
+        
         // Collect classes and statemachines.
         classes = new ArrayList<IClass>()
         statemachines = new HashMap<IClass, IStateMachine>()

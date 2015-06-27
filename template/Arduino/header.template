@@ -1,0 +1,47 @@
+<% def stateInstance = u.instanceName+"_state"%>\
+<% def eventInstance = u.instanceName+"_event"%>\
+#ifndef ${u.name}_H
+#define ${u.name}_H
+#include "Arduino.h"
+//#include <arduino.h>
+//#include <Create.h>
+/* class declaration */
+class ${u.name}
+{
+public:
+/* events and states enums */
+<%if(u.statemachine){%>\
+	enum State_T{
+		<%for(state in u.states){%>${state}, <%}%>
+	};
+	enum Event_T{
+		<%for(event in u.events){ if(event=="true") continue; %>${event}, <%}%> None
+	};
+<%}%>\
+/* member var */
+<%for(var in u.iclass.getAttributes()){%>\
+<%if(var.getAssociation() == null){%>\
+	${var.getTypeExpression()} ${var.getName()};
+<%}%>\
+<%}%>\
+
+/* functions */
+	static ${u.name}* getInstance(){
+		static ${u.name} instance;
+		return &instance;
+	}
+<%if(u.statemachine){%>\
+	void transition(${u.name}::Event_T event);
+	void doAction();
+<%}%>\
+<%for(op in u.iclass.operations){%>\
+	${op.returnType.name} ${op.name}(<%=op.parameters.collect{it.type}.join(", ")%>);
+<%}%>\
+private:
+	${u.name}();
+	~${u.name}();
+<%if(u.statemachine){%>\
+	State_T ${stateInstance};
+<%}%>\
+};
+#endif //${u.name}_H

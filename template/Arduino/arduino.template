@@ -1,0 +1,30 @@
+#include "Arduino.h"
+<% for(c in u.classes){ %>\
+#include "${c.name}.h"
+<%}%>\
+
+<% for(c in u.classes){ %>\
+${c.name} *${u.getInstanceName(c)};
+<%}%>\
+
+void setup()
+{
+<% for(c in u.classes){ %>\
+	${u.getInstanceName(c)} = ${c.name}::getInstance();
+<%}%>\
+	pinMode(PIN_LED0, OUTPUT);
+}
+
+void loop()
+{
+<% for(c in u.classes){%>\
+<%if(u.statemachines.get(c)){%>\
+  ${u.getInstanceName(c)}->transition(${c.name}::None);
+<%}%>\
+<%}%>\
+<% for(c in u.classes){%>\
+<%if(u.statemachines.get(c)){%>\
+  ${u.getInstanceName(c)}->doAction();
+<%}%>\
+<%}%>\
+}

@@ -1,0 +1,62 @@
+<% def stateInstance = u.instanceName+"_state"%>\
+<% def eventInstance = u.instanceName+"_event"%>\
+<% def getStateName(state){u.name+"::"+state.name}%>\
+<% def getEventName(event){u.name+"_"}%>\
+#include "${u.name}.h"
+${u.name}::${u.name}(){
+<%if(u.statemachine){%>\
+	${stateInstance}=${u.initialState};
+<%}%>\
+}
+${u.name}::~${u.name}(){}
+
+<%if(u.statemachine){%>\
+void ${u.name}::transition(${u.name}::Event_T event){
+  switch(${stateInstance}){
+<%for(state in u.states){%>\
+  case ${getStateName(state)}:
+<%for(t in state.outgoings){%>\
+    if(<%if(t.guard.trim()!="") {out<<t.guard+" && "}%><%if(t.event=="true") { out<<"true" } else {%>event == ${u.name}::${t.event}<%}%>){
+<%if(state.exit.trim()!="") {%>\
+      ${state.exit}; // ${state.name} exit action;
+<%}%>\
+<%if(t.action.trim()!="") {%>\
+      ${t.action}; // ${t.name} transition action;
+<%}%>\
+      ${stateInstance} = ${getStateName(t.target)};
+<%if(t.target.entry.trim()!=""){%>\
+      ${t.target.entry}; // ${getStateName(t.target)} entry action;
+<%}%>\
+    }
+<%}%>\
+    break;
+<%}%>\
+  default:
+    break;
+  }
+}
+<%}%>\
+
+<%if(u.statemachine){%>\
+void ${u.name}::doAction(){
+  switch(${stateInstance}){
+<%for(state in u.states){%>\
+  case ${getStateName(state)}:
+<%if(state.doActivity.trim()!=""){%>\
+    ${state.doActivity};
+<%}%>\
+    break;
+<%}%>\
+  default:
+    break;
+  }
+}
+<%}%>\
+
+<%for(op in u.iclass.operations){%>\
+${op.returnType.name} ${u.name}::${op.name}(<%=op.parameters.collect{it.typeExpression+" "+it.name}.join(", ")%>){
+<%for(body in op.definition.split("\n")){%>\
+  ${body}
+<%}%>\
+}
+<%}%>\
