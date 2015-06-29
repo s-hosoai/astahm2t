@@ -19,12 +19,12 @@ void loop()
 {
 <% for(c in u.classes){%>\
 <%if(u.statemachines.get(c)){%>\
-  ${u.getInstanceName(c)}->transition(${c.name}::None);
+	${u.getInstanceName(c)}->transition(${c.name}::None);
 <%}%>\
 <%}%>\
 <% for(c in u.classes){%>\
 <%if(u.statemachines.get(c)){%>\
-  ${u.getInstanceName(c)}->doAction();
+	${u.getInstanceName(c)}->doAction();
 <%}%>\
 <%}%>\
 }

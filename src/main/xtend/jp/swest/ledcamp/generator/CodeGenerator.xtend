@@ -25,7 +25,7 @@ class CodeGenerator {
         val utils = new GeneratorUtils
         val templatePath = Paths.get(setting.templatePath)
         val targetPath = Paths.get(setting.targetPath)
-        if (Files.exists(targetPath, LinkOption.NOFOLLOW_LINKS)) {
+        if (!Files.exists(targetPath, LinkOption.NOFOLLOW_LINKS)) {
             Files.createDirectories(targetPath)
         }
         for (iClass : utils.classes) {

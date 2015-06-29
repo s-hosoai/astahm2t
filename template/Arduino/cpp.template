@@ -12,51 +12,59 @@ ${u.name}::~${u.name}(){}
 
 <%if(u.statemachine){%>\
 void ${u.name}::transition(${u.name}::Event_T event){
-  switch(${stateInstance}){
+	switch(${stateInstance}){
 <%for(state in u.states){%>\
-  case ${getStateName(state)}:
+	case ${getStateName(state)}:
 <%for(t in state.outgoings){%>\
-    if(<%if(t.guard.trim()!="") {out<<t.guard+" && "}%><%if(t.event=="true") { out<<"true" } else {%>event == ${u.name}::${t.event}<%}%>){
+		if(<%if(t.guard.trim()!="") {out<<t.guard+" && "}%><%if(t.event=="true") { out<<"true" } else {%>event == ${u.name}::${t.event}<%}%>){
 <%if(state.exit.trim()!="") {%>\
-      ${state.exit}; // ${state.name} exit action;
+<%for(exitAct in state.exit.normalize().split("\n")){%>\
+			${exitAct.trim()}; // ${state.name} exit action;
+<%}%>\
 <%}%>\
 <%if(t.action.trim()!="") {%>\
-      ${t.action}; // ${t.name} transition action;
+<%for(transAct in t.action.normalize().split("\n")){%>\
+			${transAct.trim()}; // transition action
 <%}%>\
-      ${stateInstance} = ${getStateName(t.target)};
+<%}%>\
+			${stateInstance} = ${getStateName(t.target)};
 <%if(t.target.entry.trim()!=""){%>\
-      ${t.target.entry}; // ${getStateName(t.target)} entry action;
+<%for(entryAct in t.target.entry.normalize().split("\n")){%>\
+			${entryAct.trim()}; // ${getStateName(t.target)} entry action;
 <%}%>\
-    }
 <%}%>\
-    break;
+		}
 <%}%>\
-  default:
-    break;
-  }
+		break;
+<%}%>\
+	default:
+		break;
+	}
 }
 <%}%>\
 
 <%if(u.statemachine){%>\
 void ${u.name}::doAction(){
-  switch(${stateInstance}){
+	switch(${stateInstance}){
 <%for(state in u.states){%>\
-  case ${getStateName(state)}:
+	case ${getStateName(state)}:
 <%if(state.doActivity.trim()!=""){%>\
-    ${state.doActivity};
+<%for(doAct in state.doActivity.normalize().split("\n")){%>\
+		${doAct.trim()};
 <%}%>\
-    break;
 <%}%>\
-  default:
-    break;
-  }
+		break;
+<%}%>\
+	default:
+		break;
+	}
 }
 <%}%>\
 
 <%for(op in u.iclass.operations){%>\
 ${op.returnType.name} ${u.name}::${op.name}(<%=op.parameters.collect{it.typeExpression+" "+it.name}.join(", ")%>){
 <%for(body in op.definition.split("\n")){%>\
-  ${body}
+	${body}
 <%}%>\
 }
 <%}%>\

@@ -42,7 +42,8 @@ public class CodeGenerator {
       String _targetPath = setting.getTargetPath();
       final Path targetPath = Paths.get(_targetPath);
       boolean _exists = Files.exists(targetPath, LinkOption.NOFOLLOW_LINKS);
-      if (_exists) {
+      boolean _not = (!_exists);
+      if (_not) {
         Files.createDirectories(targetPath);
       }
       List<IClass> _classes = utils.getClasses();
