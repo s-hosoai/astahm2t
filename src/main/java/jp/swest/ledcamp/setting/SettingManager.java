@@ -28,7 +28,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   @XmlTransient
   @Accessors
-  private static String settingFilePath;
+  private String settingFilePath;
   
   @Accessors
   private GenerateSetting currentSetting;
@@ -37,13 +37,16 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   private String userFolder = System.getProperty("user.home");
   
   @XmlTransient
+  @Accessors
   private String m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
+  
+  @XmlTransient
+  @Accessors
+  private String currentAstahFileName;
   
   private SettingManager() {
     super();
-    final String userFolder = System.getProperty("user.home");
-    final String m2tPluginFolderPath = (userFolder + "/.astah/plugins/m2t/");
-    SettingManager.settingFilePath = (m2tPluginFolderPath + "m2tsetting.xml");
+    this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
   }
   
   public static SettingManager getInstance() {
@@ -57,7 +60,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   public void save() {
-    File _file = new File(SettingManager.settingFilePath);
+    File _file = new File(this.settingFilePath);
     JAXB.marshal(SettingManager.instance, _file);
   }
   
@@ -67,7 +70,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
       String _property = System.getProperty("user.home");
       this.userFolder = _property;
       this.m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
-      SettingManager.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
+      this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
       final File asgenPluginFolder = new File(this.m2tPluginFolderPath);
       boolean _exists = asgenPluginFolder.exists();
       boolean _not = (!_exists);
@@ -108,13 +111,13 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
       try {
         GenerateSetting _xblockexpression_1 = null;
         {
-          final File settingFile = new File(SettingManager.settingFilePath);
+          final File settingFile = new File(this.settingFilePath);
           GenerateSetting _xifexpression = null;
           boolean _exists_1 = settingFile.exists();
           if (_exists_1) {
             GenerateSetting _xblockexpression_2 = null;
             {
-              File _file = new File(SettingManager.settingFilePath);
+              File _file = new File(this.settingFilePath);
               final SettingManager settings = JAXB.<SettingManager>unmarshal(_file, SettingManager.class);
               SettingManager.instance.clear();
               SettingManager.instance.putAll(settings);
@@ -223,12 +226,12 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   @Pure
-  public static String getSettingFilePath() {
-    return SettingManager.settingFilePath;
+  public String getSettingFilePath() {
+    return this.settingFilePath;
   }
   
-  public static void setSettingFilePath(final String settingFilePath) {
-    SettingManager.settingFilePath = settingFilePath;
+  public void setSettingFilePath(final String settingFilePath) {
+    this.settingFilePath = settingFilePath;
   }
   
   @Pure
@@ -238,5 +241,23 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   public void setCurrentSetting(final GenerateSetting currentSetting) {
     this.currentSetting = currentSetting;
+  }
+  
+  @Pure
+  public String getM2tPluginFolderPath() {
+    return this.m2tPluginFolderPath;
+  }
+  
+  public void setM2tPluginFolderPath(final String m2tPluginFolderPath) {
+    this.m2tPluginFolderPath = m2tPluginFolderPath;
+  }
+  
+  @Pure
+  public String getCurrentAstahFileName() {
+    return this.currentAstahFileName;
+  }
+  
+  public void setCurrentAstahFileName(final String currentAstahFileName) {
+    this.currentAstahFileName = currentAstahFileName;
   }
 }

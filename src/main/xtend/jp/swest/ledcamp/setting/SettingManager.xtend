@@ -14,16 +14,15 @@ import java.io.IOException
 // Singleton
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
-    @XmlTransient @Accessors private static String settingFilePath
+    @XmlTransient @Accessors private String settingFilePath
     @Accessors private GenerateSetting currentSetting
     @XmlTransient private String userFolder = System.getProperty("user.home")
-    @XmlTransient private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
-
+    @XmlTransient @Accessors private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
+    @XmlTransient @Accessors private String currentAstahFileName
+    
     private new() {
         super()
-        val userFolder = System.getProperty("user.home")
-        val m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
-        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+       settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
     }
 
     static def getInstance() {
