@@ -50,8 +50,9 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                 var BufferedInputStream bis = null;
                 var BufferedOutputStream bos = null;
                 try {
-                    bis = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("m2t.zip"));
-                    bos = new BufferedOutputStream(new FileOutputStream(zipFile));
+                    bis = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("m2t.zip"))
+//                    println(getClass().classLoader.getResource("m2t.zip")
+                    bos = new BufferedOutputStream(new FileOutputStream(zipFile))
                     writeFile(bis, bos);
                 } finally {
                     bis.close();
@@ -83,13 +84,15 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     private def createDefaultSetting(){
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/grsakura/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
+        sampleGenerateSetting.templateID = "grsakura"
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("cpp.template", "cpp"))
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("header.template", "h"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("arduino.template", "Sketch.cpp"))
-        instance.put("sample", sampleGenerateSetting)
+        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp"))
+        instance.put("grsakura", sampleGenerateSetting)
         instance.currentSetting = sampleGenerateSetting
+        save
     }
 
     def getMap() {

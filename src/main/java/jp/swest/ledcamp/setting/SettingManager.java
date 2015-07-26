@@ -148,30 +148,28 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
     return _xblockexpression;
   }
   
-  private GenerateSetting createDefaultSetting() {
-    GenerateSetting _xblockexpression = null;
-    {
-      final GenerateSetting sampleGenerateSetting = new GenerateSetting();
-      File _file = new File(this.userFolder);
-      String _absolutePath = _file.getAbsolutePath();
-      sampleGenerateSetting.setTargetPath(_absolutePath);
-      File _file_1 = new File((this.m2tPluginFolderPath + "templates/"));
-      String _absolutePath_1 = _file_1.getAbsolutePath();
-      sampleGenerateSetting.setTemplatePath(_absolutePath_1);
-      sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
-      HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
-      TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap("cpp.template", "cpp");
-      _mapping.add(_newDefaultTemplateMap);
-      HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
-      TemplateMap _newDefaultTemplateMap_1 = TemplateMap.newDefaultTemplateMap("header.template", "h");
-      _mapping_1.add(_newDefaultTemplateMap_1);
-      HashSet<TemplateMap> _mapping_2 = sampleGenerateSetting.getMapping();
-      TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("arduino.template", "Sketch.cpp");
-      _mapping_2.add(_newGlobalTemplateMap);
-      SettingManager.instance.put("sample", sampleGenerateSetting);
-      _xblockexpression = SettingManager.instance.currentSetting = sampleGenerateSetting;
-    }
-    return _xblockexpression;
+  private void createDefaultSetting() {
+    final GenerateSetting sampleGenerateSetting = new GenerateSetting();
+    File _file = new File(this.userFolder);
+    String _absolutePath = _file.getAbsolutePath();
+    sampleGenerateSetting.setTargetPath(_absolutePath);
+    File _file_1 = new File((this.m2tPluginFolderPath + "templates/grsakura/"));
+    String _absolutePath_1 = _file_1.getAbsolutePath();
+    sampleGenerateSetting.setTemplatePath(_absolutePath_1);
+    sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
+    sampleGenerateSetting.setTemplateID("grsakura");
+    HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
+    TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap("cpp.template", "cpp");
+    _mapping.add(_newDefaultTemplateMap);
+    HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
+    TemplateMap _newDefaultTemplateMap_1 = TemplateMap.newDefaultTemplateMap("header.template", "h");
+    _mapping_1.add(_newDefaultTemplateMap_1);
+    HashSet<TemplateMap> _mapping_2 = sampleGenerateSetting.getMapping();
+    TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp");
+    _mapping_2.add(_newGlobalTemplateMap);
+    SettingManager.instance.put("grsakura", sampleGenerateSetting);
+    SettingManager.instance.currentSetting = sampleGenerateSetting;
+    this.save();
   }
   
   public Map<String, GenerateSetting> getMap() {
