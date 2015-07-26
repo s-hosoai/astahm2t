@@ -14,16 +14,15 @@ import java.io.IOException
 // Singleton
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
-    @XmlTransient @Accessors private static String settingFilePath
+    @XmlTransient @Accessors private String settingFilePath
     @Accessors private GenerateSetting currentSetting
     @XmlTransient private String userFolder = System.getProperty("user.home")
-    @XmlTransient private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
-
+    @XmlTransient @Accessors private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
+    @XmlTransient @Accessors private String currentAstahFileName
+    
     private new() {
         super()
-        val userFolder = System.getProperty("user.home")
-        val m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
-        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+       settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
     }
 
     static def getInstance() {
@@ -51,8 +50,9 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                 var BufferedInputStream bis = null;
                 var BufferedOutputStream bos = null;
                 try {
-                    bis = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("m2t.zip"));
-                    bos = new BufferedOutputStream(new FileOutputStream(zipFile));
+                    bis = new BufferedInputStream(getClass().getClassLoader().getResourceAsStream("m2t.zip"))
+//                    println(getClass().classLoader.getResource("m2t.zip")
+                    bos = new BufferedOutputStream(new FileOutputStream(zipFile))
                     writeFile(bis, bos);
                 } finally {
                     bis.close();
@@ -70,6 +70,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                 instance.clear
                 instance.putAll(settings)
                 instance.currentSetting = settings.currentSetting
+                println("setting file current : "+settings.currentSetting.templateID)
             }else{
                 createDefaultSetting
                 save
@@ -83,13 +84,15 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     private def createDefaultSetting(){
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/grsakura/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
+        sampleGenerateSetting.templateID = "grsakura"
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("cpp.template", "cpp"))
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("header.template", "h"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("arduino.template", "Sketch.cpp"))
-        instance.put("sample", sampleGenerateSetting)
+        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp"))
+        instance.put("grsakura", sampleGenerateSetting)
         instance.currentSetting = sampleGenerateSetting
+        save
     }
 
     def getMap() {

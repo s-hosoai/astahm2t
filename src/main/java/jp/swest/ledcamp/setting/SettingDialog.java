@@ -43,7 +43,8 @@ import jp.swest.ledcamp.setting.TemplateType;
 import jp.swest.ledcamp.setting.TextBinding;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Conversions;
-import org.eclipse.xtext.xbase.lib.InputOutput;
+import org.eclipse.xtext.xbase.lib.Functions.Function1;
+import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.Pure;
 import org.eclipse.xtext.xbase.lib.StringExtensions;
 
@@ -110,11 +111,21 @@ public class SettingDialog extends JDialog {
             this.setField(this.stereotype, _stereotype);
             break;
           default:
-            InputOutput.<String>println("select default");
+            {
+              String _templateFile_3 = map.getTemplateFile();
+              this.setField(this.templateFile_D, _templateFile_3);
+              String _fileExtension_2 = map.getFileExtension();
+              this.setField(this.fileExtension_D, _fileExtension_2);
+            }
             break;
         }
       } else {
-        InputOutput.<String>println("select default");
+        {
+          String _templateFile_3 = map.getTemplateFile();
+          this.setField(this.templateFile_D, _templateFile_3);
+          String _fileExtension_2 = map.getFileExtension();
+          this.setField(this.fileExtension_D, _fileExtension_2);
+        }
       }
     }
     
@@ -408,310 +419,308 @@ public class SettingDialog extends JDialog {
   public SettingDialog(final JFrame parent) {
     super(parent, "Generator Settings", true);
     this.initComponent();
-    this.load();
   }
   
-  private Component initComponent() {
-    Component _xblockexpression = null;
+  private void initComponent() {
+    this.setBounds(100, 100, 800, 600);
+    final Container root = this.getContentPane();
+    BorderLayout _borderLayout = new BorderLayout();
+    root.setLayout(_borderLayout);
+    EmptyBorder _emptyBorder = new EmptyBorder(5, 5, 5, 5);
+    this.contentPanel.setBorder(_emptyBorder);
+    root.add(this.contentPanel, BorderLayout.CENTER);
+    final GridBagLayout gbl = new GridBagLayout();
+    gbl.columnWeights = new double[] { 0, 0, 0, 0 };
+    gbl.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
+    gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
+    gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
+    this.contentPanel.setLayout(gbl);
+    final Insets insets = new Insets(0, 0, 5, 5);
     {
-      this.setBounds(100, 100, 800, 600);
-      final Container root = this.getContentPane();
-      BorderLayout _borderLayout = new BorderLayout();
-      root.setLayout(_borderLayout);
-      EmptyBorder _emptyBorder = new EmptyBorder(5, 5, 5, 5);
-      this.contentPanel.setBorder(_emptyBorder);
-      root.add(this.contentPanel, BorderLayout.CENTER);
-      final GridBagLayout gbl = new GridBagLayout();
-      gbl.columnWeights = new double[] { 0, 0, 0, 0 };
-      gbl.columnWeights = new double[] { 0.0, 1.0, 0.0, Double.MIN_VALUE };
-      gbl.rowHeights = new int[] { 0, 0, 0, 0, 0, 0, 0 };
-      gbl.rowWeights = new double[] { 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, Double.MIN_VALUE };
-      this.contentPanel.setLayout(gbl);
-      final Insets insets = new Insets(0, 0, 5, 5);
-      {
-        JComboBox<String> _jComboBox = new JComboBox<String>();
-        this.combo_templateSet = _jComboBox;
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            SettingDialog.this.changeTemplateSet();
-          }
-        };
-        this.combo_templateSet.addActionListener(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.anchor = GridBagConstraints.ABOVE_BASELINE;
-        gbc.insets = insets;
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        this.contentPanel.add(this.combo_templateSet, gbc);
-      }
-      {
-        JPanel paneButton = new JPanel();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        gbc.insets = insets;
-        gbc.anchor = GridBagConstraints.WEST;
-        this.contentPanel.add(paneButton, gbc);
-        {
-          JButton _jButton = new JButton("Add");
-          this.btnAddSet = _jButton;
-          final ActionListener _function = new ActionListener() {
-            public void actionPerformed(final ActionEvent it) {
-              final String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
-              boolean _notEquals = (!Objects.equal(setName, null));
-              if (_notEquals) {
-                final GenerateSetting generateSetting = new GenerateSetting();
-                SettingDialog.this.manager.put(setName, generateSetting);
-                SettingDialog.this.manager.setCurrentSetting(generateSetting);
-                GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
-                _currentSetting.setTemplateID(setName);
-                SettingDialog.this.combo_templateSet.addItem(setName);
-                SettingDialog.this.combo_templateSet.setSelectedItem(setName);
-                SettingDialog.this.enableAll();
-              }
-            }
-          };
-          this.btnAddSet.addActionListener(_function);
-          GridBagConstraints _gridBagConstraints = new GridBagConstraints();
-          gbc = _gridBagConstraints;
-          gbc.anchor = GridBagConstraints.WEST;
-          gbc.insets = insets;
-          gbc.gridx = 1;
-          gbc.gridy = 0;
-          paneButton.add(this.btnAddSet, gbc);
+      JComboBox<String> _jComboBox = new JComboBox<String>();
+      this.combo_templateSet = _jComboBox;
+      Set<String> _keySet = this.manager.keySet();
+      final Consumer<String> _function = new Consumer<String>() {
+        public void accept(final String it) {
+          SettingDialog.this.combo_templateSet.addItem(it);
         }
-        {
-          final JButton btnRemoveSet = new JButton("Remove");
-          final ActionListener _function = new ActionListener() {
-            public void actionPerformed(final ActionEvent it) {
-              final Object selectedSet = SettingDialog.this.combo_templateSet.getSelectedItem();
-              SettingDialog.this.combo_templateSet.removeItem(selectedSet);
-              SettingDialog.this.manager.remove(selectedSet);
-              final Object afterSelectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
-              boolean _notEquals = (!Objects.equal(afterSelectedItem, null));
-              if (_notEquals) {
-                Object _selectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
-                GenerateSetting _get = SettingDialog.this.manager.get(_selectedItem);
-                SettingDialog.this.manager.setCurrentSetting(_get);
-              } else {
-                SettingDialog.this.manager.setCurrentSetting(null);
-                SettingDialog.this.disableAll();
-              }
-            }
-          };
-          btnRemoveSet.addActionListener(_function);
-          GridBagConstraints _gridBagConstraints = new GridBagConstraints();
-          gbc = _gridBagConstraints;
-          gbc.anchor = GridBagConstraints.WEST;
-          gbc.insets = insets;
-          gbc.gridx = 2;
-          gbc.gridy = 0;
-          paneButton.add(btnRemoveSet, gbc);
-        }
+      };
+      _keySet.forEach(_function);
+      int _itemCount = this.combo_templateSet.getItemCount();
+      boolean _equals = (_itemCount == 0);
+      if (_equals) {
+        this.disableAll();
       }
-      {
-        final JLabel lblTemplateEngine = new JLabel("Template Engine");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.EAST;
-        Insets _insets = new Insets(0, 10, 5, 10);
-        gbc.insets = _insets;
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        this.contentPanel.add(lblTemplateEngine, gbc);
-      }
-      {
-        JComboBox<TemplateEngine> _jComboBox = new JComboBox<TemplateEngine>();
-        this.combo_templateEngine = _jComboBox;
-        TemplateEngine[] _values = TemplateEngine.values();
-        final Consumer<TemplateEngine> _function = new Consumer<TemplateEngine>() {
-          public void accept(final TemplateEngine it) {
-            SettingDialog.this.combo_templateEngine.addItem(it);
-          }
-        };
-        ((List<TemplateEngine>)Conversions.doWrapArray(_values)).forEach(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.WEST;
-        Insets _insets = new Insets(0, 10, 5, 10);
-        gbc.insets = _insets;
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        this.contentPanel.add(this.combo_templateEngine, gbc);
-      }
-      {
-        final JLabel lblTemplateDir = new JLabel("Template Dir");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.EAST;
-        Insets _insets = new Insets(0, 10, 5, 10);
-        gbc.insets = _insets;
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        this.contentPanel.add(lblTemplateDir, gbc);
-      }
-      {
-        JTextField _jTextField = new JTextField();
-        this.textTemplateDir = _jTextField;
-        final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
-          public void accespt(final String it) {
-            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
-            _currentSetting.setTemplatePath(it);
-          }
-        };
-        new TextBinding(this.textTemplateDir, _function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = insets;
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        this.contentPanel.add(this.textTemplateDir, gbc);
-      }
-      {
-        final JButton btnTempDirBrowse = new JButton("...");
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            String _property = System.getProperty("user.home");
-            String _plus = (_property + "/.astah/plugins/m2t/");
-            SettingDialog.this.browseDirectory(_plus, SettingDialog.this.textTemplateDir);
-          }
-        };
-        btnTempDirBrowse.addActionListener(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = insets;
-        gbc.gridx = 2;
-        gbc.gridy = 2;
-        this.contentPanel.add(btnTempDirBrowse, gbc);
-      }
-      {
-        final JLabel lblDestinationPath = new JLabel("Destination Path");
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.anchor = GridBagConstraints.EAST;
-        Insets _insets = new Insets(0, 10, 5, 10);
-        gbc.insets = _insets;
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        this.contentPanel.add(lblDestinationPath, gbc);
-      }
-      {
-        JTextField _jTextField = new JTextField();
-        this.textDestinationPath = _jTextField;
-        final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
-          public void accespt(final String it) {
-            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
-            _currentSetting.setTargetPath(it);
-          }
-        };
-        new TextBinding(this.textDestinationPath, _function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = insets;
-        gbc.gridx = 1;
-        gbc.gridy = 3;
-        this.contentPanel.add(this.textDestinationPath, gbc);
-      }
-      {
-        final JButton btnDestBrowse = new JButton("...");
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            SettingDialog.this.browseDirectory("", SettingDialog.this.textDestinationPath);
-          }
-        };
-        btnDestBrowse.addActionListener(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = insets;
-        gbc.gridx = 2;
-        gbc.gridy = 3;
-        this.contentPanel.add(btnDestBrowse, gbc);
-      }
-      {
-        final JScrollPane scrollPane = new JScrollPane();
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.gridwidth = 3;
-        gbc.insets = insets;
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        this.contentPanel.add(scrollPane, gbc);
-        {
-          JPanel _jPanel = new JPanel();
-          this.templatePanel = _jPanel;
-          BoxLayout _boxLayout = new BoxLayout(this.templatePanel, BoxLayout.Y_AXIS);
-          this.templatePanel.setLayout(_boxLayout);
-          scrollPane.setViewportView(this.templatePanel);
-        }
-      }
-      {
-        final JButton btnAddTemplate = new JButton("Add template");
-        final ActionListener _function = new ActionListener() {
-          public void actionPerformed(final ActionEvent it) {
-            final TemplateMap map = new TemplateMap();
-            final SettingDialog.TemplatePanel template = new SettingDialog.TemplatePanel(SettingDialog.this, map);
-            GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
-            HashSet<TemplateMap> _mapping = _currentSetting.getMapping();
-            _mapping.add(map);
-            SettingDialog.this.templatePanel.add(template);
-            SettingDialog.this.templatePanel.revalidate();
-          }
-        };
-        btnAddTemplate.addActionListener(_function);
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = insets;
-        gbc.gridx = 0;
-        gbc.gridy = 5;
-        this.contentPanel.add(btnAddTemplate, gbc);
-      }
-      Component _xblockexpression_1 = null;
-      {
-        final JPanel buttonPane = new JPanel();
-        FlowLayout _flowLayout = new FlowLayout(FlowLayout.RIGHT);
-        buttonPane.setLayout(_flowLayout);
-        root.add(buttonPane, BorderLayout.SOUTH);
-        {
-          final JButton btnOk = new JButton("OK");
-          btnOk.setActionCommand("OK");
-          final ActionListener _function = new ActionListener() {
-            public void actionPerformed(final ActionEvent it) {
-              SettingDialog.this.manager.save();
-              SettingDialog.this.dispose();
-            }
-          };
-          btnOk.addActionListener(_function);
-          Locale _locale = this.getLocale();
-          buttonPane.add(btnOk, _locale);
-          JRootPane _rootPane = this.getRootPane();
-          _rootPane.setDefaultButton(btnOk);
-        }
-        Component _xblockexpression_2 = null;
-        {
-          final JButton btnCancel = new JButton("Cancel");
-          final ActionListener _function = new ActionListener() {
-            public void actionPerformed(final ActionEvent it) {
-              SettingDialog.this.dispose();
-            }
-          };
-          btnCancel.addActionListener(_function);
-          btnCancel.setActionCommand("Cancel");
-          _xblockexpression_2 = buttonPane.add(btnCancel);
-        }
-        _xblockexpression_1 = _xblockexpression_2;
-      }
-      _xblockexpression = _xblockexpression_1;
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.anchor = GridBagConstraints.ABOVE_BASELINE;
+      gbc.insets = insets;
+      gbc.gridx = 0;
+      gbc.gridy = 0;
+      this.contentPanel.add(this.combo_templateSet, gbc);
     }
-    return _xblockexpression;
-  }
-  
-  private void load() {
-    Set<String> _keySet = this.manager.keySet();
-    final Consumer<String> _function = new Consumer<String>() {
-      public void accept(final String it) {
-        SettingDialog.this.combo_templateSet.addItem(it);
+    {
+      JPanel paneButton = new JPanel();
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.gridx = 1;
+      gbc.gridy = 0;
+      gbc.insets = insets;
+      gbc.anchor = GridBagConstraints.WEST;
+      this.contentPanel.add(paneButton, gbc);
+      {
+        JButton _jButton = new JButton("Add");
+        this.btnAddSet = _jButton;
+        final ActionListener _function = new ActionListener() {
+          public void actionPerformed(final ActionEvent it) {
+            final String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
+            boolean _notEquals = (!Objects.equal(setName, null));
+            if (_notEquals) {
+              final GenerateSetting generateSetting = new GenerateSetting();
+              SettingDialog.this.manager.put(setName, generateSetting);
+              SettingDialog.this.manager.setCurrentSetting(generateSetting);
+              GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+              _currentSetting.setTemplateID(setName);
+              SettingDialog.this.combo_templateSet.addItem(setName);
+              SettingDialog.this.combo_templateSet.setSelectedItem(setName);
+              SettingDialog.this.enableAll();
+            }
+          }
+        };
+        this.btnAddSet.addActionListener(_function);
+        GridBagConstraints _gridBagConstraints = new GridBagConstraints();
+        gbc = _gridBagConstraints;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = insets;
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        paneButton.add(this.btnAddSet, gbc);
+      }
+      {
+        final JButton btnRemoveSet = new JButton("Remove");
+        final ActionListener _function = new ActionListener() {
+          public void actionPerformed(final ActionEvent it) {
+            final Object selectedSet = SettingDialog.this.combo_templateSet.getSelectedItem();
+            SettingDialog.this.combo_templateSet.removeItem(selectedSet);
+            SettingDialog.this.manager.remove(selectedSet);
+            final Object afterSelectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
+            boolean _notEquals = (!Objects.equal(afterSelectedItem, null));
+            if (_notEquals) {
+              Object _selectedItem = SettingDialog.this.combo_templateSet.getSelectedItem();
+              GenerateSetting _get = SettingDialog.this.manager.get(_selectedItem);
+              SettingDialog.this.manager.setCurrentSetting(_get);
+            } else {
+              SettingDialog.this.manager.setCurrentSetting(null);
+              SettingDialog.this.disableAll();
+            }
+          }
+        };
+        btnRemoveSet.addActionListener(_function);
+        GridBagConstraints _gridBagConstraints = new GridBagConstraints();
+        gbc = _gridBagConstraints;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.insets = insets;
+        gbc.gridx = 2;
+        gbc.gridy = 0;
+        paneButton.add(btnRemoveSet, gbc);
+      }
+    }
+    {
+      final JLabel lblTemplateEngine = new JLabel("Template Engine");
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.anchor = GridBagConstraints.EAST;
+      Insets _insets = new Insets(0, 10, 5, 10);
+      gbc.insets = _insets;
+      gbc.gridx = 0;
+      gbc.gridy = 1;
+      this.contentPanel.add(lblTemplateEngine, gbc);
+    }
+    {
+      JComboBox<TemplateEngine> _jComboBox = new JComboBox<TemplateEngine>();
+      this.combo_templateEngine = _jComboBox;
+      TemplateEngine[] _values = TemplateEngine.values();
+      final Consumer<TemplateEngine> _function = new Consumer<TemplateEngine>() {
+        public void accept(final TemplateEngine it) {
+          SettingDialog.this.combo_templateEngine.addItem(it);
+        }
+      };
+      ((List<TemplateEngine>)Conversions.doWrapArray(_values)).forEach(_function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.anchor = GridBagConstraints.WEST;
+      Insets _insets = new Insets(0, 10, 5, 10);
+      gbc.insets = _insets;
+      gbc.gridx = 1;
+      gbc.gridy = 1;
+      this.contentPanel.add(this.combo_templateEngine, gbc);
+    }
+    {
+      final JLabel lblTemplateDir = new JLabel("Template Dir");
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.anchor = GridBagConstraints.EAST;
+      Insets _insets = new Insets(0, 10, 5, 10);
+      gbc.insets = _insets;
+      gbc.gridx = 0;
+      gbc.gridy = 2;
+      this.contentPanel.add(lblTemplateDir, gbc);
+    }
+    {
+      JTextField _jTextField = new JTextField();
+      this.textTemplateDir = _jTextField;
+      final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+        public void accespt(final String it) {
+          GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+          _currentSetting.setTemplatePath(it);
+        }
+      };
+      new TextBinding(this.textTemplateDir, _function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = insets;
+      gbc.gridx = 1;
+      gbc.gridy = 2;
+      this.contentPanel.add(this.textTemplateDir, gbc);
+    }
+    {
+      final JButton btnTempDirBrowse = new JButton("...");
+      final ActionListener _function = new ActionListener() {
+        public void actionPerformed(final ActionEvent it) {
+          String _property = System.getProperty("user.home");
+          String _plus = (_property + "/.astah/plugins/m2t/");
+          SettingDialog.this.browseDirectory(_plus, SettingDialog.this.textTemplateDir);
+        }
+      };
+      btnTempDirBrowse.addActionListener(_function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.insets = insets;
+      gbc.gridx = 2;
+      gbc.gridy = 2;
+      this.contentPanel.add(btnTempDirBrowse, gbc);
+    }
+    {
+      final JLabel lblDestinationPath = new JLabel("Destination Path");
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.anchor = GridBagConstraints.EAST;
+      Insets _insets = new Insets(0, 10, 5, 10);
+      gbc.insets = _insets;
+      gbc.gridx = 0;
+      gbc.gridy = 3;
+      this.contentPanel.add(lblDestinationPath, gbc);
+    }
+    {
+      JTextField _jTextField = new JTextField();
+      this.textDestinationPath = _jTextField;
+      final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+        public void accespt(final String it) {
+          GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+          _currentSetting.setTargetPath(it);
+        }
+      };
+      new TextBinding(this.textDestinationPath, _function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.HORIZONTAL;
+      gbc.insets = insets;
+      gbc.gridx = 1;
+      gbc.gridy = 3;
+      this.contentPanel.add(this.textDestinationPath, gbc);
+    }
+    {
+      final JButton btnDestBrowse = new JButton("...");
+      final ActionListener _function = new ActionListener() {
+        public void actionPerformed(final ActionEvent it) {
+          SettingDialog.this.browseDirectory("", SettingDialog.this.textDestinationPath);
+        }
+      };
+      btnDestBrowse.addActionListener(_function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.insets = insets;
+      gbc.gridx = 2;
+      gbc.gridy = 3;
+      this.contentPanel.add(btnDestBrowse, gbc);
+    }
+    {
+      final JScrollPane scrollPane = new JScrollPane();
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.fill = GridBagConstraints.BOTH;
+      gbc.gridwidth = 3;
+      gbc.insets = insets;
+      gbc.gridx = 0;
+      gbc.gridy = 4;
+      this.contentPanel.add(scrollPane, gbc);
+      {
+        JPanel _jPanel = new JPanel();
+        this.templatePanel = _jPanel;
+        BoxLayout _boxLayout = new BoxLayout(this.templatePanel, BoxLayout.Y_AXIS);
+        this.templatePanel.setLayout(_boxLayout);
+        scrollPane.setViewportView(this.templatePanel);
+      }
+    }
+    {
+      final JButton btnAddTemplate = new JButton("Add template");
+      final ActionListener _function = new ActionListener() {
+        public void actionPerformed(final ActionEvent it) {
+          final TemplateMap map = new TemplateMap();
+          final SettingDialog.TemplatePanel template = new SettingDialog.TemplatePanel(SettingDialog.this, map);
+          GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+          HashSet<TemplateMap> _mapping = _currentSetting.getMapping();
+          _mapping.add(map);
+          SettingDialog.this.templatePanel.add(template);
+          SettingDialog.this.templatePanel.revalidate();
+        }
+      };
+      btnAddTemplate.addActionListener(_function);
+      GridBagConstraints gbc = new GridBagConstraints();
+      gbc.insets = insets;
+      gbc.gridx = 0;
+      gbc.gridy = 5;
+      this.contentPanel.add(btnAddTemplate, gbc);
+    }
+    {
+      final JPanel buttonPane = new JPanel();
+      FlowLayout _flowLayout = new FlowLayout(FlowLayout.RIGHT);
+      buttonPane.setLayout(_flowLayout);
+      root.add(buttonPane, BorderLayout.SOUTH);
+      {
+        final JButton btnOk = new JButton("OK");
+        btnOk.setActionCommand("OK");
+        final ActionListener _function = new ActionListener() {
+          public void actionPerformed(final ActionEvent it) {
+            SettingDialog.this.manager.save();
+            SettingDialog.this.dispose();
+          }
+        };
+        btnOk.addActionListener(_function);
+        Locale _locale = this.getLocale();
+        buttonPane.add(btnOk, _locale);
+        JRootPane _rootPane = this.getRootPane();
+        _rootPane.setDefaultButton(btnOk);
+      }
+      {
+        final JButton btnCancel = new JButton("Cancel");
+        final ActionListener _function = new ActionListener() {
+          public void actionPerformed(final ActionEvent it) {
+            SettingDialog.this.dispose();
+          }
+        };
+        btnCancel.addActionListener(_function);
+        btnCancel.setActionCommand("Cancel");
+        buttonPane.add(btnCancel);
+      }
+    }
+    final ActionListener _function = new ActionListener() {
+      public void actionPerformed(final ActionEvent it) {
+        SettingDialog.this.changeTemplateSet();
       }
     };
-    _keySet.forEach(_function);
-    int _itemCount = this.combo_templateSet.getItemCount();
-    boolean _equals = (_itemCount == 0);
-    if (_equals) {
-      this.disableAll();
-    }
+    this.combo_templateSet.addActionListener(_function);
+    Set<String> _keySet = this.manager.keySet();
+    final Function1<String, Boolean> _function_1 = new Function1<String, Boolean>() {
+      public Boolean apply(final String it) {
+        GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
+        String _templateID = _currentSetting.getTemplateID();
+        return Boolean.valueOf(_templateID.equals(it));
+      }
+    };
+    String _findFirst = IterableExtensions.<String>findFirst(_keySet, _function_1);
+    this.combo_templateSet.setSelectedItem(_findFirst);
   }
   
   private void disableAll() {

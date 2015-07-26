@@ -1,79 +1,176 @@
 package jp.swest.ledcamp.generator
 
-import com.change_vision.jude.api.inf.exception.InvalidUsingException
-import com.change_vision.jude.api.inf.exception.ProjectNotFoundException
-import java.awt.HeadlessException
+import difflib.DiffUtils
+import difflib.PatchFailedException
 import java.io.IOException
+import java.nio.file.FileVisitResult
+import java.nio.file.Files
+import java.nio.file.LinkOption
+import java.nio.file.Path
+import java.nio.file.Paths
+import java.nio.file.SimpleFileVisitor
+import java.nio.file.StandardCopyOption
+import java.nio.file.attribute.BasicFileAttributes
 import java.util.HashMap
-import javax.swing.JOptionPane
+import jp.swest.ledcamp.exception.GenerationException
 import jp.swest.ledcamp.setting.SettingManager
 import jp.swest.ledcamp.setting.TemplateType
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.nio.file.LinkOption
-import groovy.util.ScriptException
-import groovy.lang.MissingPropertyException
 
 class CodeGenerator {
-    static def generate() throws ClassNotFoundException, ProjectNotFoundException, IOException, HeadlessException, InvalidUsingException {
+	static val PREV_GENDIR = "prevGen"
+	static val TEMP_GENDIR = "gen"
 
-        // code generate
-        val generator = new GroovyGenerator
-        val settingManager = SettingManager.getInstance
-        val setting = settingManager.currentSetting
-        val map = new HashMap<String, Object>
-        val utils = new GeneratorUtils
-        val templatePath = Paths.get(setting.templatePath)
-        val targetPath = Paths.get(setting.targetPath)
-        if (!Files.exists(targetPath, LinkOption.NOFOLLOW_LINKS)) {
-            Files.createDirectories(targetPath)
-        }
-        for (iClass : utils.classes) {
-            utils.iclass = iClass
-            utils.statemachine = utils.statemachines.get(iClass)
-            map.put("u", utils)
-            if (iClass.stereotypes.size == 0) { // Defualt generate
-                for (mapping : setting.mapping.filter[it.templateType == TemplateType::Default]) {
-                    try {
-                        generator.doGenerate(map, targetPath.resolve(iClass.name + "." + mapping.fileExtension),
-                            templatePath.resolve(mapping.templateFile))
-                    } catch (Exception e) {
-                        switch (e) {
-                            case MissingPropertyException:
-                                JOptionPane.showMessageDialog(utils.frame,
-                                    "Cannot found property :" + e.message + ". model : " + iClass.name)
-                            default:
-                                JOptionPane.showMessageDialog(utils.frame,
-                                    e.message + ".\n in model : " + iClass.name)
-                        }
-                        return
-                    }
-                }
-            } else { // stereotype Generate
-                for (stereotype : iClass.stereotypes) {
-                    for (mapping : setting.mapping.filter[it.templateType == TemplateType::Stereotype && it.stereotype.equals(stereotype)]) {
-                        try {
-                            generator.doGenerate(map, targetPath.resolve(iClass.name + "." + mapping.fileExtension),
-                                templatePath.resolve(mapping.templateFile))
-                        } catch (Exception e) {
-                            switch (e) {
-                                case MissingPropertyException:
-                                    JOptionPane.showMessageDialog(utils.frame,
-                                        "Cannot found property :" + e.message + ". model : " + iClass.name)
-                                default:
-                                    JOptionPane.showMessageDialog(utils.frame,
-                                        e.message + ".\n in model : " + iClass.name)
-                            }
-                            return
-                        }
-                    }
-                }
-            }
-        }
-        for (mapping : setting.mapping.filter[v|v.templateType == TemplateType::Global]) {
-            map.put("u", utils)
-            generator.doGenerate(map, targetPath.resolve(mapping.fileName), templatePath.resolve(mapping.templateFile))
-        }
-        JOptionPane.showMessageDialog(utils.frame, "Generate Finish")
-    }
+	static def generate() throws GenerationException {
+
+		// code generate
+		GenerationException::instance.excetpions.clear
+
+		val generator = new GroovyGenerator
+		val settingManager = SettingManager.getInstance
+		val setting = settingManager.currentSetting
+		val map = new HashMap<String, Object>
+		val utils = new GeneratorUtils
+		val templatePath = Paths.get(setting.templatePath)
+		val targetPath = Paths.get(setting.targetPath)
+		val temporalTargetRoot = Paths.get(settingManager.m2tPluginFolderPath).resolve("projects").resolve(
+			utils.astahProjectName)
+		val temporalTargetPath = temporalTargetRoot.resolve(TEMP_GENDIR)
+		val prevTemporalTargetPath = temporalTargetRoot.resolve(PREV_GENDIR)
+		if (!Files.exists(prevTemporalTargetPath)) {
+			try {
+				Files.createDirectories(prevTemporalTargetPath)
+			} catch (Exception e) {
+				GenerationException::instance.addException(e)
+			}
+		}
+
+		// generate to temporal folder
+		if (!Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS)) {
+			try {
+				Files.createDirectories(temporalTargetPath)
+			} catch (Exception e) {
+				GenerationException::instance.addException(e)
+			}
+		}
+		for (iClass : utils.classes) {
+			utils.iclass = iClass
+			utils.statemachine = utils.statemachines.get(iClass)
+			map.put("u", utils)
+			if (iClass.stereotypes.size == 0) { // Defualt generate
+				for (mapping : setting.mapping.filter[it.templateType == TemplateType::Default]) {
+					try {
+						generator.doGenerate(map, temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
+							templatePath.resolve(mapping.templateFile))
+					} catch (Exception e) {
+						GenerationException::instance.addException(e)
+					}
+				}
+			} else { // stereotype Generate
+				for (stereotype : iClass.stereotypes) {
+					for (mapping : setting.mapping.filter[
+						it.templateType == TemplateType::Stereotype && it.stereotype.equals(stereotype)]) {
+						try {
+							generator.doGenerate(map,
+								temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
+								templatePath.resolve(mapping.templateFile))
+						} catch (Exception e) {
+							GenerationException::instance.addException(e)
+						}
+					}
+				}
+			}
+		}
+
+		map.put("u", utils)
+		for (mapping : setting.mapping.filter[v|v.templateType == TemplateType::Global]) {
+			try {
+				generator.doGenerate(map, temporalTargetPath.resolve(mapping.fileName),
+					templatePath.resolve(mapping.templateFile))
+			} catch (Exception e) {
+				GenerationException::instance.addException(e)
+			}
+		}
+
+		// 3way merge and check conflict
+		try {
+			Files.walkFileTree(temporalTargetPath,
+				new ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath))
+			Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
+			Files.deleteIfExists(prevTemporalTargetPath)
+			Files.move(temporalTargetPath, prevTemporalTargetPath)
+		} catch (Exception e) {
+			GenerationException::instance.addException(e)
+		}
+
+		if (GenerationException::instance.excetpions.size != 0) {
+			throw GenerationException::instance
+		}
+	}
+
+	static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
+		override visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			Files.delete(file)
+			return FileVisitResult.CONTINUE
+		}
+
+		override postVisitDirectory(Path dir, IOException exc) throws IOException {
+			if (exc == null) {
+				Files.delete(dir)
+				return FileVisitResult.CONTINUE
+			}
+			throw exc
+		}
+	}
+
+	static class ConflictCheckVisitor extends SimpleFileVisitor<Path> {
+		Path targetPath
+		Path temporalPath
+		Path prevTempPath
+
+		new(Path targetPath, Path temporalPath, Path prevTemp) {
+			this.targetPath = targetPath
+			this.temporalPath = temporalPath
+			this.prevTempPath = prevTemp
+		}
+
+		override visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+			val targetFile = targetPath.resolve(temporalPath.resolve(TEMP_GENDIR).relativize(file))
+			val prevTempFile = prevTempPath.resolve(temporalPath.resolve(TEMP_GENDIR).relativize(file))
+			if (Files.exists(targetFile) && Files.exists(prevTempFile)) {
+				val prev_target_diff = DiffUtils.diff(Files.readAllLines(prevTempFile),
+					Files.readAllLines(targetFile))
+				if (prev_target_diff.deltas.length > 0) {
+					val prev_gen_diff = DiffUtils.diff(Files.readAllLines(prevTempFile), Files.readAllLines(file))
+					prev_target_diff.deltas.forEach [
+						prev_gen_diff.addDelta(it)
+					]
+					try {
+						val mergedList = DiffUtils.patch(Files.readAllLines(prevTempFile), prev_gen_diff)
+						Files.write(file, mergedList)
+					} catch (PatchFailedException e) {
+						GenerationException::instance.addException(e)
+					}
+				}
+			}
+			Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
+			return FileVisitResult.CONTINUE
+		}
+
+		override preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+			val targetDir = targetPath.resolve(temporalPath.relativize(dir))
+			if (!Files.exists(targetDir)) {
+				Files.createDirectories(targetDir)
+			}
+			return FileVisitResult.CONTINUE
+		}
+	}
+
+	def static void main(String[] args) {
+		val tempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/gen/")
+		val prevTempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/prevGen/")
+		val targetPath = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/target/JavaSample/")
+		Files.walkFileTree(tempRoot, new ConflictCheckVisitor(targetPath, tempRoot, prevTempRoot))
+		Files.walkFileTree(prevTempRoot, new DeleteDirVisitor);
+		Files.move(tempRoot, prevTempRoot)
+	}
 }

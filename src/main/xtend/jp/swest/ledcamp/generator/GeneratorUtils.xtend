@@ -41,6 +41,10 @@ class GeneratorUtils {
             }
         }
     }
+    def getAstahProjectName(){
+        projectRoot.name
+    }
+    
     
     // for class diagram utility
     def getName(){

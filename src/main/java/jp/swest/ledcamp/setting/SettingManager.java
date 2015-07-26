@@ -20,6 +20,7 @@ import jp.swest.ledcamp.setting.TemplateEngine;
 import jp.swest.ledcamp.setting.TemplateMap;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.Pure;
 
 @SuppressWarnings("all")
@@ -28,7 +29,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   @XmlTransient
   @Accessors
-  private static String settingFilePath;
+  private String settingFilePath;
   
   @Accessors
   private GenerateSetting currentSetting;
@@ -37,13 +38,16 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   private String userFolder = System.getProperty("user.home");
   
   @XmlTransient
+  @Accessors
   private String m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
+  
+  @XmlTransient
+  @Accessors
+  private String currentAstahFileName;
   
   private SettingManager() {
     super();
-    final String userFolder = System.getProperty("user.home");
-    final String m2tPluginFolderPath = (userFolder + "/.astah/plugins/m2t/");
-    SettingManager.settingFilePath = (m2tPluginFolderPath + "m2tsetting.xml");
+    this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
   }
   
   public static SettingManager getInstance() {
@@ -57,17 +61,17 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   public void save() {
-    File _file = new File(SettingManager.settingFilePath);
+    File _file = new File(this.settingFilePath);
     JAXB.marshal(SettingManager.instance, _file);
   }
   
-  public GenerateSetting load() {
-    GenerateSetting _xblockexpression = null;
+  public String load() {
+    String _xblockexpression = null;
     {
       String _property = System.getProperty("user.home");
       this.userFolder = _property;
       this.m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
-      SettingManager.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
+      this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
       final File asgenPluginFolder = new File(this.m2tPluginFolderPath);
       boolean _exists = asgenPluginFolder.exists();
       boolean _not = (!_exists);
@@ -104,21 +108,24 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
           }
         }
       }
-      GenerateSetting _xtrycatchfinallyexpression = null;
+      String _xtrycatchfinallyexpression = null;
       try {
-        GenerateSetting _xblockexpression_1 = null;
+        String _xblockexpression_1 = null;
         {
-          final File settingFile = new File(SettingManager.settingFilePath);
-          GenerateSetting _xifexpression = null;
+          final File settingFile = new File(this.settingFilePath);
+          String _xifexpression = null;
           boolean _exists_1 = settingFile.exists();
           if (_exists_1) {
-            GenerateSetting _xblockexpression_2 = null;
+            String _xblockexpression_2 = null;
             {
-              File _file = new File(SettingManager.settingFilePath);
+              File _file = new File(this.settingFilePath);
               final SettingManager settings = JAXB.<SettingManager>unmarshal(_file, SettingManager.class);
               SettingManager.instance.clear();
               SettingManager.instance.putAll(settings);
-              _xblockexpression_2 = SettingManager.instance.currentSetting = settings.currentSetting;
+              SettingManager.instance.currentSetting = settings.currentSetting;
+              String _templateID = settings.currentSetting.getTemplateID();
+              String _plus = ("setting file current : " + _templateID);
+              _xblockexpression_2 = InputOutput.<String>println(_plus);
             }
             _xifexpression = _xblockexpression_2;
           } else {
@@ -141,30 +148,28 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
     return _xblockexpression;
   }
   
-  private GenerateSetting createDefaultSetting() {
-    GenerateSetting _xblockexpression = null;
-    {
-      final GenerateSetting sampleGenerateSetting = new GenerateSetting();
-      File _file = new File(this.userFolder);
-      String _absolutePath = _file.getAbsolutePath();
-      sampleGenerateSetting.setTargetPath(_absolutePath);
-      File _file_1 = new File((this.m2tPluginFolderPath + "templates/"));
-      String _absolutePath_1 = _file_1.getAbsolutePath();
-      sampleGenerateSetting.setTemplatePath(_absolutePath_1);
-      sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
-      HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
-      TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap("cpp.template", "cpp");
-      _mapping.add(_newDefaultTemplateMap);
-      HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
-      TemplateMap _newDefaultTemplateMap_1 = TemplateMap.newDefaultTemplateMap("header.template", "h");
-      _mapping_1.add(_newDefaultTemplateMap_1);
-      HashSet<TemplateMap> _mapping_2 = sampleGenerateSetting.getMapping();
-      TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("arduino.template", "Sketch.cpp");
-      _mapping_2.add(_newGlobalTemplateMap);
-      SettingManager.instance.put("sample", sampleGenerateSetting);
-      _xblockexpression = SettingManager.instance.currentSetting = sampleGenerateSetting;
-    }
-    return _xblockexpression;
+  private void createDefaultSetting() {
+    final GenerateSetting sampleGenerateSetting = new GenerateSetting();
+    File _file = new File(this.userFolder);
+    String _absolutePath = _file.getAbsolutePath();
+    sampleGenerateSetting.setTargetPath(_absolutePath);
+    File _file_1 = new File((this.m2tPluginFolderPath + "templates/grsakura/"));
+    String _absolutePath_1 = _file_1.getAbsolutePath();
+    sampleGenerateSetting.setTemplatePath(_absolutePath_1);
+    sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
+    sampleGenerateSetting.setTemplateID("grsakura");
+    HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
+    TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap("cpp.template", "cpp");
+    _mapping.add(_newDefaultTemplateMap);
+    HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
+    TemplateMap _newDefaultTemplateMap_1 = TemplateMap.newDefaultTemplateMap("header.template", "h");
+    _mapping_1.add(_newDefaultTemplateMap_1);
+    HashSet<TemplateMap> _mapping_2 = sampleGenerateSetting.getMapping();
+    TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp");
+    _mapping_2.add(_newGlobalTemplateMap);
+    SettingManager.instance.put("grsakura", sampleGenerateSetting);
+    SettingManager.instance.currentSetting = sampleGenerateSetting;
+    this.save();
   }
   
   public Map<String, GenerateSetting> getMap() {
@@ -223,12 +228,12 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   @Pure
-  public static String getSettingFilePath() {
-    return SettingManager.settingFilePath;
+  public String getSettingFilePath() {
+    return this.settingFilePath;
   }
   
-  public static void setSettingFilePath(final String settingFilePath) {
-    SettingManager.settingFilePath = settingFilePath;
+  public void setSettingFilePath(final String settingFilePath) {
+    this.settingFilePath = settingFilePath;
   }
   
   @Pure
@@ -238,5 +243,23 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   public void setCurrentSetting(final GenerateSetting currentSetting) {
     this.currentSetting = currentSetting;
+  }
+  
+  @Pure
+  public String getM2tPluginFolderPath() {
+    return this.m2tPluginFolderPath;
+  }
+  
+  public void setM2tPluginFolderPath(final String m2tPluginFolderPath) {
+    this.m2tPluginFolderPath = m2tPluginFolderPath;
+  }
+  
+  @Pure
+  public String getCurrentAstahFileName() {
+    return this.currentAstahFileName;
+  }
+  
+  public void setCurrentAstahFileName(final String currentAstahFileName) {
+    this.currentAstahFileName = currentAstahFileName;
   }
 }

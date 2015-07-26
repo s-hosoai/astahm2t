@@ -89,6 +89,10 @@ public class GeneratorUtils {
     }
   }
   
+  public String getAstahProjectName() {
+    return this.projectRoot.getName();
+  }
+  
   public String getName() {
     return this.iclass.getName();
   }
