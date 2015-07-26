@@ -7,6 +7,7 @@ import java.nio.file.Path
 import static jp.swest.ledcamp.xtendhelper.Using.*
 import groovy.lang.MissingPropertyException
 import javax.swing.JOptionPane
+import jp.swest.ledcamp.exception.GenerationException
 
 class GroovyGenerator {
     private SimpleTemplateEngine engine
@@ -26,6 +27,7 @@ class GroovyGenerator {
             ]
 
         } catch (Exception e) {
+        	GenerationException::getInstance().addException(e)
             switch (e) {
                 case MissingPropertyException:
                     JOptionPane.showMessageDialog(utils.frame,

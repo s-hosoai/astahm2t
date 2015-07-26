@@ -20,6 +20,7 @@ import jp.swest.ledcamp.setting.TemplateEngine;
 import jp.swest.ledcamp.setting.TemplateMap;
 import org.eclipse.xtend.lib.annotations.Accessors;
 import org.eclipse.xtext.xbase.lib.Exceptions;
+import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.Pure;
 
 @SuppressWarnings("all")
@@ -64,8 +65,8 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
     JAXB.marshal(SettingManager.instance, _file);
   }
   
-  public GenerateSetting load() {
-    GenerateSetting _xblockexpression = null;
+  public String load() {
+    String _xblockexpression = null;
     {
       String _property = System.getProperty("user.home");
       this.userFolder = _property;
@@ -107,21 +108,24 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
           }
         }
       }
-      GenerateSetting _xtrycatchfinallyexpression = null;
+      String _xtrycatchfinallyexpression = null;
       try {
-        GenerateSetting _xblockexpression_1 = null;
+        String _xblockexpression_1 = null;
         {
           final File settingFile = new File(this.settingFilePath);
-          GenerateSetting _xifexpression = null;
+          String _xifexpression = null;
           boolean _exists_1 = settingFile.exists();
           if (_exists_1) {
-            GenerateSetting _xblockexpression_2 = null;
+            String _xblockexpression_2 = null;
             {
               File _file = new File(this.settingFilePath);
               final SettingManager settings = JAXB.<SettingManager>unmarshal(_file, SettingManager.class);
               SettingManager.instance.clear();
               SettingManager.instance.putAll(settings);
-              _xblockexpression_2 = SettingManager.instance.currentSetting = settings.currentSetting;
+              SettingManager.instance.currentSetting = settings.currentSetting;
+              String _templateID = settings.currentSetting.getTemplateID();
+              String _plus = ("setting file current : " + _templateID);
+              _xblockexpression_2 = InputOutput.<String>println(_plus);
             }
             _xifexpression = _xblockexpression_2;
           } else {

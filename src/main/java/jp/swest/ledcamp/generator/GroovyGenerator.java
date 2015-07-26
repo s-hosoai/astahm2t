@@ -13,6 +13,7 @@ import java.nio.file.Path;
 import java.util.Map;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
+import jp.swest.ledcamp.exception.GenerationException;
 import jp.swest.ledcamp.generator.GeneratorUtils;
 import jp.swest.ledcamp.xtendhelper.Using;
 import org.eclipse.xtext.xbase.lib.Exceptions;
@@ -57,6 +58,8 @@ public class GroovyGenerator {
       } catch (final Throwable _t) {
         if (_t instanceof Exception) {
           final Exception e = (Exception)_t;
+          GenerationException _instance = GenerationException.getInstance();
+          _instance.addException(e);
           boolean _matched = false;
           if (!_matched) {
             if (Objects.equal(e, MissingPropertyException.class)) {

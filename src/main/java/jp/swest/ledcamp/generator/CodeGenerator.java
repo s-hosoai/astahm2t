@@ -1,7 +1,5 @@
 package jp.swest.ledcamp.generator;
 
-import com.change_vision.jude.api.inf.exception.InvalidUsingException;
-import com.change_vision.jude.api.inf.exception.ProjectNotFoundException;
 import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IStateMachine;
 import com.google.common.base.Objects;
@@ -9,7 +7,6 @@ import difflib.Delta;
 import difflib.DiffUtils;
 import difflib.Patch;
 import difflib.PatchFailedException;
-import java.awt.HeadlessException;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -23,8 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.function.Consumer;
-import javax.swing.JFrame;
-import javax.swing.JOptionPane;
+import jp.swest.ledcamp.exception.GenerationException;
 import jp.swest.ledcamp.generator.GeneratorUtils;
 import jp.swest.ledcamp.generator.GroovyGenerator;
 import jp.swest.ledcamp.setting.GenerateSetting;
@@ -34,7 +30,6 @@ import jp.swest.ledcamp.setting.TemplateType;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
-import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 @SuppressWarnings("all")
@@ -69,19 +64,13 @@ public class CodeGenerator {
     }
     
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
-      Path _relativize = this.temporalPath.relativize(file);
+      Path _resolve = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
+      Path _relativize = _resolve.relativize(file);
       final Path targetFile = this.targetPath.resolve(_relativize);
-      boolean hasConflict = false;
-      Path mergedFile = null;
       boolean _exists = Files.exists(targetFile);
       if (_exists) {
-        Path _fileName = file.getFileName();
-        String _plus = (_fileName + " already Exist");
-        InputOutput.<String>println(_plus);
-        Path _fileName_1 = file.getFileName();
-        String _plus_1 = (_fileName_1 + " not same");
-        InputOutput.<String>println(_plus_1);
-        Path _relativize_1 = this.temporalPath.relativize(file);
+        Path _resolve_1 = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
+        Path _relativize_1 = _resolve_1.relativize(file);
         final Path prevTempFile = this.prevTempPath.resolve(_relativize_1);
         List<String> _readAllLines = Files.readAllLines(prevTempFile);
         List<String> _readAllLines_1 = Files.readAllLines(targetFile);
@@ -90,22 +79,16 @@ public class CodeGenerator {
         int _length = ((Object[])Conversions.unwrapArray(_deltas, Object.class)).length;
         boolean _greaterThan = (_length > 0);
         if (_greaterThan) {
-          Path _fileName_2 = file.getFileName();
-          String _plus_2 = (_fileName_2 + " has Conflict! : ");
-          List<Delta<String>> _deltas_1 = prev_target_diff.getDeltas();
-          Delta<String> _get = _deltas_1.get(0);
-          String _plus_3 = (_plus_2 + _get);
-          InputOutput.<String>println(_plus_3);
           List<String> _readAllLines_2 = Files.readAllLines(prevTempFile);
           List<String> _readAllLines_3 = Files.readAllLines(file);
           final Patch<String> prev_gen_diff = DiffUtils.<String>diff(_readAllLines_2, _readAllLines_3);
-          List<Delta<String>> _deltas_2 = prev_target_diff.getDeltas();
+          List<Delta<String>> _deltas_1 = prev_target_diff.getDeltas();
           final Consumer<Delta<String>> _function = new Consumer<Delta<String>>() {
             public void accept(final Delta<String> it) {
               prev_gen_diff.addDelta(it);
             }
           };
-          _deltas_2.forEach(_function);
+          _deltas_1.forEach(_function);
           try {
             List<String> _readAllLines_4 = Files.readAllLines(prevTempFile);
             final List<String> mergedList = DiffUtils.<String>patch(_readAllLines_4, prev_gen_diff);
@@ -113,10 +96,8 @@ public class CodeGenerator {
           } catch (final Throwable _t) {
             if (_t instanceof PatchFailedException) {
               final PatchFailedException e = (PatchFailedException)_t;
-              String _plus_4 = (file + " has Conflict!");
-              String _message = e.getMessage();
-              String _plus_5 = (_plus_4 + _message);
-              System.err.println(_plus_5);
+              GenerationException _instance = GenerationException.getInstance();
+              _instance.addException(e);
             } else {
               throw Exceptions.sneakyThrow(_t);
             }
@@ -143,7 +124,10 @@ public class CodeGenerator {
   
   private final static String TEMP_GENDIR = "gen";
   
-  public static void generate() throws ClassNotFoundException, ProjectNotFoundException, IOException, HeadlessException, InvalidUsingException {
+  public static void generate() throws GenerationException {
+    GenerationException _instance = GenerationException.getInstance();
+    List<Exception> _excetpions = _instance.getExcetpions();
+    _excetpions.clear();
     final GroovyGenerator generator = new GroovyGenerator();
     final SettingManager settingManager = SettingManager.getInstance();
     final GenerateSetting setting = settingManager.getCurrentSetting();
@@ -163,12 +147,32 @@ public class CodeGenerator {
     boolean _exists = Files.exists(prevTemporalTargetPath);
     boolean _not = (!_exists);
     if (_not) {
-      Files.createDirectories(prevTemporalTargetPath);
+      try {
+        Files.createDirectories(prevTemporalTargetPath);
+      } catch (final Throwable _t) {
+        if (_t instanceof Exception) {
+          final Exception e = (Exception)_t;
+          GenerationException _instance_1 = GenerationException.getInstance();
+          _instance_1.addException(e);
+        } else {
+          throw Exceptions.sneakyThrow(_t);
+        }
+      }
     }
     boolean _exists_1 = Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS);
     boolean _not_1 = (!_exists_1);
     if (_not_1) {
-      Files.createDirectories(temporalTargetPath);
+      try {
+        Files.createDirectories(temporalTargetPath);
+      } catch (final Throwable _t_1) {
+        if (_t_1 instanceof Exception) {
+          final Exception e_1 = (Exception)_t_1;
+          GenerationException _instance_2 = GenerationException.getInstance();
+          _instance_2.addException(e_1);
+        } else {
+          throw Exceptions.sneakyThrow(_t_1);
+        }
+      }
     }
     List<IClass> _classes = utils.getClasses();
     for (final IClass iClass : _classes) {
@@ -191,14 +195,24 @@ public class CodeGenerator {
           };
           Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(_mapping, _function);
           for (final TemplateMap mapping : _filter) {
-            String _name = iClass.getName();
-            String _plus = (_name + ".");
-            String _fileExtension = mapping.getFileExtension();
-            String _plus_1 = (_plus + _fileExtension);
-            Path _resolve_1 = temporalTargetPath.resolve(_plus_1);
-            String _templateFile = mapping.getTemplateFile();
-            Path _resolve_2 = templatePath.resolve(_templateFile);
-            generator.doGenerate(map, _resolve_1, _resolve_2);
+            try {
+              String _name = iClass.getName();
+              String _plus = (_name + ".");
+              String _fileExtension = mapping.getFileExtension();
+              String _plus_1 = (_plus + _fileExtension);
+              Path _resolve_1 = temporalTargetPath.resolve(_plus_1);
+              String _templateFile = mapping.getTemplateFile();
+              Path _resolve_2 = templatePath.resolve(_templateFile);
+              generator.doGenerate(map, _resolve_1, _resolve_2);
+            } catch (final Throwable _t_2) {
+              if (_t_2 instanceof Exception) {
+                final Exception e_2 = (Exception)_t_2;
+                GenerationException _instance_3 = GenerationException.getInstance();
+                _instance_3.addException(e_2);
+              } else {
+                throw Exceptions.sneakyThrow(_t_2);
+              }
+            }
           }
         } else {
           String[] _stereotypes_1 = iClass.getStereotypes();
@@ -221,14 +235,24 @@ public class CodeGenerator {
             };
             Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(_mapping_1, _function_1);
             for (final TemplateMap mapping_1 : _filter_1) {
-              String _name_1 = iClass.getName();
-              String _plus_2 = (_name_1 + ".");
-              String _fileExtension_1 = mapping_1.getFileExtension();
-              String _plus_3 = (_plus_2 + _fileExtension_1);
-              Path _resolve_3 = temporalTargetPath.resolve(_plus_3);
-              String _templateFile_1 = mapping_1.getTemplateFile();
-              Path _resolve_4 = templatePath.resolve(_templateFile_1);
-              generator.doGenerate(map, _resolve_3, _resolve_4);
+              try {
+                String _name_1 = iClass.getName();
+                String _plus_2 = (_name_1 + ".");
+                String _fileExtension_1 = mapping_1.getFileExtension();
+                String _plus_3 = (_plus_2 + _fileExtension_1);
+                Path _resolve_3 = temporalTargetPath.resolve(_plus_3);
+                String _templateFile_1 = mapping_1.getTemplateFile();
+                Path _resolve_4 = templatePath.resolve(_templateFile_1);
+                generator.doGenerate(map, _resolve_3, _resolve_4);
+              } catch (final Throwable _t_3) {
+                if (_t_3 instanceof Exception) {
+                  final Exception e_3 = (Exception)_t_3;
+                  GenerationException _instance_4 = GenerationException.getInstance();
+                  _instance_4.addException(e_3);
+                } else {
+                  throw Exceptions.sneakyThrow(_t_3);
+                }
+              }
             }
           }
         }
@@ -244,19 +268,45 @@ public class CodeGenerator {
     };
     Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(_mapping, _function);
     for (final TemplateMap mapping : _filter) {
-      String _fileName = mapping.getFileName();
-      Path _resolve_1 = temporalTargetPath.resolve(_fileName);
-      String _templateFile = mapping.getTemplateFile();
-      Path _resolve_2 = templatePath.resolve(_templateFile);
-      generator.doGenerate(map, _resolve_1, _resolve_2);
+      try {
+        String _fileName = mapping.getFileName();
+        Path _resolve_1 = temporalTargetPath.resolve(_fileName);
+        String _templateFile = mapping.getTemplateFile();
+        Path _resolve_2 = templatePath.resolve(_templateFile);
+        generator.doGenerate(map, _resolve_1, _resolve_2);
+      } catch (final Throwable _t_2) {
+        if (_t_2 instanceof Exception) {
+          final Exception e_2 = (Exception)_t_2;
+          GenerationException _instance_3 = GenerationException.getInstance();
+          _instance_3.addException(e_2);
+        } else {
+          throw Exceptions.sneakyThrow(_t_2);
+        }
+      }
     }
-    CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath);
-    Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
-    CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
-    Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor);
-    Files.move(temporalTargetPath, prevTemporalTargetPath);
-    JFrame _frame = utils.getFrame();
-    JOptionPane.showMessageDialog(_frame, "Generate Finish");
+    try {
+      CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath);
+      Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
+      CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
+      Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor);
+      Files.deleteIfExists(prevTemporalTargetPath);
+      Files.move(temporalTargetPath, prevTemporalTargetPath);
+    } catch (final Throwable _t_3) {
+      if (_t_3 instanceof Exception) {
+        final Exception e_3 = (Exception)_t_3;
+        GenerationException _instance_4 = GenerationException.getInstance();
+        _instance_4.addException(e_3);
+      } else {
+        throw Exceptions.sneakyThrow(_t_3);
+      }
+    }
+    GenerationException _instance_5 = GenerationException.getInstance();
+    List<Exception> _excetpions_1 = _instance_5.getExcetpions();
+    int _size = _excetpions_1.size();
+    boolean _notEquals = (_size != 0);
+    if (_notEquals) {
+      throw GenerationException.getInstance();
+    }
   }
   
   public static void main(final String[] args) {

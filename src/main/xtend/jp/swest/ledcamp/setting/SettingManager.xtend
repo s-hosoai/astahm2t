@@ -69,6 +69,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                 instance.clear
                 instance.putAll(settings)
                 instance.currentSetting = settings.currentSetting
+                println("setting file current : "+settings.currentSetting.templateID)
             }else{
                 createDefaultSetting
                 save
