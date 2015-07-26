@@ -67,11 +67,18 @@ public class CodeGenerator {
       Path _resolve = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
       Path _relativize = _resolve.relativize(file);
       final Path targetFile = this.targetPath.resolve(_relativize);
+      Path _resolve_1 = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
+      Path _relativize_1 = _resolve_1.relativize(file);
+      final Path prevTempFile = this.prevTempPath.resolve(_relativize_1);
+      boolean _and = false;
       boolean _exists = Files.exists(targetFile);
-      if (_exists) {
-        Path _resolve_1 = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
-        Path _relativize_1 = _resolve_1.relativize(file);
-        final Path prevTempFile = this.prevTempPath.resolve(_relativize_1);
+      if (!_exists) {
+        _and = false;
+      } else {
+        boolean _exists_1 = Files.exists(prevTempFile);
+        _and = _exists_1;
+      }
+      if (_and) {
         List<String> _readAllLines = Files.readAllLines(prevTempFile);
         List<String> _readAllLines_1 = Files.readAllLines(targetFile);
         final Patch<String> prev_target_diff = DiffUtils.<String>diff(_readAllLines, _readAllLines_1);
