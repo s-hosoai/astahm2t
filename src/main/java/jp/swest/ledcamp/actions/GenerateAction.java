@@ -19,7 +19,7 @@ public class GenerateAction implements IPluginActionDelegate {
     try {
       CodeGenerator.generate();
       Window _parent = window.getParent();
-      JOptionPane.showMessageDialog(_parent, "Code Generation is Finish");
+      JOptionPane.showMessageDialog(_parent, "Code Generation is Complete.");
     } catch (final Throwable _t) {
       if (_t instanceof GenerationException) {
         final GenerationException ge = (GenerationException)_t;
@@ -32,7 +32,7 @@ public class GenerateAction implements IPluginActionDelegate {
         };
         List<String> _map = ListExtensions.<Exception, String>map(_excetpions, _function);
         String _join = IterableExtensions.join(_map, "\n");
-        String _plus = ("Code Generation is Fail.\n" + _join);
+        String _plus = ("Code Generation is Failed.\n" + _join);
         JOptionPane.showMessageDialog(_parent_1, _plus);
         List<Exception> _excetpions_1 = ge.getExcetpions();
         final Consumer<Exception> _function_1 = new Consumer<Exception>() {

@@ -12,9 +12,9 @@ class GenerateAction implements IPluginActionDelegate{
     override run(IWindow window) throws UnExpectedException {
         try{
         CodeGenerator::generate()
-	        JOptionPane.showMessageDialog(window.parent, "Code Generation is Finish")    
+	        JOptionPane.showMessageDialog(window.parent, "Code Generation is Complete.")    
         }catch(GenerationException ge){
-	        JOptionPane.showMessageDialog(window.parent, "Code Generation is Fail.\n"+ge.excetpions.map[e|e.message].join("\n"))
+	        JOptionPane.showMessageDialog(window.parent, "Code Generation is Failed.\n"+ge.excetpions.map[e|e.message].join("\n"))
 	        ge.excetpions.forEach[e|
 	        	e.printStackTrace()
 	        ]
