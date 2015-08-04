@@ -7,7 +7,6 @@
 		<plugin.install>true</plugin.install>
 		<astah.version>6.7</astah.version>
 		<astah.edition>all</astah.edition>
-		<astahPath>C:/Program Files/astah-professional</astahPath>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>jp.swest.ledcamp</groupId>
@@ -272,14 +271,14 @@
 			<groupId>com.change_vision.astah</groupId>
 			<artifactId>astah-api</artifactId>
 			<version>${astah.version}</version>
-			<systemPath>${astahPath}/astah-api.jar</systemPath>
+			<systemPath>${ASTAH_HOME}/astah-api.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.change_vision.astah</groupId>
 			<artifactId>astah-pro</artifactId>
 			<version>${astah.version}</version>
-			<systemPath>${astahPath}/astah-pro.jar</systemPath>
+			<systemPath>${ASTAH_HOME}/astah-pro.jar</systemPath>
 			<scope>system</scope>
 		</dependency>
 		<dependency>

@@ -21,8 +21,8 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     @XmlTransient @Accessors private String currentAstahFileName
     
     private new() {
-        super()
-       settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+    	super()
+    	settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
     }
 
     static def getInstance() {
@@ -70,7 +70,6 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                 instance.clear
                 instance.putAll(settings)
                 instance.currentSetting = settings.currentSetting
-                println("setting file current : "+settings.currentSetting.templateID)
             }else{
                 createDefaultSetting
                 save
