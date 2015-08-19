@@ -89,6 +89,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("cpp.template", "cpp"))
         sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("header.template", "h"))
         sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp"))
+        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("events.template", "Events.h"))
         instance.put("grsakura", sampleGenerateSetting)
         instance.currentSetting = sampleGenerateSetting
         save

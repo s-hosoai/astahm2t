@@ -20,8 +20,10 @@ import com.change_vision.jude.api.inf.view.IViewManager;
 import com.google.common.base.Objects;
 import com.google.common.collect.Iterables;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.swing.JFrame;
@@ -180,7 +182,7 @@ public class GeneratorUtils {
     ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
   
-  public Iterable<String> getEvents() {
+  public Set<String> getEvents() {
     ITransition[] _transitions = null;
     if (this.statemachine!=null) {
       _transitions=this.statemachine.getTransitions();
@@ -198,10 +200,87 @@ public class GeneratorUtils {
         return Boolean.valueOf((_length > 1));
       }
     };
-    return IterableExtensions.<String>filter(_map, _function_1);
+    Iterable<String> _filter = IterableExtensions.<String>filter(_map, _function_1);
+    return IterableExtensions.<String>toSet(_filter);
   }
   
-  public String getInitialState() {
+  public Set<String> getEvents(final IClass c) {
+    Set<String> _xblockexpression = null;
+    {
+      final IStateMachine _statemachine = this.statemachines.get(c);
+      ITransition[] _transitions = null;
+      if (_statemachine!=null) {
+        _transitions=_statemachine.getTransitions();
+      }
+      Iterable<ITransition> _filter = null;
+      if (((Iterable<ITransition>)Conversions.doWrapArray(_transitions))!=null) {
+        final Function1<ITransition, Boolean> _function = new Function1<ITransition, Boolean>() {
+          public Boolean apply(final ITransition it) {
+            boolean _and = false;
+            boolean _and_1 = false;
+            String _event = it.getEvent();
+            boolean _notEquals = (!Objects.equal(_event, null));
+            if (!_notEquals) {
+              _and_1 = false;
+            } else {
+              String _event_1 = it.getEvent();
+              String _trim = _event_1.trim();
+              int _length = _trim.length();
+              boolean _greaterThan = (_length > 1);
+              _and_1 = _greaterThan;
+            }
+            if (!_and_1) {
+              _and = false;
+            } else {
+              String _event_2 = it.getEvent();
+              String _trim_1 = _event_2.trim();
+              boolean _notEquals_1 = (!Objects.equal(_trim_1, "true"));
+              _and = _notEquals_1;
+            }
+            return Boolean.valueOf(_and);
+          }
+        };
+        _filter=IterableExtensions.<ITransition>filter(((Iterable<ITransition>)Conversions.doWrapArray(_transitions)), _function);
+      }
+      final Function1<ITransition, String> _function_1 = new Function1<ITransition, String>() {
+        public String apply(final ITransition it) {
+          return it.getEvent();
+        }
+      };
+      Iterable<String> _map = IterableExtensions.<ITransition, String>map(_filter, _function_1);
+      _xblockexpression = IterableExtensions.<String>toSet(_map);
+    }
+    return _xblockexpression;
+  }
+  
+  public Set<String> getAllEvents() {
+    Collection<IStateMachine> _values = this.statemachines.values();
+    final Function1<IStateMachine, List<ITransition>> _function = new Function1<IStateMachine, List<ITransition>>() {
+      public List<ITransition> apply(final IStateMachine s) {
+        ITransition[] _transitions = s.getTransitions();
+        return IterableExtensions.<ITransition>toList(((Iterable<ITransition>)Conversions.doWrapArray(_transitions)));
+      }
+    };
+    Iterable<List<ITransition>> _map = IterableExtensions.<IStateMachine, List<ITransition>>map(_values, _function);
+    Iterable<ITransition> _flatten = Iterables.<ITransition>concat(_map);
+    final Function1<ITransition, String> _function_1 = new Function1<ITransition, String>() {
+      public String apply(final ITransition t) {
+        return t.getEvent();
+      }
+    };
+    Iterable<String> _map_1 = IterableExtensions.<ITransition, String>map(_flatten, _function_1);
+    final Function1<String, Boolean> _function_2 = new Function1<String, Boolean>() {
+      public Boolean apply(final String e) {
+        String _trim = e.trim();
+        int _length = _trim.length();
+        return Boolean.valueOf((_length > 1));
+      }
+    };
+    Iterable<String> _filter = IterableExtensions.<String>filter(_map_1, _function_2);
+    return IterableExtensions.<String>toSet(_filter);
+  }
+  
+  public IVertex getInitialState() {
     IVertex[] _vertexes = null;
     if (this.statemachine!=null) {
       _vertexes=this.statemachine.getVertexes();
@@ -222,8 +301,7 @@ public class GeneratorUtils {
       _outgoings=initialPseudo.getOutgoings();
     }
     ITransition _get = _outgoings[0];
-    IVertex _target = _get.getTarget();
-    return _target.getName();
+    return _get.getTarget();
   }
   
   public ITransition[] getAllParentTransitions(final IState state) {
@@ -330,8 +408,6 @@ public class GeneratorUtils {
         utils.iclass = c;
         IStateMachine _get = utils.statemachines.get(c);
         utils.statemachine = _get;
-        String _name = c.getName();
-        InputOutput.<String>println(_name);
         Iterable<IClass> _allReferenceClasses = utils.getAllReferenceClasses();
         final Consumer<IClass> _function = new Consumer<IClass>() {
           public void accept(final IClass r) {

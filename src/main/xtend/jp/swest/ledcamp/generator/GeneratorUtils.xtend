@@ -68,7 +68,7 @@ class GeneratorUtils {
     def getAllReferenceClasses(){
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
-        
+       
     // for statemachine utility
     private ArrayList<IState> allStates
     def getStates(){
@@ -91,14 +91,23 @@ class GeneratorUtils {
     }
     
     def getEvents(){
-        statemachine?.transitions.map[t|t.event].filter[e|e.trim.length>1]
+        statemachine?.transitions.map[t|t.event].filter[e|e.trim.length>1].toSet
     }
+
+    def getEvents(IClass c){
+    	val _statemachine = statemachines.get(c)
+        _statemachine?.transitions?.filter[it.event!=null && it.event.trim.length>1 && it.event.trim!="true"].map[it.event].toSet
+    }
+
+	def getAllEvents(){
+		statemachines.values.map[s|s.transitions.toList].flatten.map[t|t.event].filter[e|e.trim.length>1].toSet
+	}
     
     def getInitialState(){
         var initialPseudo = statemachine?.vertexes?.filter(IPseudostate).filter[s|s.isInitialPseudostate].get(0)
-        return initialPseudo?.outgoings.get(0).target.name
+        return initialPseudo?.outgoings.get(0).target
     }
-        def ITransition[] getAllParentTransitions(IState state){
+    def ITransition[] getAllParentTransitions(IState state){
         if(state.container instanceof IState){
             return state.outgoings + (getAllParentTransitions(state.container as IState) as ITransition[]);
         }else{
@@ -148,7 +157,6 @@ class GeneratorUtils {
         for(c : utils.classes){
             utils.iclass = c
             utils.statemachine = utils.statemachines.get(c)
-            println(c.name)
             utils.allReferenceClasses.forEach[r|println(" reference:"+r.name)]
             if(utils.statemachine!=null){
             var table = utils.generateStateTable()

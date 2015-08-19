@@ -163,6 +163,9 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
     HashSet<TemplateMap> _mapping_2 = sampleGenerateSetting.getMapping();
     TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp");
     _mapping_2.add(_newGlobalTemplateMap);
+    HashSet<TemplateMap> _mapping_3 = sampleGenerateSetting.getMapping();
+    TemplateMap _newGlobalTemplateMap_1 = TemplateMap.newGlobalTemplateMap("events.template", "Events.h");
+    _mapping_3.add(_newGlobalTemplateMap_1);
     SettingManager.instance.put("grsakura", sampleGenerateSetting);
     SettingManager.instance.currentSetting = sampleGenerateSetting;
     this.save();
