@@ -20,8 +20,6 @@ ${u.name}::${u.name}(){
 	${u.toFirstLowerCase(reference.name)} = ${reference.name}::getInstance();
 <%}%>\
 <%}%>\
-	create2 = iRobotCreate2::getInstance();
-	timer = Timer::getInstance();
 <% if(u.initialState.entry.trim()!=""){%>\
 <% for(entryAct in u.initialState.entry.normalize().split("\n")){%>\
 	${replaceAct(entryAct)};	// initial entry action
@@ -45,7 +43,7 @@ void ${u.name}::transition(Event event){
 		break;
 <%}else{%>\
 <% for(t in state.outgoings){%>\
-		if(<%if(t.guard.trim()!="") {out<<t.guard+" && "}%><%if(t.event.trim()=="true"||t.event.trim()==""){%>"true"<% }else if(t.event.toLowerCase()=="timeout"){%>${u.name}_Timeout==event<%} else {%>${t.event}==event<%}%>){
+		if(<%if(t.guard.trim()!="") {out<<"("+t.guard+") && "}%><%if(t.event.trim()=="true"||t.event.trim()==""){%>true<% }else if(t.event.trim().toLowerCase()=="timeout"){%>${u.name}_Timeout==event<%} else {%>${t.event.trim()}==event<%}%>){
 <% if(state.exit.trim()!="") {%>\
 <% for(exitAct in state.exit.normalize().split("\n")){%>\
 			${replaceAct(exitAct)};		//  exit action;
@@ -70,7 +68,7 @@ void ${u.name}::transition(Event event){
 		}
 <% if(state.container instanceof IState){%>\
 <% for(p in state.container.outgoings){%>\
-		if(<%if(p.guard.trim()!="") {out<<p.guard+" && "}%><%if(p.event.trim()=="true"||p.event.trim()=="") { out<<"true" } else {%>${p.event}==event<%}%>){
+		if(<%if(p.guard.trim()!="") {out<<"("+p.guard+") && "}%><%if(p.event.trim()=="true"||p.event.trim()==""){%>true <% } else {%>${p.event}==event<%}%>){
 <% if(state.exit.trim()!="") {%>\
 <% for(exitAct in state.exit.normalize().split("\n")){%>\
 			${replaceAct(exitAct)};		// exit action

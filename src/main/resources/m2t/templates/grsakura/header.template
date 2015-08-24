@@ -4,8 +4,6 @@
 #define ${u.name}_H
 #include <Arduino.h>
 #include <Events.h>
-#include <iRobotCreate2.h>
-#include <Timer.h>
 <% for(reference in u.getAllReferenceClasses()){%>\
 <% if(reference.stereotypes.contains("lib")) { %>\
 #include <${reference.name}.h>
@@ -54,7 +52,5 @@ private:
 <% if(u.statemachine){%>\
 	State_T ${stateInstance};
 <%}%>\
-	iRobotCreate2 *create2;
-	Timer *timer;
 };
 #endif //${u.name}_H

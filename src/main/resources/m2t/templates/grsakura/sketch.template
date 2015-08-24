@@ -1,16 +1,13 @@
-<% preDefClasses = ["iRobotCreate2", "Timer", "Events"]%>
 #include <Arduino.h>
-#include <iRobotCreate2.h>
-#include <Timer.h>
 #include <Events.h>
-<% for(c in u.classes.findAll{!preDefClasses.contains(it.name)}){ %>\
+<% for(c in u.classes){ %>\
 #include "${c.name}.h"
 <%}%>\
 
+<% for(c in u.classes){ %>\
+<% if(c.name == "iRobotCreate2"){%>\
 iRobotCreate2 *create2;
-Timer *timer;
-<% for(c in u.classes.findAll{!preDefClasses.contains(it.name)}){ %>\
-<% if(u.statemachines.get(c)){%>\
+<%}else{%>\
 ${c.name} *${u.getInstanceName(c)};
 <%}%>\
 <%}%>\
@@ -37,25 +34,22 @@ void setup()
     delay( 10 );
     digitalWrite( 51, 1 );
     Serial3.begin(38400);
-    create2 = iRobotCreate2::getInstance();
-    create2->setSensorListener(eventHandler);
-    create2->start();
-    timer = Timer::getInstance();
-    timer->setEventHandler(eventHandler);
 
 <% for(c in u.classes){ %>\
-<% if(u.statemachines.get(c)){%>\
+<% if(c.name == "iRobotCreate2"){%>\
+	create2 = iRobotCreate2::getInstance();
+	create2->setSensorListener(eventHandler);
+	create2->start();
+	create2->safeMode();
+<%}else if(c.name=="Timer"){%>\
+	Timer::getInstance()->setEventHandler(eventHandler);
+<%}else{%>
 	${u.getInstanceName(c)} = ${c.name}::getInstance();
 <%}%>\
 <%}%>\
 }
-
 void loop()
 {
-    Serial3.print("Distance : ");
-    Serial3.println(create2->getDistance());
-    Serial3.print("Angle    : ");
-    Serial3.println(create2->getAngle());
-	eventHandler(None);	// for true transition.
-	delay(100);
+    eventHandler(None);
+    delay(50);
 }
