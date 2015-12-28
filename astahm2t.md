@@ -8,7 +8,7 @@
 # astah m2t(Model to Text)
 
 ## 概要
-Astahで汎用的なコード生成を行うためのプラグインです．
+astahで汎用的なコード生成を行うためのプラグインです．
 GroovyのSimpleTemplateEngineを利用してコード生成を行います．
 コード生成のパターンは以下の3種類を用意しています．基本的にプロジェクトが持つ全クラスを対象に生成が行われます．
 条件にマッチするクラスに対して，GroovyのSimpleTemplateEngineの記法に沿ったテンプレートファイルを指定します．
@@ -22,9 +22,9 @@ GroovyのSimpleTemplateEngineを利用してコード生成を行います．
  - ヘルプ＞プラグイン一覧
   + ＋インストール
   + →プラグインファイルを選択 (astahm2t/target/～.jar）
-  + →ついでに，Astah SDKフォルダの/astah-plugin-SDK-1.2/bundles/console-1.0.1.jarも
+  + →ついでに，astah SDKフォルダの/astah-plugin-SDK-1.2/bundles/console-1.0.1.jarも
 
-Astah再起動
+astah再起動
 
 ### 設定フォルダ・設定ファイルの生成
 プラグイン用のフォルダが生成されていない場合，初回の起動時に下記フォルダとサンプル類が生成されます．
@@ -40,7 +40,7 @@ m2tメニューには，Generate（現在の設定でコード生成）とSettin
 
 ### 設定
 Settingを開いて，コード生成の設定を行いましょう．
-![Astahm2tSetting.png](Astahm2tSetting.png)
+![astahm2tSetting.png](astahm2tSetting.png)
 
 設定名の箇所で，現在の生成設定を指定します．新たに追加する場合はAdd, 現在の設定を削除する場合はRemoveをクリックしてください．  
 テンプレートフォルダはデフォルトでは上記の設定フォルダ下のtemplates/になっています．別途指定したい場合は変更してください．（複数のテンプレートを管理する場合は，templatesフォルダ下に
@@ -49,7 +49,7 @@ Settingを開いて，コード生成の設定を行いましょう．
 テンプレートのマッピングは，ステレオタイプを指定しないものは，Default，指定するものはStereotype, プロジェクトに共通のファイルはGlobalで指定します．    
 
 ### 生成テスト
-~/.astah/plugins/m2t/sampleDiagram下にサンプルのAstahファイルがあります．
+~/.astah/plugins/m2t/sampleDiagram下にサンプルのastahファイルがあります．
 とりあえず試してみたい場合は，こちらを試してみてください．
 
 一応どのファイルと設定の組み合わせでも生成は可能ですが，以下の組み合わせを想定しています．
@@ -105,7 +105,7 @@ Abstract sample
         ${variable}
     <%}%>
 
-メソッドの定義をするのであれば，以下のような感じです．（アクセス修飾子，パラメータ展開を除く. Astahのメソッドの”定義”にメソッド内処理を記述しているとする）
+メソッドの定義をするのであれば，以下のような感じです．（アクセス修飾子，パラメータ展開を除く. astahのメソッドの”定義”にメソッド内処理を記述しているとする）
 
 Java Method sample
 
