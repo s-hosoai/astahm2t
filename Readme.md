@@ -40,7 +40,7 @@ m2tメニューには，Generate（現在の設定でコード生成）とSettin
 
 ### 設定
 Settingを開いて，コード生成の設定を行いましょう．
-![astahm2tSetting.png](astahm2tSetting.png)
+![Astahm2tSetting.png](Astahm2tSetting.png)
 
 設定名の箇所で，現在の生成設定を指定します．新たに追加する場合はAdd, 現在の設定を削除する場合はRemoveをクリックしてください．  
 テンプレートフォルダはデフォルトでは上記の設定フォルダ下のtemplates/になっています．別途指定したい場合は変更してください．（複数のテンプレートを管理する場合は，templatesフォルダ下に
