@@ -31,7 +31,7 @@ Once the plug-in is installed successfully, new menu [m2t] is added under [Tool]
 
 ### Setting
 Go to [Tool] - [m2t] - [Setting] to open the configuration window.
-![Astahm2tSetting.png](Astahm2tSetting.png)
+![Astahm2tSetting_e.png](Astahm2tSetting_e.png)
 
 Please refer to [How to use m2t] on Astah.net (http://astah.net/features/m2t-plugin)
 
