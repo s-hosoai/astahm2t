@@ -19,6 +19,7 @@ GroovyのSimpleTemplateEngineを利用してコード生成を行います．
 
 ## インストール
 ### プラグインのインストール
+ - [Latest Release](https://github.com/s-hosoai/astahm2t/releases)から最新版をダウンロード
  - ヘルプ＞プラグイン一覧
   + ＋インストール
   + →プラグインファイルを選択 (astahm2t/target/～.jar）
@@ -32,7 +33,7 @@ astah再起動
  - Windows
 　C:/Users/{username}/.astah/plugins/m2t/
  - Mac
-　UserHome?/.astah/plugins/m2t/
+　~/.astah/plugins/m2t/
 
 ## 利用方法
 プラグインがインストールされると，ツールメニューの一番下にm2tメニューが追加されます．
@@ -126,4 +127,3 @@ Abstract sample with helper
 ## For Developer
 本プラグインはXtendにて作成しています．src/main/javaのコードはすべて生成コードです．
 変更を加える場合は，src/main/xtendのコードを変更してください．
-（Plugin APIがJava8に対応した場合は，Javaに戻すかもしれませんが．）
