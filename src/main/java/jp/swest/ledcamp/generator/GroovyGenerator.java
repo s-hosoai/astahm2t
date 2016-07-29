@@ -44,6 +44,7 @@ public class GroovyGenerator {
           File _file_1 = output.toFile();
           FileWriter _fileWriter = new FileWriter(_file_1);
           final Function1<FileWriter, Writer> _function = new Function1<FileWriter, Writer>() {
+            @Override
             public Writer apply(final FileWriter it) {
               try {
                 return generatedCode.writeTo(it);
@@ -61,17 +62,15 @@ public class GroovyGenerator {
           GenerationException _instance = GenerationException.getInstance();
           _instance.addException(e);
           boolean _matched = false;
-          if (!_matched) {
-            if (Objects.equal(e, MissingPropertyException.class)) {
-              _matched=true;
-              JFrame _frame = utils.getFrame();
-              String _message = e.getMessage();
-              String _plus = ("Cannot found property :" + _message);
-              String _plus_1 = (_plus + ". model : ");
-              String _name = iClass.getName();
-              String _plus_2 = (_plus_1 + _name);
-              JOptionPane.showMessageDialog(_frame, _plus_2);
-            }
+          if (Objects.equal(e, MissingPropertyException.class)) {
+            _matched=true;
+            JFrame _frame = utils.getFrame();
+            String _message = e.getMessage();
+            String _plus = ("Cannot found property :" + _message);
+            String _plus_1 = (_plus + ". model : ");
+            String _name = iClass.getName();
+            String _plus_2 = (_plus_1 + _name);
+            JOptionPane.showMessageDialog(_frame, _plus_2);
           }
           if (!_matched) {
             JFrame _frame_1 = utils.getFrame();

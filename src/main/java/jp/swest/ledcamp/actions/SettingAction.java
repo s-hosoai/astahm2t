@@ -10,6 +10,7 @@ import org.eclipse.xtext.xbase.lib.Exceptions;
 
 @SuppressWarnings("all")
 public class SettingAction implements IPluginActionDelegate {
+  @Override
   public Object run(final IWindow window) throws IPluginActionDelegate.UnExpectedException {
     try {
       AstahAPI _astahAPI = AstahAPI.getAstahAPI();

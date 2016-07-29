@@ -35,11 +35,13 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 @SuppressWarnings("all")
 public class CodeGenerator {
   public static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
+    @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
       Files.delete(file);
       return FileVisitResult.CONTINUE;
     }
     
+    @Override
     public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
       boolean _equals = Objects.equal(exc, null);
       if (_equals) {
@@ -63,6 +65,7 @@ public class CodeGenerator {
       this.prevTempPath = prevTemp;
     }
     
+    @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
       Path _resolve = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
       Path _relativize = _resolve.relativize(file);
@@ -70,15 +73,7 @@ public class CodeGenerator {
       Path _resolve_1 = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
       Path _relativize_1 = _resolve_1.relativize(file);
       final Path prevTempFile = this.prevTempPath.resolve(_relativize_1);
-      boolean _and = false;
-      boolean _exists = Files.exists(targetFile);
-      if (!_exists) {
-        _and = false;
-      } else {
-        boolean _exists_1 = Files.exists(prevTempFile);
-        _and = _exists_1;
-      }
-      if (_and) {
+      if ((Files.exists(targetFile) && Files.exists(prevTempFile))) {
         List<String> _readAllLines = Files.readAllLines(prevTempFile);
         List<String> _readAllLines_1 = Files.readAllLines(targetFile);
         final Patch<String> prev_target_diff = DiffUtils.<String>diff(_readAllLines, _readAllLines_1);
@@ -91,6 +86,7 @@ public class CodeGenerator {
           final Patch<String> prev_gen_diff = DiffUtils.<String>diff(_readAllLines_2, _readAllLines_3);
           List<Delta<String>> _deltas_1 = prev_target_diff.getDeltas();
           final Consumer<Delta<String>> _function = new Consumer<Delta<String>>() {
+            @Override
             public void accept(final Delta<String> it) {
               prev_gen_diff.addDelta(it);
             }
@@ -115,6 +111,7 @@ public class CodeGenerator {
       return FileVisitResult.CONTINUE;
     }
     
+    @Override
     public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
       Path _relativize = this.temporalPath.relativize(dir);
       final Path targetDir = this.targetPath.resolve(_relativize);
@@ -195,6 +192,7 @@ public class CodeGenerator {
         if (_equals) {
           HashSet<TemplateMap> _mapping = setting.getMapping();
           final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+            @Override
             public Boolean apply(final TemplateMap it) {
               TemplateType _templateType = it.getTemplateType();
               return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
@@ -226,18 +224,9 @@ public class CodeGenerator {
           for (final String stereotype : _stereotypes_1) {
             HashSet<TemplateMap> _mapping_1 = setting.getMapping();
             final Function1<TemplateMap, Boolean> _function_1 = new Function1<TemplateMap, Boolean>() {
+              @Override
               public Boolean apply(final TemplateMap it) {
-                boolean _and = false;
-                TemplateType _templateType = it.getTemplateType();
-                boolean _equals = Objects.equal(_templateType, TemplateType.Stereotype);
-                if (!_equals) {
-                  _and = false;
-                } else {
-                  String _stereotype = it.getStereotype();
-                  boolean _equals_1 = _stereotype.equals(stereotype);
-                  _and = _equals_1;
-                }
-                return Boolean.valueOf(_and);
+                return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
               }
             };
             Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(_mapping_1, _function_1);
@@ -268,6 +257,7 @@ public class CodeGenerator {
     map.put("u", utils);
     HashSet<TemplateMap> _mapping = setting.getMapping();
     final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+      @Override
       public Boolean apply(final TemplateMap v) {
         TemplateType _templateType = v.getTemplateType();
         return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));

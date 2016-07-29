@@ -6,11 +6,13 @@ import org.osgi.framework.BundleContext;
 
 @SuppressWarnings("all")
 public class Activator implements BundleActivator {
+  @Override
   public void start(final BundleContext context) {
     SettingManager manager = SettingManager.getInstance();
     manager.load();
   }
   
+  @Override
   public void stop(final BundleContext context) {
   }
 }

@@ -129,15 +129,18 @@ public class SettingDialog extends JDialog {
       }
     }
     
+    @Override
     public Dimension getPreferredSize() {
       return new Dimension((this.settingDialog.templatePanel.getSize().width - 10), 30);
     }
     
+    @Override
     public Dimension getMaximumSize() {
       Dimension _size = this.settingDialog.templatePanel.getSize();
       return new Dimension(_size.width, 30);
     }
     
+    @Override
     public Dimension getMinimumSize() {
       JPanel _templatePanel = null;
       if (this.settingDialog!=null) {
@@ -160,12 +163,14 @@ public class SettingDialog extends JDialog {
         this.typeCardLayout = _cardLayout;
         TemplateType[] _values = TemplateType.values();
         final Consumer<TemplateType> _function = new Consumer<TemplateType>() {
+          @Override
           public void accept(final TemplateType it) {
             TemplatePanel.this.comboType.addItem(it);
           }
         };
         ((List<TemplateType>)Conversions.doWrapArray(_values)).forEach(_function);
         final ActionListener _function_1 = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             int _selectedIndex = TemplatePanel.this.comboType.getSelectedIndex();
             boolean _notEquals = (_selectedIndex != (-1));
@@ -196,6 +201,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("file name");
             this.fileName = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setFileName(it);
               }
@@ -210,6 +216,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_G = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -232,6 +239,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("file extension");
             this.fileExtension_D = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setFileExtension(it);
               }
@@ -246,6 +254,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_D = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -268,6 +277,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("stereotype");
             this.stereotype = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setStereotype(it);
               }
@@ -282,6 +292,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("file extension");
             this.fileExtension_S = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setFileExtension(it);
               }
@@ -296,6 +307,7 @@ public class SettingDialog extends JDialog {
             JTextField _jTextField = new JTextField("template file path");
             this.templateFile_S = _jTextField;
             final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+              @Override
               public void accespt(final String it) {
                 TemplatePanel.this.map.setTemplateFile(it);
               }
@@ -313,6 +325,7 @@ public class SettingDialog extends JDialog {
         final JButton btnRemove = new JButton("x");
         final SettingDialog.TemplatePanel thisPanel = this;
         final ActionListener _function = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             final Container owner = thisPanel.getParent();
             GenerateSetting _currentSetting = settingDialog.manager.getCurrentSetting();
@@ -346,6 +359,7 @@ public class SettingDialog extends JDialog {
         {
           first = true;
         }
+        @Override
         public void focusGained(final FocusEvent e) {
           if (this.first) {
             final JFileChooser fileChooser = new JFileChooser();
@@ -375,6 +389,7 @@ public class SettingDialog extends JDialog {
           }
         }
         
+        @Override
         public void focusLost(final FocusEvent arg0) {
           this.first = true;
         }
@@ -383,6 +398,7 @@ public class SettingDialog extends JDialog {
     
     private FocusAdapter clearField(final JTextField field) {
       return new FocusAdapter() {
+        @Override
         public void focusGained(final FocusEvent arg0) {
           Color _foreground = field.getForeground();
           boolean _notEquals = (!Objects.equal(_foreground, Color.BLACK));
@@ -392,6 +408,7 @@ public class SettingDialog extends JDialog {
           }
         }
         
+        @Override
         public void focusLost(final FocusEvent arg0) {
         }
       };
@@ -441,6 +458,7 @@ public class SettingDialog extends JDialog {
       this.combo_templateSet = _jComboBox;
       Set<String> _keySet = this.manager.keySet();
       final Consumer<String> _function = new Consumer<String>() {
+        @Override
         public void accept(final String it) {
           SettingDialog.this.combo_templateSet.addItem(it);
         }
@@ -471,6 +489,7 @@ public class SettingDialog extends JDialog {
         JButton _jButton = new JButton("Add");
         this.btnAddSet = _jButton;
         final ActionListener _function = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             final String setName = JOptionPane.showInputDialog(SettingDialog.this, "please input templateSet name");
             boolean _notEquals = (!Objects.equal(setName, null));
@@ -498,6 +517,7 @@ public class SettingDialog extends JDialog {
       {
         final JButton btnRemoveSet = new JButton("Remove");
         final ActionListener _function = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             final Object selectedSet = SettingDialog.this.combo_templateSet.getSelectedItem();
             SettingDialog.this.combo_templateSet.removeItem(selectedSet);
@@ -539,6 +559,7 @@ public class SettingDialog extends JDialog {
       this.combo_templateEngine = _jComboBox;
       TemplateEngine[] _values = TemplateEngine.values();
       final Consumer<TemplateEngine> _function = new Consumer<TemplateEngine>() {
+        @Override
         public void accept(final TemplateEngine it) {
           SettingDialog.this.combo_templateEngine.addItem(it);
         }
@@ -566,6 +587,7 @@ public class SettingDialog extends JDialog {
       JTextField _jTextField = new JTextField();
       this.textTemplateDir = _jTextField;
       final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+        @Override
         public void accespt(final String it) {
           GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
           _currentSetting.setTemplatePath(it);
@@ -582,6 +604,7 @@ public class SettingDialog extends JDialog {
     {
       final JButton btnTempDirBrowse = new JButton("...");
       final ActionListener _function = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent it) {
           String _property = System.getProperty("user.home");
           String _plus = (_property + "/.astah/plugins/m2t/");
@@ -609,6 +632,7 @@ public class SettingDialog extends JDialog {
       JTextField _jTextField = new JTextField();
       this.textDestinationPath = _jTextField;
       final jp.swest.ledcamp.xtendhelper.Consumer<String> _function = new jp.swest.ledcamp.xtendhelper.Consumer<String>() {
+        @Override
         public void accespt(final String it) {
           GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
           _currentSetting.setTargetPath(it);
@@ -625,6 +649,7 @@ public class SettingDialog extends JDialog {
     {
       final JButton btnDestBrowse = new JButton("...");
       final ActionListener _function = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent it) {
           SettingDialog.this.browseDirectory("", SettingDialog.this.textDestinationPath);
         }
@@ -656,6 +681,7 @@ public class SettingDialog extends JDialog {
     {
       final JButton btnAddTemplate = new JButton("Add template");
       final ActionListener _function = new ActionListener() {
+        @Override
         public void actionPerformed(final ActionEvent it) {
           final TemplateMap map = new TemplateMap();
           final SettingDialog.TemplatePanel template = new SettingDialog.TemplatePanel(SettingDialog.this, map);
@@ -682,6 +708,7 @@ public class SettingDialog extends JDialog {
         final JButton btnOk = new JButton("OK");
         btnOk.setActionCommand("OK");
         final ActionListener _function = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             SettingDialog.this.manager.save();
             SettingDialog.this.dispose();
@@ -696,6 +723,7 @@ public class SettingDialog extends JDialog {
       {
         final JButton btnCancel = new JButton("Cancel");
         final ActionListener _function = new ActionListener() {
+          @Override
           public void actionPerformed(final ActionEvent it) {
             SettingDialog.this.dispose();
           }
@@ -706,6 +734,7 @@ public class SettingDialog extends JDialog {
       }
     }
     final ActionListener _function = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent it) {
         SettingDialog.this.changeTemplateSet();
       }
@@ -713,6 +742,7 @@ public class SettingDialog extends JDialog {
     this.combo_templateSet.addActionListener(_function);
     Set<String> _keySet = this.manager.keySet();
     final Function1<String, Boolean> _function_1 = new Function1<String, Boolean>() {
+      @Override
       public Boolean apply(final String it) {
         GenerateSetting _currentSetting = SettingDialog.this.manager.getCurrentSetting();
         String _templateID = _currentSetting.getTemplateID();
@@ -726,6 +756,7 @@ public class SettingDialog extends JDialog {
   private void disableAll() {
     Component[] _components = this.contentPanel.getComponents();
     final Consumer<Component> _function = new Consumer<Component>() {
+      @Override
       public void accept(final Component it) {
         it.setEnabled(false);
       }
@@ -737,6 +768,7 @@ public class SettingDialog extends JDialog {
   private void enableAll() {
     Component[] _components = this.contentPanel.getComponents();
     final Consumer<Component> _function = new Consumer<Component>() {
+      @Override
       public void accept(final Component it) {
         it.setEnabled(true);
       }
@@ -771,6 +803,7 @@ public class SettingDialog extends JDialog {
     }
     if (_mapping!=null) {
       final Consumer<TemplateMap> _function = new Consumer<TemplateMap>() {
+        @Override
         public void accept(final TemplateMap map) {
           SettingDialog.TemplatePanel _templatePanel = new SettingDialog.TemplatePanel(SettingDialog.this, map);
           SettingDialog.this.templatePanel.add(_templatePanel);

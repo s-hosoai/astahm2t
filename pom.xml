@@ -5,7 +5,7 @@
 		<bundle.symbolicName>jp.swest.ledcamp.astahm2t</bundle.symbolicName>
 		<bundle.namespace>jp.swest.ledcamp</bundle.namespace>
 		<plugin.install>true</plugin.install>
-		<astah.version>6.7</astah.version>
+		<astah.version>7.0</astah.version>
 		<astah.edition>all</astah.edition>
 	</properties>
 	<modelVersion>4.0.0</modelVersion>

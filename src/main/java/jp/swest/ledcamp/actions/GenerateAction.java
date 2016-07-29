@@ -15,6 +15,7 @@ import org.eclipse.xtext.xbase.lib.ListExtensions;
 
 @SuppressWarnings("all")
 public class GenerateAction implements IPluginActionDelegate {
+  @Override
   public Object run(final IWindow window) throws IPluginActionDelegate.UnExpectedException {
     try {
       CodeGenerator.generate();
@@ -26,6 +27,7 @@ public class GenerateAction implements IPluginActionDelegate {
         Window _parent_1 = window.getParent();
         List<Exception> _excetpions = ge.getExcetpions();
         final Function1<Exception, String> _function = new Function1<Exception, String>() {
+          @Override
           public String apply(final Exception e) {
             return e.getMessage();
           }
@@ -36,6 +38,7 @@ public class GenerateAction implements IPluginActionDelegate {
         JOptionPane.showMessageDialog(_parent_1, _plus);
         List<Exception> _excetpions_1 = ge.getExcetpions();
         final Consumer<Exception> _function_1 = new Consumer<Exception>() {
+          @Override
           public void accept(final Exception e) {
             e.printStackTrace();
           }

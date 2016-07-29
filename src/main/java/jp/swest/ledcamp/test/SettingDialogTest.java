@@ -19,6 +19,7 @@ public class SettingDialogTest {
     final BorderLayout layout = new BorderLayout();
     final JButton btn = new JButton("open dialog");
     final ActionListener _function = new ActionListener() {
+      @Override
       public void actionPerformed(final ActionEvent it) {
         final SettingDialog dialog = new SettingDialog(frame);
         dialog.setVisible(true);
