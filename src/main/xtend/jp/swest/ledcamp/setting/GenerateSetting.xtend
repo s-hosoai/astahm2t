@@ -22,21 +22,21 @@ class TemplateMap {
         @Accessors String stereotype
         @Accessors String helper
         new(){}
-        static def newGlobalTemplateMap(String templateFile, String fileName){
+        static def TemplateMap newGlobalTemplateMap(String templateFile, String fileName){
             val globalTemplateMap = new TemplateMap
             globalTemplateMap.templateType = TemplateType.Global
             globalTemplateMap.templateFile = templateFile
             globalTemplateMap.fileName = fileName
             return globalTemplateMap
         }
-        static def newDefaultTemplateMap(String templateFile, String fileExtension){
+        static def TemplateMap newDefaultTemplateMap(String templateFile, String fileExtension){
             val defaultTemplateMap = new TemplateMap
             defaultTemplateMap.templateType = TemplateType.Default
             defaultTemplateMap.templateFile = templateFile
             defaultTemplateMap.fileExtension = fileExtension
             return defaultTemplateMap
         }
-        static def newStereotypeTemplateMap(String templateFile, String fileExtension, String stereotype){
+        static def TemplateMap newStereotypeTemplateMap(String templateFile, String fileExtension, String stereotype){
             val stereotypeTemplateMap = new TemplateMap
             stereotypeTemplateMap.templateType = TemplateType.Stereotype
             stereotypeTemplateMap.stereotype = stereotype
@@ -44,9 +44,10 @@ class TemplateMap {
             stereotypeTemplateMap.fileExtension = fileExtension
             return stereotypeTemplateMap
         }
-        static def newHelperTemplateMap(String helperFile){
+        static def TemplateMap newHelperTemplateMap(String helperFile){
             val helperMap = new TemplateMap
             helperMap.helper = helperFile
+            return helperMap
         }
 }
 

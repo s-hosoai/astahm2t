@@ -59,8 +59,13 @@ class CodeGenerator {
 			if (iClass.stereotypes.size == 0) { // Defualt generate
 				for (mapping : setting.mapping.filter[it.templateType == TemplateType::Default]) {
 					try {
-						generator.doGenerate(map, temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
-							templatePath.resolve(mapping.templateFile))
+						if(!mapping.fileExtension.contains("#")){
+							generator.doGenerate(map, temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
+								templatePath.resolve(mapping.templateFile))
+						}else{
+							generator.doGenerate(map, temporalTargetPath.resolve(mapping.fileExtension.replace("#",iClass.name)),
+								templatePath.resolve(mapping.templateFile))
+						}
 					} catch (Exception e) {
 						GenerationException::instance.addException(e)
 					}
@@ -70,9 +75,15 @@ class CodeGenerator {
 					for (mapping : setting.mapping.filter[
 						it.templateType == TemplateType::Stereotype && it.stereotype.equals(stereotype)]) {
 						try {
-							generator.doGenerate(map,
-								temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
-								templatePath.resolve(mapping.templateFile))
+							if(!mapping.fileExtension.contains("#")){
+								generator.doGenerate(map,
+									temporalTargetPath.resolve(iClass.name + "." + mapping.fileExtension),
+									templatePath.resolve(mapping.templateFile))
+							}else{
+								generator.doGenerate(map,
+									temporalTargetPath.resolve(mapping.fileExtension.replace("#", iClass.name)),
+									templatePath.resolve(mapping.templateFile))
+							}
 						} catch (Exception e) {
 							GenerationException::instance.addException(e)
 						}
@@ -163,14 +174,5 @@ class CodeGenerator {
 			}
 			return FileVisitResult.CONTINUE
 		}
-	}
-
-	def static void main(String[] args) {
-		val tempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/gen/")
-		val prevTempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/prevGen/")
-		val targetPath = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/target/JavaSample/")
-		Files.walkFileTree(tempRoot, new ConflictCheckVisitor(targetPath, tempRoot, prevTempRoot))
-		Files.walkFileTree(prevTempRoot, new DeleteDirVisitor);
-		Files.move(tempRoot, prevTempRoot)
 	}
 }

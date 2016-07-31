@@ -83,14 +83,12 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     private def createDefaultSetting(){
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/grsakura/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/RestWeb/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
-        sampleGenerateSetting.templateID = "grsakura"
-        sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("cpp.template", "cpp"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("header.template", "h"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("sketch.template", "Sketch.cpp"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("events.template", "Events.h"))
-        instance.put("grsakura", sampleGenerateSetting)
+        sampleGenerateSetting.templateID = "RestWeb"
+        sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST"))
+        sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("controller.template", "java", "REST"))
+        instance.put("RestWeb", sampleGenerateSetting)
         instance.currentSetting = sampleGenerateSetting
         save
     }

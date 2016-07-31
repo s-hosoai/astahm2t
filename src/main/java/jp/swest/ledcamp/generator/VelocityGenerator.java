@@ -14,6 +14,7 @@ import org.eclipse.xtext.xbase.lib.Exceptions;
 
 @SuppressWarnings("all")
 public class VelocityGenerator implements ITemplateEngine {
+  @Override
   public void doGenerate(final Map<String, Object> mapping, final Path output, final Path templatePath) {
     try {
       Properties p = new Properties();
@@ -25,6 +26,7 @@ public class VelocityGenerator implements ITemplateEngine {
       Velocity.init(p);
       final VelocityContext ctx = new VelocityContext();
       final BiConsumer<String, Object> _function = new BiConsumer<String, Object>() {
+        @Override
         public void accept(final String k, final Object v) {
           ctx.put(k, v);
         }

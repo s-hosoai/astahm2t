@@ -55,13 +55,10 @@ public class TemplateMap {
     return stereotypeTemplateMap;
   }
   
-  public static String newHelperTemplateMap(final String helperFile) {
-    String _xblockexpression = null;
-    {
-      final TemplateMap helperMap = new TemplateMap();
-      _xblockexpression = helperMap.helper = helperFile;
-    }
-    return _xblockexpression;
+  public static TemplateMap newHelperTemplateMap(final String helperFile) {
+    final TemplateMap helperMap = new TemplateMap();
+    helperMap.helper = helperFile;
+    return helperMap;
   }
   
   @Pure

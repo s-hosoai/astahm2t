@@ -16,6 +16,7 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.change_vision.jude.api.inf.model.IAttribute
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -45,7 +46,6 @@ class GeneratorUtils {
         projectRoot.name
     }
     
-    
     // for class diagram utility
     def getName(){
         iclass.name
@@ -64,7 +64,7 @@ class GeneratorUtils {
     def toFirstLowerCase(String str){
         str.toFirstLower
     }
-    
+
     def getAllReferenceClasses(){
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
