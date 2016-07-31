@@ -9,14 +9,14 @@ import groovy.lang.MissingPropertyException
 import javax.swing.JOptionPane
 import jp.swest.ledcamp.exception.GenerationException
 
-class GroovyGenerator {
+class GroovyGenerator implements ITemplateEngine{
     private SimpleTemplateEngine engine
 
     new() {
         engine = new SimpleTemplateEngine
     }
 
-    def doGenerate(Map<String, Object> map, Path output, Path templateFile) {
+    override doGenerate(Map<String, Object> map, Path output, Path templateFile) {
         val utils = map.get('u') as GeneratorUtils
         val iClass = utils.iclass
         try {

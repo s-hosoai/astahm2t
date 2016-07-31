@@ -35,11 +35,13 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 @SuppressWarnings("all")
 public class CodeGenerator {
   public static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
+    @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
       Files.delete(file);
       return FileVisitResult.CONTINUE;
     }
     
+    @Override
     public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
       boolean _equals = Objects.equal(exc, null);
       if (_equals) {
@@ -63,6 +65,7 @@ public class CodeGenerator {
       this.prevTempPath = prevTemp;
     }
     
+    @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
       Path _resolve = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
       Path _relativize = _resolve.relativize(file);
@@ -70,15 +73,7 @@ public class CodeGenerator {
       Path _resolve_1 = this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR);
       Path _relativize_1 = _resolve_1.relativize(file);
       final Path prevTempFile = this.prevTempPath.resolve(_relativize_1);
-      boolean _and = false;
-      boolean _exists = Files.exists(targetFile);
-      if (!_exists) {
-        _and = false;
-      } else {
-        boolean _exists_1 = Files.exists(prevTempFile);
-        _and = _exists_1;
-      }
-      if (_and) {
+      if ((Files.exists(targetFile) && Files.exists(prevTempFile))) {
         List<String> _readAllLines = Files.readAllLines(prevTempFile);
         List<String> _readAllLines_1 = Files.readAllLines(targetFile);
         final Patch<String> prev_target_diff = DiffUtils.<String>diff(_readAllLines, _readAllLines_1);
@@ -91,6 +86,7 @@ public class CodeGenerator {
           final Patch<String> prev_gen_diff = DiffUtils.<String>diff(_readAllLines_2, _readAllLines_3);
           List<Delta<String>> _deltas_1 = prev_target_diff.getDeltas();
           final Consumer<Delta<String>> _function = new Consumer<Delta<String>>() {
+            @Override
             public void accept(final Delta<String> it) {
               prev_gen_diff.addDelta(it);
             }
@@ -115,6 +111,7 @@ public class CodeGenerator {
       return FileVisitResult.CONTINUE;
     }
     
+    @Override
     public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
       Path _relativize = this.temporalPath.relativize(dir);
       final Path targetDir = this.targetPath.resolve(_relativize);
@@ -195,6 +192,7 @@ public class CodeGenerator {
         if (_equals) {
           HashSet<TemplateMap> _mapping = setting.getMapping();
           final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+            @Override
             public Boolean apply(final TemplateMap it) {
               TemplateType _templateType = it.getTemplateType();
               return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
@@ -203,14 +201,27 @@ public class CodeGenerator {
           Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(_mapping, _function);
           for (final TemplateMap mapping : _filter) {
             try {
-              String _name = iClass.getName();
-              String _plus = (_name + ".");
               String _fileExtension = mapping.getFileExtension();
-              String _plus_1 = (_plus + _fileExtension);
-              Path _resolve_1 = temporalTargetPath.resolve(_plus_1);
-              String _templateFile = mapping.getTemplateFile();
-              Path _resolve_2 = templatePath.resolve(_templateFile);
-              generator.doGenerate(map, _resolve_1, _resolve_2);
+              boolean _contains = _fileExtension.contains("#");
+              boolean _not_2 = (!_contains);
+              if (_not_2) {
+                String _name = iClass.getName();
+                String _plus = (_name + ".");
+                String _fileExtension_1 = mapping.getFileExtension();
+                String _plus_1 = (_plus + _fileExtension_1);
+                Path _resolve_1 = temporalTargetPath.resolve(_plus_1);
+                String _templateFile = mapping.getTemplateFile();
+                Path _resolve_2 = templatePath.resolve(_templateFile);
+                generator.doGenerate(map, _resolve_1, _resolve_2);
+              } else {
+                String _fileExtension_2 = mapping.getFileExtension();
+                String _name_1 = iClass.getName();
+                String _replace = _fileExtension_2.replace("#", _name_1);
+                Path _resolve_3 = temporalTargetPath.resolve(_replace);
+                String _templateFile_1 = mapping.getTemplateFile();
+                Path _resolve_4 = templatePath.resolve(_templateFile_1);
+                generator.doGenerate(map, _resolve_3, _resolve_4);
+              }
             } catch (final Throwable _t_2) {
               if (_t_2 instanceof Exception) {
                 final Exception e_2 = (Exception)_t_2;
@@ -226,31 +237,35 @@ public class CodeGenerator {
           for (final String stereotype : _stereotypes_1) {
             HashSet<TemplateMap> _mapping_1 = setting.getMapping();
             final Function1<TemplateMap, Boolean> _function_1 = new Function1<TemplateMap, Boolean>() {
+              @Override
               public Boolean apply(final TemplateMap it) {
-                boolean _and = false;
-                TemplateType _templateType = it.getTemplateType();
-                boolean _equals = Objects.equal(_templateType, TemplateType.Stereotype);
-                if (!_equals) {
-                  _and = false;
-                } else {
-                  String _stereotype = it.getStereotype();
-                  boolean _equals_1 = _stereotype.equals(stereotype);
-                  _and = _equals_1;
-                }
-                return Boolean.valueOf(_and);
+                return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
               }
             };
             Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(_mapping_1, _function_1);
             for (final TemplateMap mapping_1 : _filter_1) {
               try {
-                String _name_1 = iClass.getName();
-                String _plus_2 = (_name_1 + ".");
-                String _fileExtension_1 = mapping_1.getFileExtension();
-                String _plus_3 = (_plus_2 + _fileExtension_1);
-                Path _resolve_3 = temporalTargetPath.resolve(_plus_3);
-                String _templateFile_1 = mapping_1.getTemplateFile();
-                Path _resolve_4 = templatePath.resolve(_templateFile_1);
-                generator.doGenerate(map, _resolve_3, _resolve_4);
+                String _fileExtension_3 = mapping_1.getFileExtension();
+                boolean _contains_1 = _fileExtension_3.contains("#");
+                boolean _not_3 = (!_contains_1);
+                if (_not_3) {
+                  String _name_2 = iClass.getName();
+                  String _plus_2 = (_name_2 + ".");
+                  String _fileExtension_4 = mapping_1.getFileExtension();
+                  String _plus_3 = (_plus_2 + _fileExtension_4);
+                  Path _resolve_5 = temporalTargetPath.resolve(_plus_3);
+                  String _templateFile_2 = mapping_1.getTemplateFile();
+                  Path _resolve_6 = templatePath.resolve(_templateFile_2);
+                  generator.doGenerate(map, _resolve_5, _resolve_6);
+                } else {
+                  String _fileExtension_5 = mapping_1.getFileExtension();
+                  String _name_3 = iClass.getName();
+                  String _replace_1 = _fileExtension_5.replace("#", _name_3);
+                  Path _resolve_7 = temporalTargetPath.resolve(_replace_1);
+                  String _templateFile_3 = mapping_1.getTemplateFile();
+                  Path _resolve_8 = templatePath.resolve(_templateFile_3);
+                  generator.doGenerate(map, _resolve_7, _resolve_8);
+                }
               } catch (final Throwable _t_3) {
                 if (_t_3 instanceof Exception) {
                   final Exception e_3 = (Exception)_t_3;
@@ -268,6 +283,7 @@ public class CodeGenerator {
     map.put("u", utils);
     HashSet<TemplateMap> _mapping = setting.getMapping();
     final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+      @Override
       public Boolean apply(final TemplateMap v) {
         TemplateType _templateType = v.getTemplateType();
         return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));
@@ -313,21 +329,6 @@ public class CodeGenerator {
     boolean _notEquals = (_size != 0);
     if (_notEquals) {
       throw GenerationException.getInstance();
-    }
-  }
-  
-  public static void main(final String[] args) {
-    try {
-      final Path tempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/gen/");
-      final Path prevTempRoot = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/projects/JavaSample/prevGen/");
-      final Path targetPath = Paths.get("C:/Users/hosoai/.astah/plugins/m2t/target/JavaSample/");
-      CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, tempRoot, prevTempRoot);
-      Files.walkFileTree(tempRoot, _conflictCheckVisitor);
-      CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
-      Files.walkFileTree(prevTempRoot, _deleteDirVisitor);
-      Files.move(tempRoot, prevTempRoot);
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
     }
   }
 }

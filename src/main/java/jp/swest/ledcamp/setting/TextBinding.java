@@ -19,14 +19,17 @@ public class TextBinding implements DocumentListener {
     this.setterFunction = setterFunction;
   }
   
+  @Override
   public void changedUpdate(final DocumentEvent e) {
   }
   
+  @Override
   public void insertUpdate(final DocumentEvent e) {
     String _text = this.field.getText();
     this.setterFunction.accespt(_text);
   }
   
+  @Override
   public void removeUpdate(final DocumentEvent e) {
     String _text = this.field.getText();
     this.setterFunction.accespt(_text);
