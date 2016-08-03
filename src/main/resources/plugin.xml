@@ -27,6 +27,35 @@
                 menubarPath="tool/m2t/"
                 id="jp.swest.ledcamp.actions.GenerateAction">
             </action>
+            <menu
+                id="ssh"
+                label="%menu_ssh_group"
+                path="tool/ssh">
+            </menu>
+            <action
+                label="%menu_scp_label"
+                icon="icons/sample.gif"
+                class="jp.swest.ledcamp.actions.SCPAction"
+                tooltip="%menu_scp_tooltip"
+                menubarPath="tool/ssh/"
+                id="jp.swest.ledcamp.actions.SCPAction">
+            </action>
+            <action
+                label="%menu_ssh_invoke_label"
+                icon="icons/sample.gif"
+                class="jp.swest.ledcamp.actions.SSHInvokeAction"
+                tooltip="%menu_ssh_invoke_tooltip"
+                menubarPath="tool/ssh/"
+                id="jp.swest.ledcamp.actions.SSHInvokeAction">
+            </action>
+            <action
+                label="%menu_ssh_settings_label"
+                icon="icons/sample.gif"
+                class="jp.swest.ledcamp.actions.SSHSettingsAction"
+                tooltip="%menu_ssh_settings_tooltip"
+                menubarPath="tool/ssh/"
+                id="jp.swest.ledcamp.actions.SSHSettingsAction">
+            </action>
         </actionSet>
     </extension>   
 </plugin>

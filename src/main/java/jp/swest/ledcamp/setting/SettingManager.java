@@ -4,13 +4,18 @@ import com.google.common.base.Objects;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Properties;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.xml.bind.JAXB;
@@ -44,9 +49,17 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   @Accessors
   private String currentAstahFileName;
   
+  @XmlTransient
+  private String sshSettingFilePath;
+  
+  @XmlTransient
+  @Accessors
+  private Properties sshSettings;
+  
   private SettingManager() {
     super();
     this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
+    this.sshSettingFilePath = (this.m2tPluginFolderPath + "sshsetting.properties");
   }
   
   public static SettingManager getInstance() {
@@ -60,17 +73,23 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   public void save() {
-    File _file = new File(this.settingFilePath);
-    JAXB.marshal(SettingManager.instance, _file);
+    try {
+      File _file = new File(this.settingFilePath);
+      JAXB.marshal(SettingManager.instance, _file);
+      if (this.sshSettings!=null) {
+        FileOutputStream _fileOutputStream = new FileOutputStream(this.sshSettingFilePath);
+        this.sshSettings.store(_fileOutputStream, "");
+      }
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
+    }
   }
   
-  public GenerateSetting load() {
-    GenerateSetting _xblockexpression = null;
-    {
+  public void load() {
+    try {
       String _property = System.getProperty("user.home");
       this.userFolder = _property;
       this.m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
-      this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
       final File asgenPluginFolder = new File(this.m2tPluginFolderPath);
       boolean _exists = asgenPluginFolder.exists();
       boolean _not = (!_exists);
@@ -107,30 +126,19 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
           }
         }
       }
-      GenerateSetting _xtrycatchfinallyexpression = null;
       try {
-        GenerateSetting _xblockexpression_1 = null;
-        {
-          final File settingFile = new File(this.settingFilePath);
-          GenerateSetting _xifexpression = null;
-          boolean _exists_1 = settingFile.exists();
-          if (_exists_1) {
-            GenerateSetting _xblockexpression_2 = null;
-            {
-              File _file = new File(this.settingFilePath);
-              final SettingManager settings = JAXB.<SettingManager>unmarshal(_file, SettingManager.class);
-              SettingManager.instance.clear();
-              SettingManager.instance.putAll(settings);
-              _xblockexpression_2 = SettingManager.instance.currentSetting = settings.currentSetting;
-            }
-            _xifexpression = _xblockexpression_2;
-          } else {
-            this.createDefaultSetting();
-            this.save();
-          }
-          _xblockexpression_1 = _xifexpression;
+        final File settingFile = new File(this.settingFilePath);
+        boolean _exists_1 = settingFile.exists();
+        if (_exists_1) {
+          File _file = new File(this.settingFilePath);
+          final SettingManager settings = JAXB.<SettingManager>unmarshal(_file, SettingManager.class);
+          SettingManager.instance.clear();
+          SettingManager.instance.putAll(settings);
+          SettingManager.instance.currentSetting = settings.currentSetting;
+        } else {
+          this.createDefaultSetting();
+          this.save();
         }
-        _xtrycatchfinallyexpression = _xblockexpression_1;
       } catch (final Throwable _t_1) {
         if (_t_1 instanceof Exception) {
           final Exception e = (Exception)_t_1;
@@ -139,9 +147,20 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
           throw Exceptions.sneakyThrow(_t_1);
         }
       }
-      _xblockexpression = _xtrycatchfinallyexpression;
+      this.sshSettingFilePath = (this.m2tPluginFolderPath + "sshsetting.properties");
+      Properties _properties = new Properties();
+      this.sshSettings = _properties;
+      Path _get = Paths.get(this.sshSettingFilePath);
+      boolean _exists_2 = Files.exists(_get);
+      boolean _not_1 = (!_exists_2);
+      if (_not_1) {
+        return;
+      }
+      FileInputStream _fileInputStream = new FileInputStream(this.sshSettingFilePath);
+      this.sshSettings.load(_fileInputStream);
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
-    return _xblockexpression;
   }
   
   private void createDefaultSetting() {
@@ -254,5 +273,14 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   public void setCurrentAstahFileName(final String currentAstahFileName) {
     this.currentAstahFileName = currentAstahFileName;
+  }
+  
+  @Pure
+  public Properties getSshSettings() {
+    return this.sshSettings;
+  }
+  
+  public void setSshSettings(final Properties sshSettings) {
+    this.sshSettings = sshSettings;
   }
 }
