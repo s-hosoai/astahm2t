@@ -101,12 +101,12 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     private def createDefaultSetting() {
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath + "templates/RestWeb/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath + "templates/PyCreate/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
-        sampleGenerateSetting.templateID = "RestWeb"
-        sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST"))
-        sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("controller.template", "java", "REST"))
-        instance.put("RestWeb", sampleGenerateSetting)
+        sampleGenerateSetting.templateID = "PyCreate"
+        sampleGenerateSetting.mapping.add(TemplateMap.newGlobalTemplateMap("main.template", "main.py"))
+        sampleGenerateSetting.mapping.add(TemplateMap.newDefaultTemplateMap("python.template", "py"))
+        instance.put("PyCreate", sampleGenerateSetting)
         instance.currentSetting = sampleGenerateSetting
         save
     }

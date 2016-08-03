@@ -168,18 +168,18 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
     File _file = new File(this.userFolder);
     String _absolutePath = _file.getAbsolutePath();
     sampleGenerateSetting.setTargetPath(_absolutePath);
-    File _file_1 = new File((this.m2tPluginFolderPath + "templates/RestWeb/"));
+    File _file_1 = new File((this.m2tPluginFolderPath + "templates/PyCreate/"));
     String _absolutePath_1 = _file_1.getAbsolutePath();
     sampleGenerateSetting.setTemplatePath(_absolutePath_1);
     sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
-    sampleGenerateSetting.setTemplateID("RestWeb");
+    sampleGenerateSetting.setTemplateID("PyCreate");
     HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
-    TemplateMap _newStereotypeTemplateMap = TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST");
-    _mapping.add(_newStereotypeTemplateMap);
+    TemplateMap _newGlobalTemplateMap = TemplateMap.newGlobalTemplateMap("main.template", "main.py");
+    _mapping.add(_newGlobalTemplateMap);
     HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
-    TemplateMap _newStereotypeTemplateMap_1 = TemplateMap.newStereotypeTemplateMap("controller.template", "java", "REST");
-    _mapping_1.add(_newStereotypeTemplateMap_1);
-    SettingManager.instance.put("RestWeb", sampleGenerateSetting);
+    TemplateMap _newDefaultTemplateMap = TemplateMap.newDefaultTemplateMap("python.template", "py");
+    _mapping_1.add(_newDefaultTemplateMap);
+    SettingManager.instance.put("PyCreate", sampleGenerateSetting);
     SettingManager.instance.currentSetting = sampleGenerateSetting;
     this.save();
   }
