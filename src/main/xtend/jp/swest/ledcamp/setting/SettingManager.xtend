@@ -11,6 +11,12 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import java.io.IOException
+import java.util.Properties
+import java.io.FileInputStream
+import java.nio.file.Files
+import java.nio.file.Paths
+import java.io.OutputStream
+
 // Singleton
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
@@ -19,10 +25,14 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     @XmlTransient private String userFolder = System.getProperty("user.home")
     @XmlTransient @Accessors private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
     @XmlTransient @Accessors private String currentAstahFileName
-    
+
+    @XmlTransient private String sshSettingFilePath
+    @XmlTransient @Accessors private Properties sshSettings
+
     private new() {
-    	super()
-    	settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+        super()
+        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+        sshSettingFilePath = m2tPluginFolderPath + "sshsetting.properties"
     }
 
     static def getInstance() {
@@ -32,18 +42,18 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         }
         return instance
     }
-    
+
     def save() {
         JAXB.marshal(instance, new File(settingFilePath))
+        sshSettings?.store(new FileOutputStream(sshSettingFilePath),"")
     }
 
     def load() {
         // load property file
         userFolder = System.getProperty("user.home")
         m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
-        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
         val asgenPluginFolder = new File(m2tPluginFolderPath);
-        if (!(asgenPluginFolder.exists())) {  // install setting files.
+        if (!(asgenPluginFolder.exists())) { // install setting files.
             try {
                 asgenPluginFolder.getParentFile().mkdirs();
                 val zipFile = File.createTempFile("astahm2t", "templeatezip");
@@ -65,25 +75,33 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         }
         try {
             val settingFile = new File(settingFilePath)
-            if(settingFile.exists){
+            if (settingFile.exists) {
                 val settings = JAXB.unmarshal(new File(settingFilePath), SettingManager)
                 instance.clear
                 instance.putAll(settings)
                 instance.currentSetting = settings.currentSetting
-            }else{
+            } else {
                 createDefaultSetting
                 save
             }
         } catch (Exception e) {
             e.printStackTrace
-            // load fail. 
+        // load fail. 
         }
+
+        // SSH settings for ledcamp4
+        sshSettingFilePath = m2tPluginFolderPath + "sshsetting.properties"
+        sshSettings = new Properties()
+        if (! Files.exists(Paths.get(sshSettingFilePath))) {
+            return
+        }
+        sshSettings.load(new FileInputStream(sshSettingFilePath))
     }
-    
-    private def createDefaultSetting(){
+
+    private def createDefaultSetting() {
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/RestWeb/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath + "templates/RestWeb/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
         sampleGenerateSetting.templateID = "RestWeb"
         sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST"))
