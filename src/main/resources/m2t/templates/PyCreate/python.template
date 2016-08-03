@@ -1,0 +1,64 @@
+<% import com.change_vision.jude.api.inf.model.* %>\
+<% import java.util.regex.Matcher %>\
+<% def stateInstance = u.instanceName+"_state"%>\
+<% def eventInstance = u.instanceName+"_event"%>\
+<% def getEventName(event){u.name+"_"}%>\
+<% def isEmpty(str){str!=null&&str.trim().size()>1\
+    ?"("+str.trim().split("\n").join(", ")+")"\
+    :"True"}%>\
+<% def replaceAct(act){
+    if(act=~"setNextTimeout\\((\\d+)(,.+)?\\)"){
+        "timer->setNextTimeout("+Matcher.getLastMatcher().group(1)+","+u.name+"_Timeout)"
+    }else{act.trim();}}%>\
+<% def replaceExec(execStr){
+	buf = execStr.replace('\"','\\\"')
+	buf = buf.replace('\r','')
+	buf = buf.replace('\n','\\n')
+	buf
+}%>\
+from create2.sensor import Event
+from main import create2
+from create2.create2 import Create2
+
+class ${u.name} :
+    def __init__(self):
+<% for(var in u.iclass.getAttributes()){%>\
+<% if(var.getAssociation() == null){%>\
+        self.${var.getName()} = 0
+<%}%>\
+<%}%>\
+        self.stateMap = {
+<%for(state in u.states){%>\
+            "${state.name}":{
+                "entry": "${replaceExec(state.entry)}",
+                "do"   : "${state.doActivity}",
+                "exit" : "${state.exit}",
+<%for(t in state.outgoings){%>\
+                ${t.event.trim()} : {
+                    "guard": (lambda : ${isEmpty(t.guard)==""?"True":isEmpty(t.guard)}),
+                    "act"  : "${replaceExec(t.action)}",
+                    "next" : "${t.target.name}"
+                },
+<%}%>\
+            },
+<%}%>\
+        }
+        self.current = self.stateMap["${u.initialState}"]
+        self.initState()
+
+    def initState(self):
+        exec(self.current["entry"])
+        exec(self.current["do"])
+
+    def doTransition(self, event):
+        state = self.current
+        if event in state:
+            trans = state[event]
+            if trans["guard"]():
+                exec(state["exit"])
+                exec(trans["act"])
+                state = self.stateMap[trans["next"]]
+                exec(state["entry"])
+                exec(state["do"])
+                self.current = state
+
