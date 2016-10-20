@@ -2,5 +2,5 @@
 *.bak
 *.lock
 /target/
-*.xtextbin
+*.xtendbin
 .gitignore
