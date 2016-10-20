@@ -15,6 +15,7 @@ import java.util.HashMap
 import jp.swest.ledcamp.exception.GenerationException
 import jp.swest.ledcamp.setting.SettingManager
 import jp.swest.ledcamp.setting.TemplateType
+import org.zeroturnaround.zip.ZipUtil
 
 class CodeGenerator {
     static val PREV_GENDIR = "prevGen"
@@ -112,7 +113,6 @@ class CodeGenerator {
             Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
             Files.deleteIfExists(prevTemporalTargetPath)
             Files.move(temporalTargetPath, prevTemporalTargetPath)
-            Files.delete(temporalTargetPath)
         } catch (Exception e) {
             GenerationException::instance.addException(e)
         }
@@ -120,6 +120,18 @@ class CodeGenerator {
         if (GenerationException::instance.excetpions.size != 0) {
             throw GenerationException::instance
         }
+        
+        transferToCompilerServer(targetPath)
+    }
+    
+    def static transferToCompilerServer(Path targetPath) {
+        val tempPath = Files.createTempDirectory("astahm2t")
+        val zipPath = tempPath.resolve("temp.zip")
+        ZipUtil.pack(targetPath.toFile, zipPath.toFile)
+        
+        println(tempPath)
+//        Files.delete(zipPath)
+//        Files.delete(tempPath)
     }
 
     static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
