@@ -109,6 +109,7 @@ class CodeGenerator {
 			Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
 			Files.deleteIfExists(prevTemporalTargetPath)
 			Files.move(temporalTargetPath, prevTemporalTargetPath)
+			Files.delete(temporalTargetPath)
 		} catch (Exception e) {
 			GenerationException::instance.addException(e)
 		}

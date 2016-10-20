@@ -314,6 +314,7 @@ public class CodeGenerator {
       Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor);
       Files.deleteIfExists(prevTemporalTargetPath);
       Files.move(temporalTargetPath, prevTemporalTargetPath);
+      Files.delete(temporalTargetPath);
     } catch (final Throwable _t_3) {
       if (_t_3 instanceof Exception) {
         final Exception e_3 = (Exception)_t_3;
