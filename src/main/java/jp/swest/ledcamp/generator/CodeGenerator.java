@@ -305,6 +305,7 @@ public class CodeGenerator {
         Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
         CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
         Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor);
+        Thread.sleep(200);
         Files.deleteIfExists(prevTemporalTargetPath);
         Files.move(temporalTargetPath, prevTemporalTargetPath);
       } catch (final Throwable _t_3) {

@@ -111,6 +111,7 @@ class CodeGenerator {
             Files.walkFileTree(temporalTargetPath,
                 new ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath))
             Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
+            Thread.sleep(200); // wait for file system
             Files.deleteIfExists(prevTemporalTargetPath)
             Files.move(temporalTargetPath, prevTemporalTargetPath)
         } catch (Exception e) {
