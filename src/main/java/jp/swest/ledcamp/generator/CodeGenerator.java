@@ -113,18 +113,6 @@ public class CodeGenerator {
       Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING);
       return FileVisitResult.CONTINUE;
     }
-    
-    @Override
-    public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
-      Path _relativize = this.temporalPath.relativize(dir);
-      final Path targetDir = this.targetPath.resolve(_relativize);
-      boolean _exists = Files.exists(targetDir);
-      boolean _not = (!_exists);
-      if (_not) {
-        Files.createDirectories(targetDir);
-      }
-      return FileVisitResult.CONTINUE;
-    }
   }
   
   private final static String PREV_GENDIR = "prevGen";

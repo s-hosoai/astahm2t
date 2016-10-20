@@ -181,13 +181,5 @@ class CodeGenerator {
             Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
             return FileVisitResult.CONTINUE
         }
-
-        override preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
-            val targetDir = targetPath.resolve(temporalPath.relativize(dir))
-            if (!Files.exists(targetDir)) {
-                Files.createDirectories(targetDir)
-            }
-            return FileVisitResult.CONTINUE
-        }
     }
 }
