@@ -3,6 +3,8 @@ package jp.swest.ledcamp.generator;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.view.IViewManager;
 import com.google.common.base.Objects;
+import java.awt.Container;
+import java.awt.Frame;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.InputStream;
@@ -13,7 +15,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,11 @@ import java.util.regex.Pattern;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-import jp.swest.ledcamp.setting.GenerateSetting;
-import jp.swest.ledcamp.setting.SettingManager;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import org.apache.http.Consts;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -49,6 +51,22 @@ import org.eclipse.xtext.xbase.lib.InputOutput;
 
 @SuppressWarnings("all")
 public class FileUploader {
+  public static class CompileErrorDialog extends JDialog {
+    public CompileErrorDialog(final Frame owner, final String errorMessage) {
+      super(owner);
+      this.setTitle("Compile Error");
+      final JTextArea textArea = new JTextArea();
+      textArea.setText(errorMessage);
+      textArea.setEditable(false);
+      textArea.setSize(400, 400);
+      final JScrollPane scroll = new JScrollPane(textArea);
+      Container _contentPane = this.getContentPane();
+      _contentPane.add(scroll);
+      this.pack();
+      this.setVisible(true);
+    }
+  }
+  
   private final static String boundary = "----WebKitFormBoundaryAR7c5if126HH4FGk";
   
   private final static String defaultURL = "http://mdd-compile.shinshu-u.ac.jp/upload";
@@ -135,9 +153,8 @@ public class FileUploader {
         final CharSequence errorReport = errorTemp.subSequence(_plus, _lastIndexOf);
         InputOutput.<String>println("Compile is failed");
         InputOutput.<CharSequence>println(errorReport);
-        IViewManager _viewManager = astahAPI.getViewManager();
-        JFrame _mainFrame = _viewManager.getMainFrame();
-        JOptionPane.showMessageDialog(_mainFrame, errorReport, "Compile is failed", JOptionPane.ERROR_MESSAGE);
+        String _string = errorReport.toString();
+        FileUploader.showCompileErrorDialog(_string);
         br.close();
         return;
       }
@@ -161,9 +178,9 @@ public class FileUploader {
         is.close();
         writer.close();
         InputOutput.<String>println("Compile is successful");
-        IViewManager _viewManager_1 = astahAPI.getViewManager();
-        JFrame _mainFrame_1 = _viewManager_1.getMainFrame();
-        JOptionPane.showMessageDialog(_mainFrame_1, "Compile is successful", "Compile is successful", JOptionPane.INFORMATION_MESSAGE);
+        IViewManager _viewManager = astahAPI.getViewManager();
+        JFrame _mainFrame = _viewManager.getMainFrame();
+        JOptionPane.showMessageDialog(_mainFrame, "Compile is successful", "Compile is successful", JOptionPane.INFORMATION_MESSAGE);
       } else {
         InputOutput.<String>println(filename);
       }
@@ -184,20 +201,6 @@ public class FileUploader {
    * fileDownload(url, Paths.get(setting.targetPath));
    * }
    */
-  public void fileUpload(final File zipFile) {
-    try {
-      final String url = FileUploader.fileUpload(FileUploader.defaultURL, zipFile);
-      SettingManager _instance = SettingManager.getInstance();
-      final GenerateSetting setting = _instance.getCurrentSetting();
-      Thread.sleep(3000);
-      String _targetPath = setting.getTargetPath();
-      Path _get = Paths.get(_targetPath);
-      FileUploader.fileDownload(url, _get);
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
-  }
-  
   public static String getURL(final String body) {
     final Matcher match = FileUploader.urlJsonPatetrn.matcher(body);
     boolean _matches = match.matches();
@@ -205,6 +208,21 @@ public class FileUploader {
       return match.group(1);
     } else {
       return "";
+    }
+  }
+  
+  public static FileUploader.CompileErrorDialog showCompileErrorDialog(final String errorMessage) {
+    try {
+      FileUploader.CompileErrorDialog _xblockexpression = null;
+      {
+        final AstahAPI astahAPI = AstahAPI.getAstahAPI();
+        IViewManager _viewManager = astahAPI.getViewManager();
+        JFrame _mainFrame = _viewManager.getMainFrame();
+        _xblockexpression = new FileUploader.CompileErrorDialog(_mainFrame, errorMessage);
+      }
+      return _xblockexpression;
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
   }
 }

@@ -29,6 +29,13 @@ import javax.swing.JOptionPane
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.util.stream.Collectors
+import javax.swing.JComponent
+import java.util.List
+import javax.swing.JLabel
+import javax.swing.JTextArea
+import javax.swing.JDialog
+import java.awt.Frame
+import javax.swing.JScrollPane
 
 class FileUploader {
     static val boundary = "----WebKitFormBoundaryAR7c5if126HH4FGk"
@@ -98,7 +105,7 @@ class FileUploader {
             val errorReport = errorTemp.subSequence(errorTemp.indexOf("<pre>")+5, errorTemp.lastIndexOf("</pre>"))
             println("Compile is failed")
             println(errorReport)
-            JOptionPane.showMessageDialog( astahAPI.viewManager.mainFrame, errorReport, "Compile is failed", JOptionPane.ERROR_MESSAGE)
+            showCompileErrorDialog(errorReport.toString)
             br.close
             return
         }
@@ -135,20 +142,31 @@ class FileUploader {
         fileDownload(url, Paths.get(setting.targetPath));
     }*/
 
-    def fileUpload(File zipFile){
-        val url = fileUpload(defaultURL, zipFile)
-
-        val setting = SettingManager.instance.currentSetting
-        Thread.sleep(3000)
-        fileDownload(url, Paths.get(setting.targetPath));
-    }
-
     def static getURL(String body){
         val match = urlJsonPatetrn.matcher(body)
         if (match.matches){
             return match.group(1)
         }else{
             return ""
+        }
+    }
+    def static showCompileErrorDialog(String errorMessage){
+        val astahAPI = AstahAPI.astahAPI
+        new CompileErrorDialog(astahAPI.viewManager.mainFrame, errorMessage)
+    }
+
+    static class CompileErrorDialog extends JDialog {
+        new(Frame owner, String errorMessage) {
+            super(owner)
+            title = "Compile Error"
+            val textArea = new JTextArea
+            textArea.text = errorMessage
+            textArea.editable = false
+            textArea.setSize(400,400)
+            val scroll = new JScrollPane(textArea)
+            contentPane.add(scroll)
+            pack
+            visible = true
         }
     }
 }
