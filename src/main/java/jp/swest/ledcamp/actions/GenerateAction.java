@@ -21,6 +21,7 @@ public class GenerateAction implements IPluginActionDelegate {
       CodeGenerator.generate();
       Window _parent = window.getParent();
       JOptionPane.showMessageDialog(_parent, "Code Generation is Complete.");
+      CodeGenerator.transferToCompilerServer();
     } catch (final Throwable _t) {
       if (_t instanceof GenerationException) {
         final GenerationException ge = (GenerationException)_t;

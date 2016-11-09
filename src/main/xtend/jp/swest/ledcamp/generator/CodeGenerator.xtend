@@ -1,7 +1,5 @@
 package jp.swest.ledcamp.generator
 
-import difflib.DiffUtils
-import difflib.PatchFailedException
 import java.io.IOException
 import java.nio.file.FileVisitResult
 import java.nio.file.Files
@@ -20,6 +18,7 @@ import org.zeroturnaround.zip.ZipUtil
 class CodeGenerator {
     static val PREV_GENDIR = "prevGen"
     static val TEMP_GENDIR = "gen"
+    static val uploadURL = "http://mdd-compile.shinshu-u.ac.jp/upload"
 
     static def generate() throws GenerationException {
 
@@ -121,18 +120,20 @@ class CodeGenerator {
         if (GenerationException::instance.excetpions.size != 0) {
             throw GenerationException::instance
         }
-        
-        transferToCompilerServer(targetPath)
     }
-    
-    def static transferToCompilerServer(Path targetPath) {
+
+    def static transferToCompilerServer() {
+        val setting = SettingManager.instance.currentSetting
+        val targetPath = Paths.get(setting.targetPath)
+        val uploadURL = "http://mdd-compile.shinshu-u.ac.jp/upload"
         val tempPath = Files.createTempDirectory("astahm2t")
         val zipPath = tempPath.resolve("temp.zip")
         ZipUtil.pack(targetPath.toFile, zipPath.toFile)
-        
-        println(tempPath)
-//        Files.delete(zipPath)
-//        Files.delete(tempPath)
+        val dlURL = FileUploader.fileUpload(uploadURL, zipPath.toFile)
+        Thread.sleep(3000)
+        FileUploader.fileDownload(dlURL, Paths.get(setting.targetPath))
+        Files.delete(zipPath)
+        Files.delete(tempPath)
     }
 
     static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
@@ -164,22 +165,32 @@ class CodeGenerator {
         override visitFile(Path file, BasicFileAttributes attrs) throws IOException {
             val targetFile = targetPath.resolve(temporalPath.resolve(TEMP_GENDIR).relativize(file))
             val prevTempFile = prevTempPath.resolve(temporalPath.resolve(TEMP_GENDIR).relativize(file))
-            if (Files.exists(targetFile) && Files.exists(prevTempFile)) {
-                val prev_target_diff = DiffUtils.diff(Files.readAllLines(prevTempFile), Files.readAllLines(targetFile))
-                if (prev_target_diff.deltas.length > 0) {
-                    val prev_gen_diff = DiffUtils.diff(Files.readAllLines(prevTempFile), Files.readAllLines(file))
-                    prev_target_diff.deltas.forEach [
-                        prev_gen_diff.addDelta(it)
-                    ]
-                    try {
-                        val mergedList = DiffUtils.patch(Files.readAllLines(prevTempFile), prev_gen_diff)
-                        Files.write(file, mergedList)
-                    } catch (PatchFailedException e) {
-                        GenerationException::instance.addException(e)
-                    }
-                }
+//            if (Files.exists(targetFile) && Files.exists(prevTempFile)) {
+//                val prev_target_diff = DiffUtils.diff(Files.readAllLines(prevTempFile), Files.readAllLines(targetFile))
+//                if (prev_target_diff.deltas.length > 0) {
+//                    val prev_gen_diff = DiffUtils.diff(Files.readAllLines(prevTempFile), Files.readAllLines(file))
+//                    prev_target_diff.deltas.forEach [
+//                        prev_gen_diff.addDelta(it)
+//                    ]
+//                    try {
+//                        val mergedList = DiffUtils.patch(Files.readAllLines(prevTempFile), prev_gen_diff)
+//                        Files.write(file, mergedList)
+//                    } catch (PatchFailedException e) {
+//                        GenerationException::instance.addException(e)
+//                    }
+//                }
+//            }
+            if (!Files.exists(targetFile.parent)) {
+                Files.createDirectories(targetFile.parent)
             }
             Files.copy(file, targetFile, StandardCopyOption.REPLACE_EXISTING)
+            return FileVisitResult.CONTINUE
+        }
+
+        override preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            if (!Files.exists(dir)) {
+                Files.createDirectories(dir)
+            }
             return FileVisitResult.CONTINUE
         }
     }

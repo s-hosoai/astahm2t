@@ -330,7 +330,18 @@
 			<version>1.9</version>
 			<type>jar</type>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpmime</artifactId>
+			<version>4.5.2</version>
+		</dependency>
 	</dependencies>
-	<version>1.4.0</version>
-	<description>LED-Camp3用 Astah コード生成プラグイン</description>
+	<version>1.4.2</version>
+	<description>LED-Camp4用 Astah コード生成プラグイン</description>
 </project>

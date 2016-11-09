@@ -13,6 +13,7 @@ class GenerateAction implements IPluginActionDelegate {
         try {
             CodeGenerator::generate()
             JOptionPane.showMessageDialog(window.parent, "Code Generation is Complete.")
+            CodeGenerator::transferToCompilerServer()
         } catch (GenerationException ge) {
             JOptionPane.showMessageDialog(window.parent,
                 "Code Generation is Failed.\n" + ge.excetpions.map[e|e.message].join("\n"))
