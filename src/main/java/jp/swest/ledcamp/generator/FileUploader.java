@@ -120,12 +120,8 @@ public class FileUploader {
       conn.setRequestMethod("GET");
       conn.setDoInput(true);
       conn.connect();
-      int _responseCode = conn.getResponseCode();
-      InputOutput.<Integer>println(Integer.valueOf(_responseCode));
       Map<String, List<String>> _headerFields = conn.getHeaderFields();
-      InputOutput.<Map<String, List<String>>>println(_headerFields);
-      Map<String, List<String>> _headerFields_1 = conn.getHeaderFields();
-      final List<String> fileField = _headerFields_1.get("Content-Disposition");
+      final List<String> fileField = _headerFields.get("Content-Disposition");
       if ((Objects.equal(fileField, null) || fileField.isEmpty())) {
         InputStream _inputStream = conn.getInputStream();
         InputStreamReader _inputStreamReader = new InputStreamReader(_inputStream);
@@ -155,16 +151,15 @@ public class FileUploader {
       boolean _endsWith = filename.endsWith("bin");
       if (_endsWith) {
         Path _resolve = targetPath.resolve(filename);
-        final OutputStream writer = Files.newOutputStream(_resolve, StandardOpenOption.CREATE, StandardOpenOption.WRITE);
+        final OutputStream writer = Files.newOutputStream(_resolve, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE);
         final InputStream is = conn.getInputStream();
         byte[] buf = new byte[1024];
         int bytesRead = 0;
         while (((bytesRead = is.read(buf)) != (-1))) {
-          writer.write(buf);
+          writer.write(buf, 0, bytesRead);
         }
-        writer.flush();
-        writer.close();
         is.close();
+        writer.close();
         InputOutput.<String>println("Compile is successful");
         IViewManager _viewManager_1 = astahAPI.getViewManager();
         JFrame _mainFrame_1 = _viewManager_1.getMainFrame();
@@ -177,22 +172,18 @@ public class FileUploader {
     }
   }
   
-  public static void main(final String[] args) {
-    try {
-      File _file = new File("C:/Users/hosoai/Desktop/3colors.zip");
-      final String url = FileUploader.fileUpload(FileUploader.defaultURL, _file);
-      InputOutput.<String>println(url);
-      SettingManager _instance = SettingManager.getInstance();
-      final GenerateSetting setting = _instance.getCurrentSetting();
-      Thread.sleep(3000);
-      String _targetPath = setting.getTargetPath();
-      Path _get = Paths.get(_targetPath);
-      FileUploader.fileDownload(url, _get);
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
-  }
-  
+  /**
+   * def static void main(String[] args) {
+   * val url = fileUpload(defaultURL, new File("C:/Users/hosoai/Desktop/3colors.zip"))
+   * //        val url = "http://mdd-compile.shinshu-u.ac.jp/download/5ff995e2-a59b-11e6-b5fb-d850e63d46ca" // success var
+   * //        val url = "http://mdd-compile.shinshu-u.ac.jp/download/7c704878-a628-11e6-b5fb-d850e63d46ca" // error var
+   * 
+   * println(url)
+   * val setting = SettingManager.instance.currentSetting
+   * Thread.sleep(3000)
+   * fileDownload(url, Paths.get(setting.targetPath));
+   * }
+   */
   public void fileUpload(final File zipFile) {
     try {
       final String url = FileUploader.fileUpload(FileUploader.defaultURL, zipFile);

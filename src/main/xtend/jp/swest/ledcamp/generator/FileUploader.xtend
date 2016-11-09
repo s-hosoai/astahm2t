@@ -89,10 +89,10 @@ class FileUploader {
         conn.requestMethod = "GET"
         conn.doInput = true
         conn.connect
-        println(conn.responseCode)
-        println(conn.headerFields)
+//        println(conn.responseCode)
+//        println(conn.headerFields)
         val fileField = conn.headerFields.get("Content-Disposition")
-        if( fileField==null || fileField.isEmpty){ 
+        if( fileField==null || fileField.isEmpty){
             val br = new BufferedReader(new InputStreamReader(conn.inputStream))
             val errorTemp = br.lines.collect(Collectors.joining("\n"))
             val errorReport = errorTemp.subSequence(errorTemp.indexOf("<pre>")+5, errorTemp.lastIndexOf("</pre>"))
@@ -107,16 +107,15 @@ class FileUploader {
         if( ! matcher.matches){ /* throw exception */}
         val filename = matcher.group(1)
         if(filename.endsWith("bin")){ // compile success
-            val writer = Files.newOutputStream(targetPath.resolve(filename), StandardOpenOption.CREATE, StandardOpenOption.WRITE)
+            val writer = Files.newOutputStream(targetPath.resolve(filename), StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)
             val is = conn.inputStream
             var buf = newByteArrayOfSize(1024);
             var bytesRead = 0
             while((bytesRead = is.read(buf))!= -1){
-                writer.write(buf);
+                writer.write(buf, 0, bytesRead)
             }
-            writer.flush
-            writer.close
             is.close
+            writer.close
             
             println("Compile is successful")
             JOptionPane.showMessageDialog( astahAPI.viewManager.mainFrame, "Compile is successful", "Compile is successful", JOptionPane.INFORMATION_MESSAGE)
@@ -124,7 +123,7 @@ class FileUploader {
             println(filename) // unknown file? throw exception
         }
     }
-
+/*
     def static void main(String[] args) {
         val url = fileUpload(defaultURL, new File("C:/Users/hosoai/Desktop/3colors.zip"))
 //        val url = "http://mdd-compile.shinshu-u.ac.jp/download/5ff995e2-a59b-11e6-b5fb-d850e63d46ca" // success var
@@ -134,13 +133,10 @@ class FileUploader {
         val setting = SettingManager.instance.currentSetting
         Thread.sleep(3000)
         fileDownload(url, Paths.get(setting.targetPath));
-    }
-    
+    }*/
+
     def fileUpload(File zipFile){
         val url = fileUpload(defaultURL, zipFile)
-//        val url = fileUpload(defaultURL, new File("C:/Users/hosoai/Desktop/3colors.zip"))
-//        val url = "http://mdd-compile.shinshu-u.ac.jp/download/5ff995e2-a59b-11e6-b5fb-d850e63d46ca" // success var
-//        val url = "http://mdd-compile.shinshu-u.ac.jp/download/7c704878-a628-11e6-b5fb-d850e63d46ca" // error var
 
         val setting = SettingManager.instance.currentSetting
         Thread.sleep(3000)
