@@ -28,6 +28,7 @@ import javax.swing.JOptionPane
 import javax.swing.event.DocumentListener
 import javax.swing.event.DocumentEvent
 import jp.swest.ledcamp.xtendhelper.Consumer
+import javax.swing.JCheckBox
 
 class SettingDialog extends JDialog {
 	private SettingManager manager = SettingManager.getInstance
@@ -36,8 +37,8 @@ class SettingDialog extends JDialog {
 	private JTextField textDestinationPath;
 	private JComboBox<TemplateEngine> combo_templateEngine
 	private JButton btnAddSet
-	@Accessors private JTextField textTemplateDir;
-	@Accessors private JPanel templatePanel;
+	@Accessors private JTextField textTemplateDir
+	@Accessors private JPanel templatePanel
 
 	new(JFrame parent) {
 		super(parent, "Generator Settings", true)
@@ -229,6 +230,16 @@ class SettingDialog extends JDialog {
 			gbc.gridy = 5
 			contentPanel.add(btnAddTemplate, gbc)
 		}
+		{
+		    val chkUse3WayMerge = new JCheckBox("Use 3Way Merge")
+		    chkUse3WayMerge.selected = manager.use3wayMerge
+		    chkUse3WayMerge.addActionListener([manager.use3wayMerge=chkUse3WayMerge.selected])
+            val gbc = new GridBagConstraints
+            gbc.insets = insets
+            gbc.gridx = 1
+            gbc.gridy=5
+            contentPanel.add(chkUse3WayMerge, gbc)
+        }
 		{
 			val buttonPane = new JPanel
 			buttonPane.layout = new FlowLayout(FlowLayout.RIGHT)

@@ -19,7 +19,8 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     @XmlTransient private String userFolder = System.getProperty("user.home")
     @XmlTransient @Accessors private String m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
     @XmlTransient @Accessors private String currentAstahFileName
-    
+    @Accessors private boolean use3wayMerge
+
     private new() {
     	super()
     	settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
