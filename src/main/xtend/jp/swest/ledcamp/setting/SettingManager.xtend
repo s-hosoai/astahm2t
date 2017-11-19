@@ -11,6 +11,7 @@ import java.io.BufferedOutputStream
 import java.io.FileOutputStream
 import java.util.zip.ZipFile
 import java.io.IOException
+
 // Singleton
 class SettingManager extends HashMap<String, GenerateSetting> {
     private static SettingManager instance;
@@ -22,8 +23,8 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     @Accessors private boolean use3wayMerge
 
     private new() {
-    	super()
-    	settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
+        super()
+        settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
     }
 
     static def getInstance() {
@@ -33,7 +34,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         }
         return instance
     }
-    
+
     def save() {
         JAXB.marshal(instance, new File(settingFilePath))
     }
@@ -44,7 +45,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         m2tPluginFolderPath = userFolder + "/.astah/plugins/m2t/"
         settingFilePath = m2tPluginFolderPath + "m2tsetting.xml"
         val asgenPluginFolder = new File(m2tPluginFolderPath);
-        if (!(asgenPluginFolder.exists())) {  // install setting files.
+        if (!(asgenPluginFolder.exists())) { // install setting files.
             try {
                 asgenPluginFolder.getParentFile().mkdirs();
                 val zipFile = File.createTempFile("astahm2t", "templeatezip");
@@ -66,25 +67,25 @@ class SettingManager extends HashMap<String, GenerateSetting> {
         }
         try {
             val settingFile = new File(settingFilePath)
-            if(settingFile.exists){
+            if (settingFile.exists) {
                 val settings = JAXB.unmarshal(new File(settingFilePath), SettingManager)
                 instance.clear
                 instance.putAll(settings)
                 instance.currentSetting = settings.currentSetting
-            }else{
+            } else {
                 createDefaultSetting
                 save
             }
         } catch (Exception e) {
             e.printStackTrace
-            // load fail. 
+        // load fail. 
         }
     }
-    
-    private def createDefaultSetting(){
+
+    private def createDefaultSetting() {
         val sampleGenerateSetting = new GenerateSetting
         sampleGenerateSetting.targetPath = new File(userFolder).absolutePath
-        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath+"templates/RestWeb/").absolutePath
+        sampleGenerateSetting.templatePath = new File(m2tPluginFolderPath + "templates/RestWeb/").absolutePath
         sampleGenerateSetting.templateEngine = TemplateEngine.Groovy
         sampleGenerateSetting.templateID = "RestWeb"
         sampleGenerateSetting.mapping.add(TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST"))

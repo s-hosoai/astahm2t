@@ -1,6 +1,5 @@
 package jp.swest.ledcamp.exception;
 
-import com.google.common.base.Objects;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,8 +10,7 @@ public class GenerationException extends Exception {
   private static GenerationException instance;
   
   public static GenerationException getInstance() {
-    boolean _equals = Objects.equal(GenerationException.instance, null);
-    if (_equals) {
+    if ((GenerationException.instance == null)) {
       GenerationException _generationException = new GenerationException();
       GenerationException.instance = _generationException;
     }

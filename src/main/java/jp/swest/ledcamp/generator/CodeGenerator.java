@@ -68,8 +68,7 @@ public class CodeGenerator {
       final Path targetFile = this.targetPath.resolve(this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR).relativize(file));
       final Path prevTempFile = this.prevTempPath.resolve(this.temporalPath.resolve(CodeGenerator.TEMP_GENDIR).relativize(file));
       if ((Files.exists(targetFile) && Files.exists(prevTempFile))) {
-        final Patch<String> prev_target_diff = DiffUtils.<String>diff(Files.readAllLines(prevTempFile), 
-          Files.readAllLines(targetFile));
+        final Patch<String> prev_target_diff = DiffUtils.<String>diff(Files.readAllLines(prevTempFile), Files.readAllLines(targetFile));
         int _length = ((Object[])Conversions.unwrapArray(prev_target_diff.getDeltas(), Object.class)).length;
         boolean _greaterThan = (_length > 0);
         if (_greaterThan) {
@@ -181,10 +180,12 @@ public class CodeGenerator {
                 String _plus = (_name + ".");
                 String _fileExtension = mapping.getFileExtension();
                 String _plus_1 = (_plus + _fileExtension);
-                generator.doGenerate(map, temporalTargetPath.resolve(_plus_1), 
+                generator.doGenerate(map, 
+                  temporalTargetPath.resolve(_plus_1), 
                   templatePath.resolve(mapping.getTemplateFile()));
               } else {
-                generator.doGenerate(map, temporalTargetPath.resolve(mapping.getFileExtension().replace("#", iClass.getName())), 
+                generator.doGenerate(map, 
+                  temporalTargetPath.resolve(mapping.getFileExtension().replace("#", iClass.getName())), 
                   templatePath.resolve(mapping.getTemplateFile()));
               }
             } catch (final Throwable _t_2) {

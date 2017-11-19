@@ -9,7 +9,7 @@ import groovy.lang.MissingPropertyException
 import javax.swing.JOptionPane
 import jp.swest.ledcamp.exception.GenerationException
 
-class GroovyGenerator implements ITemplateEngine{
+class GroovyGenerator implements ITemplateEngine {
     private SimpleTemplateEngine engine
 
     new() {
@@ -27,14 +27,13 @@ class GroovyGenerator implements ITemplateEngine{
             ]
 
         } catch (Exception e) {
-        	GenerationException::getInstance().addException(e)
+            GenerationException::getInstance().addException(e)
             switch (e) {
                 case MissingPropertyException:
                     JOptionPane.showMessageDialog(utils.frame,
                         "Cannot found property :" + e.message + ". model : " + iClass.name)
                 default:
-                    JOptionPane.showMessageDialog(utils.frame,
-                        e.message + ".\n in model : " + iClass.name)
+                    JOptionPane.showMessageDialog(utils.frame, e.message + ".\n in model : " + iClass.name)
             }
         }
     }
