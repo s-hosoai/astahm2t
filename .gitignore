@@ -3,4 +3,5 @@
 *.lock
 /target/
 *.xtextbin
+*.xtendbin
 .gitignore
