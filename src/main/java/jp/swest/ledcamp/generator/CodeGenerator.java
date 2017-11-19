@@ -41,8 +41,7 @@ public class CodeGenerator {
     
     @Override
     public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) throws IOException {
-      boolean _equals = Objects.equal(exc, null);
-      if (_equals) {
+      if ((exc == null)) {
         Files.delete(dir);
         return FileVisitResult.CONTINUE;
       }
@@ -114,170 +113,185 @@ public class CodeGenerator {
   private final static String TEMP_GENDIR = "gen";
   
   public static void generate() throws GenerationException {
-    GenerationException.getInstance().getExcetpions().clear();
-    final GroovyGenerator generator = new GroovyGenerator();
-    final SettingManager settingManager = SettingManager.getInstance();
-    final GenerateSetting setting = settingManager.getCurrentSetting();
-    final HashMap<String, Object> map = new HashMap<String, Object>();
-    final GeneratorUtils utils = new GeneratorUtils();
-    final Path templatePath = Paths.get(setting.getTemplatePath());
-    final Path targetPath = Paths.get(setting.getTargetPath());
-    final Path temporalTargetRoot = Paths.get(settingManager.getM2tPluginFolderPath()).resolve("projects").resolve(
-      utils.getAstahProjectName());
-    final Path temporalTargetPath = temporalTargetRoot.resolve(CodeGenerator.TEMP_GENDIR);
-    final Path prevTemporalTargetPath = temporalTargetRoot.resolve(CodeGenerator.PREV_GENDIR);
-    boolean _exists = Files.exists(prevTemporalTargetPath);
-    boolean _not = (!_exists);
-    if (_not) {
-      try {
-        Files.createDirectories(prevTemporalTargetPath);
-      } catch (final Throwable _t) {
-        if (_t instanceof Exception) {
-          final Exception e = (Exception)_t;
-          GenerationException.getInstance().addException(e);
-        } else {
-          throw Exceptions.sneakyThrow(_t);
-        }
-      }
-    }
-    boolean _exists_1 = Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS);
-    boolean _not_1 = (!_exists_1);
-    if (_not_1) {
-      try {
-        Files.createDirectories(temporalTargetPath);
-      } catch (final Throwable _t_1) {
-        if (_t_1 instanceof Exception) {
-          final Exception e_1 = (Exception)_t_1;
-          GenerationException.getInstance().addException(e_1);
-        } else {
-          throw Exceptions.sneakyThrow(_t_1);
-        }
-      }
-    }
-    List<IClass> _classes = utils.getClasses();
-    for (final IClass iClass : _classes) {
-      {
-        utils.setIclass(iClass);
-        utils.setStatemachine(utils.getStatemachines().get(iClass));
-        map.put("u", utils);
-        int _size = ((List<String>)Conversions.doWrapArray(iClass.getStereotypes())).size();
-        boolean _equals = (_size == 0);
-        if (_equals) {
-          final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
-            @Override
-            public Boolean apply(final TemplateMap it) {
-              TemplateType _templateType = it.getTemplateType();
-              return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
-            }
-          };
-          Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
-          for (final TemplateMap mapping : _filter) {
-            try {
-              boolean _contains = mapping.getFileExtension().contains("#");
-              boolean _not_2 = (!_contains);
-              if (_not_2) {
-                String _name = iClass.getName();
-                String _plus = (_name + ".");
-                String _fileExtension = mapping.getFileExtension();
-                String _plus_1 = (_plus + _fileExtension);
-                generator.doGenerate(map, 
-                  temporalTargetPath.resolve(_plus_1), 
-                  templatePath.resolve(mapping.getTemplateFile()));
-              } else {
-                generator.doGenerate(map, 
-                  temporalTargetPath.resolve(mapping.getFileExtension().replace("#", iClass.getName())), 
-                  templatePath.resolve(mapping.getTemplateFile()));
-              }
-            } catch (final Throwable _t_2) {
-              if (_t_2 instanceof Exception) {
-                final Exception e_2 = (Exception)_t_2;
-                GenerationException.getInstance().addException(e_2);
-              } else {
-                throw Exceptions.sneakyThrow(_t_2);
-              }
-            }
+    try {
+      GenerationException.getInstance().getExcetpions().clear();
+      final GroovyGenerator generator = new GroovyGenerator();
+      final SettingManager settingManager = SettingManager.getInstance();
+      final GenerateSetting setting = settingManager.getCurrentSetting();
+      final HashMap<String, Object> map = new HashMap<String, Object>();
+      final GeneratorUtils utils = new GeneratorUtils();
+      final Path templatePath = Paths.get(setting.getTemplatePath());
+      final Path targetPath = Paths.get(setting.getTargetPath());
+      final Path temporalTargetRoot = Paths.get(settingManager.getM2tPluginFolderPath()).resolve("projects").resolve(
+        utils.getAstahProjectName());
+      final Path temporalTargetPath = temporalTargetRoot.resolve(CodeGenerator.TEMP_GENDIR);
+      final Path prevTemporalTargetPath = temporalTargetRoot.resolve(CodeGenerator.PREV_GENDIR);
+      boolean _exists = Files.exists(prevTemporalTargetPath);
+      boolean _not = (!_exists);
+      if (_not) {
+        try {
+          Files.createDirectories(prevTemporalTargetPath);
+        } catch (final Throwable _t) {
+          if (_t instanceof Exception) {
+            final Exception e = (Exception)_t;
+            GenerationException.getInstance().addException(e);
+          } else {
+            throw Exceptions.sneakyThrow(_t);
           }
-        } else {
-          String[] _stereotypes = iClass.getStereotypes();
-          for (final String stereotype : _stereotypes) {
-            final Function1<TemplateMap, Boolean> _function_1 = new Function1<TemplateMap, Boolean>() {
+        }
+      }
+      boolean _isUse3wayMerge = settingManager.isUse3wayMerge();
+      boolean _not_1 = (!_isUse3wayMerge);
+      if (_not_1) {
+        CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
+        Files.walkFileTree(temporalTargetPath, _deleteDirVisitor);
+      }
+      boolean _exists_1 = Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS);
+      boolean _not_2 = (!_exists_1);
+      if (_not_2) {
+        try {
+          Files.createDirectories(temporalTargetPath);
+        } catch (final Throwable _t_1) {
+          if (_t_1 instanceof Exception) {
+            final Exception e_1 = (Exception)_t_1;
+            GenerationException.getInstance().addException(e_1);
+          } else {
+            throw Exceptions.sneakyThrow(_t_1);
+          }
+        }
+      }
+      List<IClass> _classes = utils.getClasses();
+      for (final IClass iClass : _classes) {
+        {
+          utils.setIclass(iClass);
+          utils.setStatemachine(utils.getStatemachines().get(iClass));
+          map.put("u", utils);
+          int _size = ((List<String>)Conversions.doWrapArray(iClass.getStereotypes())).size();
+          boolean _equals = (_size == 0);
+          if (_equals) {
+            final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
               @Override
               public Boolean apply(final TemplateMap it) {
-                return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
+                TemplateType _templateType = it.getTemplateType();
+                return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
               }
             };
-            Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function_1);
-            for (final TemplateMap mapping_1 : _filter_1) {
+            Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
+            for (final TemplateMap mapping : _filter) {
               try {
-                boolean _contains_1 = mapping_1.getFileExtension().contains("#");
-                boolean _not_3 = (!_contains_1);
+                boolean _contains = mapping.getFileExtension().contains("#");
+                boolean _not_3 = (!_contains);
                 if (_not_3) {
-                  String _name_1 = iClass.getName();
-                  String _plus_2 = (_name_1 + ".");
-                  String _fileExtension_1 = mapping_1.getFileExtension();
-                  String _plus_3 = (_plus_2 + _fileExtension_1);
+                  String _name = iClass.getName();
+                  String _plus = (_name + ".");
+                  String _fileExtension = mapping.getFileExtension();
+                  String _plus_1 = (_plus + _fileExtension);
                   generator.doGenerate(map, 
-                    temporalTargetPath.resolve(_plus_3), 
-                    templatePath.resolve(mapping_1.getTemplateFile()));
+                    temporalTargetPath.resolve(_plus_1), 
+                    templatePath.resolve(mapping.getTemplateFile()));
                 } else {
                   generator.doGenerate(map, 
-                    temporalTargetPath.resolve(mapping_1.getFileExtension().replace("#", iClass.getName())), 
-                    templatePath.resolve(mapping_1.getTemplateFile()));
+                    temporalTargetPath.resolve(mapping.getFileExtension().replace("#", iClass.getName())), 
+                    templatePath.resolve(mapping.getTemplateFile()));
                 }
-              } catch (final Throwable _t_3) {
-                if (_t_3 instanceof Exception) {
-                  final Exception e_3 = (Exception)_t_3;
-                  GenerationException.getInstance().addException(e_3);
+              } catch (final Throwable _t_2) {
+                if (_t_2 instanceof Exception) {
+                  final Exception e_2 = (Exception)_t_2;
+                  GenerationException.getInstance().addException(e_2);
                 } else {
-                  throw Exceptions.sneakyThrow(_t_3);
+                  throw Exceptions.sneakyThrow(_t_2);
+                }
+              }
+            }
+          } else {
+            String[] _stereotypes = iClass.getStereotypes();
+            for (final String stereotype : _stereotypes) {
+              final Function1<TemplateMap, Boolean> _function_1 = new Function1<TemplateMap, Boolean>() {
+                @Override
+                public Boolean apply(final TemplateMap it) {
+                  return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
+                }
+              };
+              Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function_1);
+              for (final TemplateMap mapping_1 : _filter_1) {
+                try {
+                  boolean _contains_1 = mapping_1.getFileExtension().contains("#");
+                  boolean _not_4 = (!_contains_1);
+                  if (_not_4) {
+                    String _name_1 = iClass.getName();
+                    String _plus_2 = (_name_1 + ".");
+                    String _fileExtension_1 = mapping_1.getFileExtension();
+                    String _plus_3 = (_plus_2 + _fileExtension_1);
+                    generator.doGenerate(map, 
+                      temporalTargetPath.resolve(_plus_3), 
+                      templatePath.resolve(mapping_1.getTemplateFile()));
+                  } else {
+                    generator.doGenerate(map, 
+                      temporalTargetPath.resolve(mapping_1.getFileExtension().replace("#", iClass.getName())), 
+                      templatePath.resolve(mapping_1.getTemplateFile()));
+                  }
+                } catch (final Throwable _t_3) {
+                  if (_t_3 instanceof Exception) {
+                    final Exception e_3 = (Exception)_t_3;
+                    GenerationException.getInstance().addException(e_3);
+                  } else {
+                    throw Exceptions.sneakyThrow(_t_3);
+                  }
                 }
               }
             }
           }
         }
       }
-    }
-    map.put("u", utils);
-    final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
-      @Override
-      public Boolean apply(final TemplateMap v) {
-        TemplateType _templateType = v.getTemplateType();
-        return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));
-      }
-    };
-    Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
-    for (final TemplateMap mapping : _filter) {
-      try {
-        generator.doGenerate(map, temporalTargetPath.resolve(mapping.getFileName()), 
-          templatePath.resolve(mapping.getTemplateFile()));
-      } catch (final Throwable _t_2) {
-        if (_t_2 instanceof Exception) {
-          final Exception e_2 = (Exception)_t_2;
-          GenerationException.getInstance().addException(e_2);
-        } else {
-          throw Exceptions.sneakyThrow(_t_2);
+      map.put("u", utils);
+      final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
+        @Override
+        public Boolean apply(final TemplateMap v) {
+          TemplateType _templateType = v.getTemplateType();
+          return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));
+        }
+      };
+      Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
+      for (final TemplateMap mapping : _filter) {
+        try {
+          generator.doGenerate(map, temporalTargetPath.resolve(mapping.getFileName()), 
+            templatePath.resolve(mapping.getTemplateFile()));
+        } catch (final Throwable _t_2) {
+          if (_t_2 instanceof Exception) {
+            final Exception e_2 = (Exception)_t_2;
+            GenerationException.getInstance().addException(e_2);
+          } else {
+            throw Exceptions.sneakyThrow(_t_2);
+          }
         }
       }
-    }
-    try {
-      CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath);
-      Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
-      CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
-      Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor);
-      Files.deleteIfExists(prevTemporalTargetPath);
-      Files.move(temporalTargetPath, prevTemporalTargetPath);
-    } catch (final Throwable _t_3) {
-      if (_t_3 instanceof Exception) {
-        final Exception e_3 = (Exception)_t_3;
-        GenerationException.getInstance().addException(e_3);
+      boolean _isUse3wayMerge_1 = settingManager.isUse3wayMerge();
+      if (_isUse3wayMerge_1) {
+        try {
+          CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath);
+          Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
+          CodeGenerator.DeleteDirVisitor _deleteDirVisitor_1 = new CodeGenerator.DeleteDirVisitor();
+          Files.walkFileTree(prevTemporalTargetPath, _deleteDirVisitor_1);
+          Files.deleteIfExists(prevTemporalTargetPath);
+          Files.move(temporalTargetPath, prevTemporalTargetPath);
+        } catch (final Throwable _t_3) {
+          if (_t_3 instanceof Exception) {
+            final Exception e_3 = (Exception)_t_3;
+            GenerationException.getInstance().addException(e_3);
+          } else {
+            throw Exceptions.sneakyThrow(_t_3);
+          }
+        }
       } else {
-        throw Exceptions.sneakyThrow(_t_3);
+        Files.move(temporalTargetPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
       }
-    }
-    int _size = GenerationException.getInstance().getExcetpions().size();
-    boolean _notEquals = (_size != 0);
-    if (_notEquals) {
-      throw GenerationException.getInstance();
+      int _size = GenerationException.getInstance().getExcetpions().size();
+      boolean _notEquals = (_size != 0);
+      if (_notEquals) {
+        throw GenerationException.getInstance();
+      }
+    } catch (Throwable _e) {
+      throw Exceptions.sneakyThrow(_e);
     }
   }
 }

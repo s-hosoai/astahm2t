@@ -43,6 +43,9 @@ class CodeGenerator {
                 GenerationException::instance.addException(e)
             }
         }
+        if(!settingManager.use3wayMerge){
+            Files.walkFileTree(temporalTargetPath, new DeleteDirVisitor)
+        }
 
         // generate to temporal folder
         if (!Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS)) {
@@ -105,15 +108,18 @@ class CodeGenerator {
             }
         }
 
-        // 3way merge and check conflict
-        try {
-            Files.walkFileTree(temporalTargetPath,
-                new ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath))
-            Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
-            Files.deleteIfExists(prevTemporalTargetPath)
-            Files.move(temporalTargetPath, prevTemporalTargetPath)
-        } catch (Exception e) {
-            GenerationException::instance.addException(e)
+        if (settingManager.use3wayMerge) {
+            try {
+                Files.walkFileTree(temporalTargetPath,
+                    new ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath))
+                Files.walkFileTree(prevTemporalTargetPath, new DeleteDirVisitor);
+                Files.deleteIfExists(prevTemporalTargetPath)
+                Files.move(temporalTargetPath, prevTemporalTargetPath)
+            } catch (Exception e) {
+                GenerationException::instance.addException(e)
+            }
+        } else {
+            Files.move(temporalTargetPath, targetPath, StandardCopyOption.REPLACE_EXISTING)
         }
 
         if (GenerationException::instance.excetpions.size != 0) {
@@ -128,7 +134,7 @@ class CodeGenerator {
         }
 
         override postVisitDirectory(Path dir, IOException exc) throws IOException {
-            if (exc == null) {
+            if (exc === null) {
                 Files.delete(dir)
                 return FileVisitResult.CONTINUE
             }
