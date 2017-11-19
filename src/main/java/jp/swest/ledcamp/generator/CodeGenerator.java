@@ -32,6 +32,36 @@ import org.eclipse.xtext.xbase.lib.IterableExtensions;
 
 @SuppressWarnings("all")
 public class CodeGenerator {
+  public static class MoveDirVisitor extends SimpleFileVisitor<Path> {
+    private final Path from;
+    
+    private final Path to;
+    
+    private final StandardCopyOption copyOption = StandardCopyOption.REPLACE_EXISTING;
+    
+    public MoveDirVisitor(final Path from, final Path to) {
+      this.from = from;
+      this.to = to;
+    }
+    
+    @Override
+    public FileVisitResult preVisitDirectory(final Path dir, final BasicFileAttributes attrs) throws IOException {
+      final Path targetPath = this.to.resolve(this.from.relativize(dir));
+      boolean _exists = Files.exists(targetPath);
+      boolean _not = (!_exists);
+      if (_not) {
+        Files.createDirectory(targetPath);
+      }
+      return FileVisitResult.CONTINUE;
+    }
+    
+    @Override
+    public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
+      Files.move(file, this.to.resolve(this.from.relativize(file)), this.copyOption);
+      return FileVisitResult.CONTINUE;
+    }
+  }
+  
   public static class DeleteDirVisitor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult visitFile(final Path file, final BasicFileAttributes attrs) throws IOException {
@@ -72,11 +102,8 @@ public class CodeGenerator {
         boolean _greaterThan = (_length > 0);
         if (_greaterThan) {
           final Patch<String> prev_gen_diff = DiffUtils.<String>diff(Files.readAllLines(prevTempFile), Files.readAllLines(file));
-          final Consumer<Delta<String>> _function = new Consumer<Delta<String>>() {
-            @Override
-            public void accept(final Delta<String> it) {
-              prev_gen_diff.addDelta(it);
-            }
+          final Consumer<Delta<String>> _function = (Delta<String> it) -> {
+            prev_gen_diff.addDelta(it);
           };
           prev_target_diff.getDeltas().forEach(_function);
           try {
@@ -140,15 +167,13 @@ public class CodeGenerator {
           }
         }
       }
-      boolean _isUse3wayMerge = settingManager.isUse3wayMerge();
-      boolean _not_1 = (!_isUse3wayMerge);
-      if (_not_1) {
+      if (((!settingManager.isUse3wayMerge()) && Files.exists(temporalTargetPath))) {
         CodeGenerator.DeleteDirVisitor _deleteDirVisitor = new CodeGenerator.DeleteDirVisitor();
         Files.walkFileTree(temporalTargetPath, _deleteDirVisitor);
       }
       boolean _exists_1 = Files.exists(temporalTargetPath, LinkOption.NOFOLLOW_LINKS);
-      boolean _not_2 = (!_exists_1);
-      if (_not_2) {
+      boolean _not_1 = (!_exists_1);
+      if (_not_1) {
         try {
           Files.createDirectories(temporalTargetPath);
         } catch (final Throwable _t_1) {
@@ -169,19 +194,16 @@ public class CodeGenerator {
           int _size = ((List<String>)Conversions.doWrapArray(iClass.getStereotypes())).size();
           boolean _equals = (_size == 0);
           if (_equals) {
-            final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
-              @Override
-              public Boolean apply(final TemplateMap it) {
-                TemplateType _templateType = it.getTemplateType();
-                return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
-              }
+            final Function1<TemplateMap, Boolean> _function = (TemplateMap it) -> {
+              TemplateType _templateType = it.getTemplateType();
+              return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Default));
             };
             Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
             for (final TemplateMap mapping : _filter) {
               try {
                 boolean _contains = mapping.getFileExtension().contains("#");
-                boolean _not_3 = (!_contains);
-                if (_not_3) {
+                boolean _not_2 = (!_contains);
+                if (_not_2) {
                   String _name = iClass.getName();
                   String _plus = (_name + ".");
                   String _fileExtension = mapping.getFileExtension();
@@ -206,18 +228,15 @@ public class CodeGenerator {
           } else {
             String[] _stereotypes = iClass.getStereotypes();
             for (final String stereotype : _stereotypes) {
-              final Function1<TemplateMap, Boolean> _function_1 = new Function1<TemplateMap, Boolean>() {
-                @Override
-                public Boolean apply(final TemplateMap it) {
-                  return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
-                }
+              final Function1<TemplateMap, Boolean> _function_1 = (TemplateMap it) -> {
+                return Boolean.valueOf((Objects.equal(it.getTemplateType(), TemplateType.Stereotype) && it.getStereotype().equals(stereotype)));
               };
               Iterable<TemplateMap> _filter_1 = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function_1);
               for (final TemplateMap mapping_1 : _filter_1) {
                 try {
                   boolean _contains_1 = mapping_1.getFileExtension().contains("#");
-                  boolean _not_4 = (!_contains_1);
-                  if (_not_4) {
+                  boolean _not_3 = (!_contains_1);
+                  if (_not_3) {
                     String _name_1 = iClass.getName();
                     String _plus_2 = (_name_1 + ".");
                     String _fileExtension_1 = mapping_1.getFileExtension();
@@ -244,12 +263,9 @@ public class CodeGenerator {
         }
       }
       map.put("u", utils);
-      final Function1<TemplateMap, Boolean> _function = new Function1<TemplateMap, Boolean>() {
-        @Override
-        public Boolean apply(final TemplateMap v) {
-          TemplateType _templateType = v.getTemplateType();
-          return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));
-        }
+      final Function1<TemplateMap, Boolean> _function = (TemplateMap v) -> {
+        TemplateType _templateType = v.getTemplateType();
+        return Boolean.valueOf(Objects.equal(_templateType, TemplateType.Global));
       };
       Iterable<TemplateMap> _filter = IterableExtensions.<TemplateMap>filter(setting.getMapping(), _function);
       for (final TemplateMap mapping : _filter) {
@@ -265,8 +281,8 @@ public class CodeGenerator {
           }
         }
       }
-      boolean _isUse3wayMerge_1 = settingManager.isUse3wayMerge();
-      if (_isUse3wayMerge_1) {
+      boolean _isUse3wayMerge = settingManager.isUse3wayMerge();
+      if (_isUse3wayMerge) {
         try {
           CodeGenerator.ConflictCheckVisitor _conflictCheckVisitor = new CodeGenerator.ConflictCheckVisitor(targetPath, temporalTargetRoot, prevTemporalTargetPath);
           Files.walkFileTree(temporalTargetPath, _conflictCheckVisitor);
@@ -283,7 +299,8 @@ public class CodeGenerator {
           }
         }
       } else {
-        Files.move(temporalTargetPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
+        CodeGenerator.MoveDirVisitor _moveDirVisitor = new CodeGenerator.MoveDirVisitor(temporalTargetPath, targetPath);
+        Files.walkFileTree(temporalTargetPath, _moveDirVisitor);
       }
       int _size = GenerationException.getInstance().getExcetpions().size();
       boolean _notEquals = (_size != 0);

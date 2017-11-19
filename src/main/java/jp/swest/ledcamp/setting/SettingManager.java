@@ -1,6 +1,5 @@
 package jp.swest.ledcamp.setting;
 
-import com.google.common.base.Objects;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -52,8 +51,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   }
   
   public static SettingManager getInstance() {
-    boolean _equals = Objects.equal(SettingManager.instance, null);
-    if (_equals) {
+    if ((SettingManager.instance == null)) {
       SettingManager _settingManager = new SettingManager();
       SettingManager.instance = _settingManager;
       SettingManager.instance.load();
@@ -184,12 +182,10 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
             bos = _bufferedOutputStream;
             this.writeFile(bis, bos);
           } finally {
-            boolean _notEquals = (!Objects.equal(bis, null));
-            if (_notEquals) {
+            if ((bis != null)) {
               bis.close();
             }
-            boolean _notEquals_1 = (!Objects.equal(bos, null));
-            if (_notEquals_1) {
+            if ((bos != null)) {
               bos.close();
             }
           }

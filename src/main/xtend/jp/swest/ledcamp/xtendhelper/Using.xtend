@@ -11,7 +11,7 @@ class Using {
             throwable = t
             throw t
         } finally {
-            if (throwable == null) {
+            if (throwable === null) {
                 resource.close
             } else {
                 try {

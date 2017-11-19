@@ -39,14 +39,11 @@ public class GroovyGenerator implements ITemplateEngine {
       final Writable generatedCode = template.make(map);
       File _file = output.toFile();
       FileWriter _fileWriter = new FileWriter(_file);
-      final Function1<FileWriter, Writer> _function = new Function1<FileWriter, Writer>() {
-        @Override
-        public Writer apply(final FileWriter it) {
-          try {
-            return generatedCode.writeTo(it);
-          } catch (Throwable _e) {
-            throw Exceptions.sneakyThrow(_e);
-          }
+      final Function1<FileWriter, Writer> _function = (FileWriter it) -> {
+        try {
+          return generatedCode.writeTo(it);
+        } catch (Throwable _e) {
+          throw Exceptions.sneakyThrow(_e);
         }
       };
       Using.<FileWriter, Writer>using(_fileWriter, _function);

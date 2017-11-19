@@ -106,17 +106,11 @@ public class GeneratorUtils {
   }
   
   public Iterable<IClass> getAllReferenceClasses() {
-    final Function1<IAttribute, IClass> _function = new Function1<IAttribute, IClass>() {
-      @Override
-      public IClass apply(final IAttribute e) {
-        return e.getType();
-      }
+    final Function1<IAttribute, IClass> _function = (IAttribute e) -> {
+      return e.getType();
     };
-    final Function1<IClass, Boolean> _function_1 = new Function1<IClass, Boolean>() {
-      @Override
-      public Boolean apply(final IClass e) {
-        return Boolean.valueOf(GeneratorUtils.this.classes.contains(e));
-      }
+    final Function1<IClass, Boolean> _function_1 = (IClass e) -> {
+      return Boolean.valueOf(this.classes.contains(e));
     };
     return IterableExtensions.<IClass>filter(ListExtensions.<IAttribute, IClass>map(((List<IAttribute>)Conversions.doWrapArray(this.iclass.getAttributes())), _function), _function_1);
   }
@@ -124,8 +118,7 @@ public class GeneratorUtils {
   private ArrayList<IState> allStates;
   
   public ArrayList<IState> getStates() {
-    boolean _equals = Objects.equal(this.statemachine, null);
-    if (_equals) {
+    if ((this.statemachine == null)) {
       return null;
     }
     ArrayList<IState> _arrayList = new ArrayList<IState>();
@@ -135,39 +128,27 @@ public class GeneratorUtils {
   }
   
   private void getStates(final IStateMachine m) {
-    final Function1<IVertex, Boolean> _function = new Function1<IVertex, Boolean>() {
-      @Override
-      public Boolean apply(final IVertex s) {
-        return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
-      }
+    final Function1<IVertex, Boolean> _function = (IVertex s) -> {
+      return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
     };
     Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(m.getVertexes())), _function);
     final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
     CollectionExtensions.<IState>addAll(this.allStates, substates);
-    final Consumer<IState> _function_1 = new Consumer<IState>() {
-      @Override
-      public void accept(final IState sub) {
-        GeneratorUtils.this.getStates(sub);
-      }
+    final Consumer<IState> _function_1 = (IState sub) -> {
+      this.getStates(sub);
     };
     ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
   
   private void getStates(final IState state) {
-    final Function1<IVertex, Boolean> _function = new Function1<IVertex, Boolean>() {
-      @Override
-      public Boolean apply(final IVertex s) {
-        return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
-      }
+    final Function1<IVertex, Boolean> _function = (IVertex s) -> {
+      return Boolean.valueOf((!((s instanceof IPseudostate) || (s instanceof IFinalState))));
     };
     Iterable<IVertex> _filter = IterableExtensions.<IVertex>filter(((Iterable<IVertex>)Conversions.doWrapArray(state.getSubvertexes())), _function);
     final IState[] substates = ((IState[]) ((IState[])Conversions.unwrapArray(_filter, IState.class)));
     CollectionExtensions.<IState>addAll(this.allStates, substates);
-    final Consumer<IState> _function_1 = new Consumer<IState>() {
-      @Override
-      public void accept(final IState sub) {
-        GeneratorUtils.this.getStates(sub);
-      }
+    final Consumer<IState> _function_1 = (IState sub) -> {
+      this.getStates(sub);
     };
     ((List<IState>)Conversions.doWrapArray(substates)).forEach(_function_1);
   }
@@ -177,18 +158,12 @@ public class GeneratorUtils {
     if (this.statemachine!=null) {
       _transitions=this.statemachine.getTransitions();
     }
-    final Function1<ITransition, String> _function = new Function1<ITransition, String>() {
-      @Override
-      public String apply(final ITransition t) {
-        return t.getEvent();
-      }
+    final Function1<ITransition, String> _function = (ITransition t) -> {
+      return t.getEvent();
     };
-    final Function1<String, Boolean> _function_1 = new Function1<String, Boolean>() {
-      @Override
-      public Boolean apply(final String e) {
-        int _length = e.trim().length();
-        return Boolean.valueOf((_length > 1));
-      }
+    final Function1<String, Boolean> _function_1 = (String e) -> {
+      int _length = e.trim().length();
+      return Boolean.valueOf((_length > 1));
     };
     return IterableExtensions.<String>toSet(IterableExtensions.<String>filter(ListExtensions.<ITransition, String>map(((List<ITransition>)Conversions.doWrapArray(_transitions)), _function), _function_1));
   }
@@ -203,19 +178,13 @@ public class GeneratorUtils {
       }
       Iterable<ITransition> _filter = null;
       if (((Iterable<ITransition>)Conversions.doWrapArray(_transitions))!=null) {
-        final Function1<ITransition, Boolean> _function = new Function1<ITransition, Boolean>() {
-          @Override
-          public Boolean apply(final ITransition it) {
-            return Boolean.valueOf((((!Objects.equal(it.getEvent(), null)) && (it.getEvent().trim().length() > 1)) && (!Objects.equal(it.getEvent().trim(), "true"))));
-          }
+        final Function1<ITransition, Boolean> _function = (ITransition it) -> {
+          return Boolean.valueOf((((it.getEvent() != null) && (it.getEvent().trim().length() > 1)) && (!Objects.equal(it.getEvent().trim(), "true"))));
         };
         _filter=IterableExtensions.<ITransition>filter(((Iterable<ITransition>)Conversions.doWrapArray(_transitions)), _function);
       }
-      final Function1<ITransition, String> _function_1 = new Function1<ITransition, String>() {
-        @Override
-        public String apply(final ITransition it) {
-          return it.getEvent();
-        }
+      final Function1<ITransition, String> _function_1 = (ITransition it) -> {
+        return it.getEvent();
       };
       _xblockexpression = IterableExtensions.<String>toSet(IterableExtensions.<ITransition, String>map(_filter, _function_1));
     }
@@ -223,24 +192,15 @@ public class GeneratorUtils {
   }
   
   public Set<String> getAllEvents() {
-    final Function1<IStateMachine, List<ITransition>> _function = new Function1<IStateMachine, List<ITransition>>() {
-      @Override
-      public List<ITransition> apply(final IStateMachine s) {
-        return IterableExtensions.<ITransition>toList(((Iterable<ITransition>)Conversions.doWrapArray(s.getTransitions())));
-      }
+    final Function1<IStateMachine, List<ITransition>> _function = (IStateMachine s) -> {
+      return IterableExtensions.<ITransition>toList(((Iterable<ITransition>)Conversions.doWrapArray(s.getTransitions())));
     };
-    final Function1<ITransition, String> _function_1 = new Function1<ITransition, String>() {
-      @Override
-      public String apply(final ITransition t) {
-        return t.getEvent();
-      }
+    final Function1<ITransition, String> _function_1 = (ITransition t) -> {
+      return t.getEvent();
     };
-    final Function1<String, Boolean> _function_2 = new Function1<String, Boolean>() {
-      @Override
-      public Boolean apply(final String e) {
-        int _length = e.trim().length();
-        return Boolean.valueOf((_length > 1));
-      }
+    final Function1<String, Boolean> _function_2 = (String e) -> {
+      int _length = e.trim().length();
+      return Boolean.valueOf((_length > 1));
     };
     return IterableExtensions.<String>toSet(IterableExtensions.<String>filter(IterableExtensions.<ITransition, String>map(Iterables.<ITransition>concat(IterableExtensions.<IStateMachine, List<ITransition>>map(this.statemachines.values(), _function)), _function_1), _function_2));
   }
@@ -254,11 +214,8 @@ public class GeneratorUtils {
     if (((Iterable<?>)Conversions.doWrapArray(_vertexes))!=null) {
       _filter=Iterables.<IPseudostate>filter(((Iterable<?>)Conversions.doWrapArray(_vertexes)), IPseudostate.class);
     }
-    final Function1<IPseudostate, Boolean> _function = new Function1<IPseudostate, Boolean>() {
-      @Override
-      public Boolean apply(final IPseudostate s) {
-        return Boolean.valueOf(s.isInitialPseudostate());
-      }
+    final Function1<IPseudostate, Boolean> _function = (IPseudostate s) -> {
+      return Boolean.valueOf(s.isInitialPseudostate());
     };
     IPseudostate initialPseudo = ((IPseudostate[])Conversions.unwrapArray(IterableExtensions.<IPseudostate>filter(_filter, _function), IPseudostate.class))[0];
     ITransition[] _outgoings = null;
@@ -288,11 +245,8 @@ public class GeneratorUtils {
         final IState s = ((IState) o);
         final HashMap<String, IVertex> eventToNextState = new HashMap<String, IVertex>();
         table.put(s.getName(), eventToNextState);
-        final Consumer<ITransition> _function = new Consumer<ITransition>() {
-          @Override
-          public void accept(final ITransition e) {
-            eventToNextState.put(e.getEvent(), e.getTarget());
-          }
+        final Consumer<ITransition> _function = (ITransition e) -> {
+          eventToNextState.put(e.getEvent(), e.getTarget());
         };
         ((List<ITransition>)Conversions.doWrapArray(this.getAllParentTransitions(s))).forEach(_function);
       }
@@ -313,44 +267,32 @@ public class GeneratorUtils {
   }
   
   public Iterable<IClass> stereotypeFilter(final List<IClass> classes, final String stereotype) {
-    final Function1<IClass, Boolean> _function = new Function1<IClass, Boolean>() {
-      @Override
-      public Boolean apply(final IClass c) {
-        return Boolean.valueOf(((List<String>)Conversions.doWrapArray(c.getStereotypes())).contains(stereotype));
-      }
+    final Function1<IClass, Boolean> _function = (IClass c) -> {
+      return Boolean.valueOf(((List<String>)Conversions.doWrapArray(c.getStereotypes())).contains(stereotype));
     };
     return IterableExtensions.<IClass>filter(classes, _function);
   }
   
   public Iterable<IClass> stereotypeNotFilter(final List<IClass> classes, final String stereotype) {
-    final Function1<IClass, Boolean> _function = new Function1<IClass, Boolean>() {
-      @Override
-      public Boolean apply(final IClass c) {
-        boolean _contains = ((List<String>)Conversions.doWrapArray(c.getStereotypes())).contains(stereotype);
-        return Boolean.valueOf((!_contains));
-      }
+    final Function1<IClass, Boolean> _function = (IClass c) -> {
+      boolean _contains = ((List<String>)Conversions.doWrapArray(c.getStereotypes())).contains(stereotype);
+      return Boolean.valueOf((!_contains));
     };
     return IterableExtensions.<IClass>filter(classes, _function);
   }
   
   private void recursiveClassCollect(final IModel model, final List<IClass> classes) {
     Iterables.<IClass>addAll(classes, Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IClass.class));
-    final Consumer<IPackage> _function = new Consumer<IPackage>() {
-      @Override
-      public void accept(final IPackage p) {
-        GeneratorUtils.this.recursiveClassCollect(p, classes);
-      }
+    final Consumer<IPackage> _function = (IPackage p) -> {
+      this.recursiveClassCollect(p, classes);
     };
     Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IPackage.class).forEach(_function);
   }
   
   private void recursiveClassCollect(final IPackage model, final List<IClass> classes) {
     Iterables.<IClass>addAll(classes, Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IClass.class));
-    final Consumer<IPackage> _function = new Consumer<IPackage>() {
-      @Override
-      public void accept(final IPackage p) {
-        GeneratorUtils.this.recursiveClassCollect(p, classes);
-      }
+    final Consumer<IPackage> _function = (IPackage p) -> {
+      this.recursiveClassCollect(p, classes);
     };
     Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IPackage.class).forEach(_function);
   }
@@ -361,30 +303,20 @@ public class GeneratorUtils {
       {
         utils.iclass = c;
         utils.statemachine = utils.statemachines.get(c);
-        final Consumer<IClass> _function = new Consumer<IClass>() {
-          @Override
-          public void accept(final IClass r) {
-            String _name = r.getName();
-            String _plus = (" reference:" + _name);
-            InputOutput.<String>println(_plus);
-          }
+        final Consumer<IClass> _function = (IClass r) -> {
+          String _name = r.getName();
+          String _plus = (" reference:" + _name);
+          InputOutput.<String>println(_plus);
         };
         utils.getAllReferenceClasses().forEach(_function);
-        boolean _notEquals = (!Objects.equal(utils.statemachine, null));
-        if (_notEquals) {
+        if ((utils.statemachine != null)) {
           HashMap<String, HashMap<String, IVertex>> table = utils.generateStateTable();
-          final BiConsumer<String, HashMap<String, IVertex>> _function_1 = new BiConsumer<String, HashMap<String, IVertex>>() {
-            @Override
-            public void accept(final String state, final HashMap<String, IVertex> map) {
-              InputOutput.<String>println(state);
-              final BiConsumer<String, IVertex> _function = new BiConsumer<String, IVertex>() {
-                @Override
-                public void accept(final String event, final IVertex next) {
-                  InputOutput.<String>println((((" " + event) + "->") + next));
-                }
-              };
-              map.forEach(_function);
-            }
+          final BiConsumer<String, HashMap<String, IVertex>> _function_1 = (String state, HashMap<String, IVertex> map) -> {
+            InputOutput.<String>println(state);
+            final BiConsumer<String, IVertex> _function_2 = (String event, IVertex next) -> {
+              InputOutput.<String>println((((" " + event) + "->") + next));
+            };
+            map.forEach(_function_2);
           };
           table.forEach(_function_1);
         }
@@ -398,11 +330,8 @@ public class GeneratorUtils {
       ProjectAccessor pa = api.getProjectAccessor();
       pa.open("Create2.asta");
       this.recursiveClassCollect(pa.getProject(), this.classes);
-      final Consumer<IClass> _function = new Consumer<IClass>() {
-        @Override
-        public void accept(final IClass c) {
-          InputOutput.<IClass>println(c);
-        }
+      final Consumer<IClass> _function = (IClass c) -> {
+        InputOutput.<IClass>println(c);
       };
       this.stereotypeNotFilter(this.classes, "library").forEach(_function);
     } catch (Throwable _e) {

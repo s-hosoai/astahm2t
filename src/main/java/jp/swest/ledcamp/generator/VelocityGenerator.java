@@ -22,11 +22,8 @@ public class VelocityGenerator implements ITemplateEngine {
       p.setProperty("file.resource.loader.path", templatePath.getParent().toAbsolutePath().toString());
       Velocity.init(p);
       final VelocityContext ctx = new VelocityContext();
-      final BiConsumer<String, Object> _function = new BiConsumer<String, Object>() {
-        @Override
-        public void accept(final String k, final Object v) {
-          ctx.put(k, v);
-        }
+      final BiConsumer<String, Object> _function = (String k, Object v) -> {
+        ctx.put(k, v);
       };
       mapping.forEach(_function);
       Template template = Velocity.getTemplate(templatePath.getFileName().toString());

@@ -1,6 +1,5 @@
 package jp.swest.ledcamp.xtendhelper;
 
-import com.google.common.base.Objects;
 import java.io.Closeable;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
@@ -21,8 +20,7 @@ public class Using {
           throw Exceptions.sneakyThrow(_t);
         }
       } finally {
-        boolean _equals = Objects.equal(throwable, null);
-        if (_equals) {
+        if ((throwable == null)) {
           resource.close();
         } else {
           try {

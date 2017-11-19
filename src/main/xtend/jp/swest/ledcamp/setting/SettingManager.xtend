@@ -28,7 +28,7 @@ class SettingManager extends HashMap<String, GenerateSetting> {
     }
 
     static def getInstance() {
-        if (instance == null) {
+        if (instance === null) {
             instance = new SettingManager
             instance.load
         }
@@ -118,10 +118,10 @@ class SettingManager extends HashMap<String, GenerateSetting> {
                     bos = new BufferedOutputStream(new FileOutputStream(extractFile))
                     writeFile(bis, bos)
                 } finally {
-                    if (bis != null) {
+                    if (bis !== null) {
                         bis.close();
                     }
-                    if (bos != null) {
+                    if (bos !== null) {
                         bos.close();
                     }
                 }

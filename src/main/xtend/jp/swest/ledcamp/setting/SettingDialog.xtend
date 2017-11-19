@@ -84,7 +84,7 @@ class SettingDialog extends JDialog {
                 btnAddSet = new JButton("Add")
                 btnAddSet.addActionListener [
                     val setName = JOptionPane.showInputDialog(this, "please input templateSet name")
-                    if (setName != null) {
+                    if (setName !== null) {
                         val generateSetting = new GenerateSetting
                         manager.put(setName, generateSetting)
                         manager.currentSetting = generateSetting
@@ -108,7 +108,7 @@ class SettingDialog extends JDialog {
                     combo_templateSet.removeItem(selectedSet)
                     manager.remove(selectedSet)
                     val afterSelectedItem = combo_templateSet.selectedItem
-                    if (afterSelectedItem != null) {
+                    if (afterSelectedItem !== null) {
                         manager.currentSetting = manager.get(combo_templateSet.selectedItem)
                     } else {
                         manager.currentSetting = null
@@ -279,7 +279,7 @@ class SettingDialog extends JDialog {
 
     private def changeTemplateSet() {
         val templateSet = combo_templateSet.selectedItem
-        if (templateSet == null) {
+        if (templateSet === null) {
             return
         }
 
@@ -331,7 +331,7 @@ class SettingDialog extends JDialog {
             this.map = map
             initComponent(settingDialog)
 
-            if (map.templateType != null) {
+            if (map.templateType !== null) {
                 comboType.selectedItem = map.templateType
             } else {
                 comboType.selectedItem = TemplateType.Default

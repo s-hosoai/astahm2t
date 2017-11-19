@@ -16,7 +16,6 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.change_vision.jude.api.inf.model.IAttribute
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -71,11 +70,11 @@ class GeneratorUtils {
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
 
-    // for statemachine utility
+    // for state machine utility
     private ArrayList<IState> allStates
 
     def getStates() {
-        if (statemachine == null) {
+        if (statemachine === null) {
             return null
         }
         allStates = new ArrayList
@@ -101,7 +100,7 @@ class GeneratorUtils {
 
     def getEvents(IClass c) {
         val _statemachine = statemachines.get(c)
-        _statemachine?.transitions?.filter[it.event != null && it.event.trim.length > 1 && it.event.trim != "true"].map [
+        _statemachine?.transitions?.filter[it.event !== null && it.event.trim.length > 1 && it.event.trim != "true"].map [
             it.event
         ].toSet
     }
@@ -168,7 +167,7 @@ class GeneratorUtils {
             utils.iclass = c
             utils.statemachine = utils.statemachines.get(c)
             utils.allReferenceClasses.forEach[r|println(" reference:" + r.name)]
-            if (utils.statemachine != null) {
+            if (utils.statemachine !== null) {
                 var table = utils.generateStateTable()
                 table.forEach [ state, map |
                     println(state);

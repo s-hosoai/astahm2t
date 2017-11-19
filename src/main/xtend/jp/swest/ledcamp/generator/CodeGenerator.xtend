@@ -43,7 +43,7 @@ class CodeGenerator {
                 GenerationException::instance.addException(e)
             }
         }
-        if(!settingManager.use3wayMerge){
+        if (!settingManager.use3wayMerge && Files.exists(temporalTargetPath)) {
             Files.walkFileTree(temporalTargetPath, new DeleteDirVisitor)
         }
 
@@ -119,11 +119,35 @@ class CodeGenerator {
                 GenerationException::instance.addException(e)
             }
         } else {
-            Files.move(temporalTargetPath, targetPath, StandardCopyOption.REPLACE_EXISTING)
+            Files.walkFileTree(temporalTargetPath, new MoveDirVisitor(temporalTargetPath, targetPath))
         }
 
         if (GenerationException::instance.excetpions.size != 0) {
             throw GenerationException::instance
+        }
+    }
+
+    static class MoveDirVisitor extends SimpleFileVisitor<Path> {
+        val Path from
+        val Path to
+        val copyOption = StandardCopyOption.REPLACE_EXISTING
+
+        new(Path from, Path to) {
+            this.from = from
+            this.to = to
+        }
+
+        override preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            val targetPath = to.resolve(from.relativize(dir));
+            if (!Files.exists(targetPath)) {
+                Files.createDirectory(targetPath)
+            }
+            return FileVisitResult.CONTINUE
+        }
+
+        override visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            Files.move(file, to.resolve(from.relativize(file)), copyOption)
+            return FileVisitResult.CONTINUE
         }
     }
 
