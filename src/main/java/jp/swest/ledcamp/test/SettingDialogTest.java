@@ -18,12 +18,9 @@ public class SettingDialogTest {
     frame.setSize(500, 500);
     final BorderLayout layout = new BorderLayout();
     final JButton btn = new JButton("open dialog");
-    final ActionListener _function = new ActionListener() {
-      @Override
-      public void actionPerformed(final ActionEvent it) {
-        final SettingDialog dialog = new SettingDialog(frame);
-        dialog.setVisible(true);
-      }
+    final ActionListener _function = (ActionEvent it) -> {
+      final SettingDialog dialog = new SettingDialog(frame);
+      dialog.setVisible(true);
     };
     btn.addActionListener(_function);
     frame.add(btn, BorderLayout.CENTER);

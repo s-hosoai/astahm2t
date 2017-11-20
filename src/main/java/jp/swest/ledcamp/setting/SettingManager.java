@@ -1,6 +1,5 @@
 package jp.swest.ledcamp.setting;
 
-import com.google.common.base.Objects;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -9,7 +8,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -44,14 +42,16 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   @Accessors
   private String currentAstahFileName;
   
+  @Accessors
+  private boolean use3wayMerge;
+  
   private SettingManager() {
     super();
     this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
   }
   
   public static SettingManager getInstance() {
-    boolean _equals = Objects.equal(SettingManager.instance, null);
-    if (_equals) {
+    if ((SettingManager.instance == null)) {
       SettingManager _settingManager = new SettingManager();
       SettingManager.instance = _settingManager;
       SettingManager.instance.load();
@@ -67,8 +67,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   public GenerateSetting load() {
     GenerateSetting _xblockexpression = null;
     {
-      String _property = System.getProperty("user.home");
-      this.userFolder = _property;
+      this.userFolder = System.getProperty("user.home");
       this.m2tPluginFolderPath = (this.userFolder + "/.astah/plugins/m2t/");
       this.settingFilePath = (this.m2tPluginFolderPath + "m2tsetting.xml");
       final File asgenPluginFolder = new File(this.m2tPluginFolderPath);
@@ -76,15 +75,12 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
       boolean _not = (!_exists);
       if (_not) {
         try {
-          File _parentFile = asgenPluginFolder.getParentFile();
-          _parentFile.mkdirs();
+          asgenPluginFolder.getParentFile().mkdirs();
           final File zipFile = File.createTempFile("astahm2t", "templeatezip");
           BufferedInputStream bis = null;
           BufferedOutputStream bos = null;
           try {
-            Class<? extends SettingManager> _class = this.getClass();
-            ClassLoader _classLoader = _class.getClassLoader();
-            InputStream _resourceAsStream = _classLoader.getResourceAsStream("m2t.zip");
+            InputStream _resourceAsStream = this.getClass().getClassLoader().getResourceAsStream("m2t.zip");
             BufferedInputStream _bufferedInputStream = new BufferedInputStream(_resourceAsStream);
             bis = _bufferedInputStream;
             FileOutputStream _fileOutputStream = new FileOutputStream(zipFile);
@@ -96,8 +92,7 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
             bos.close();
           }
           ZipFile _zipFile = new ZipFile(zipFile);
-          String _parent = asgenPluginFolder.getParent();
-          this.unzip(_zipFile, _parent);
+          this.unzip(_zipFile, asgenPluginFolder.getParent());
         } catch (final Throwable _t) {
           if (_t instanceof IOException) {
             final IOException ioe = (IOException)_t;
@@ -146,20 +141,12 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   private void createDefaultSetting() {
     final GenerateSetting sampleGenerateSetting = new GenerateSetting();
-    File _file = new File(this.userFolder);
-    String _absolutePath = _file.getAbsolutePath();
-    sampleGenerateSetting.setTargetPath(_absolutePath);
-    File _file_1 = new File((this.m2tPluginFolderPath + "templates/RestWeb/"));
-    String _absolutePath_1 = _file_1.getAbsolutePath();
-    sampleGenerateSetting.setTemplatePath(_absolutePath_1);
+    sampleGenerateSetting.setTargetPath(new File(this.userFolder).getAbsolutePath());
+    sampleGenerateSetting.setTemplatePath(new File((this.m2tPluginFolderPath + "templates/RestWeb/")).getAbsolutePath());
     sampleGenerateSetting.setTemplateEngine(TemplateEngine.Groovy);
     sampleGenerateSetting.setTemplateID("RestWeb");
-    HashSet<TemplateMap> _mapping = sampleGenerateSetting.getMapping();
-    TemplateMap _newStereotypeTemplateMap = TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST");
-    _mapping.add(_newStereotypeTemplateMap);
-    HashSet<TemplateMap> _mapping_1 = sampleGenerateSetting.getMapping();
-    TemplateMap _newStereotypeTemplateMap_1 = TemplateMap.newStereotypeTemplateMap("controller.template", "java", "REST");
-    _mapping_1.add(_newStereotypeTemplateMap_1);
+    sampleGenerateSetting.getMapping().add(TemplateMap.newStereotypeTemplateMap("rest.template", "java", "REST"));
+    sampleGenerateSetting.getMapping().add(TemplateMap.newStereotypeTemplateMap("controller.template", "java", "REST"));
     SettingManager.instance.put("RestWeb", sampleGenerateSetting);
     SettingManager.instance.currentSetting = sampleGenerateSetting;
     this.save();
@@ -195,12 +182,10 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
             bos = _bufferedOutputStream;
             this.writeFile(bis, bos);
           } finally {
-            boolean _notEquals = (!Objects.equal(bis, null));
-            if (_notEquals) {
+            if ((bis != null)) {
               bis.close();
             }
-            boolean _notEquals_1 = (!Objects.equal(bos, null));
-            if (_notEquals_1) {
+            if ((bos != null)) {
               bos.close();
             }
           }
@@ -254,5 +239,14 @@ public class SettingManager extends HashMap<String, GenerateSetting> {
   
   public void setCurrentAstahFileName(final String currentAstahFileName) {
     this.currentAstahFileName = currentAstahFileName;
+  }
+  
+  @Pure
+  public boolean isUse3wayMerge() {
+    return this.use3wayMerge;
+  }
+  
+  public void setUse3wayMerge(final boolean use3wayMerge) {
+    this.use3wayMerge = use3wayMerge;
   }
 }

@@ -16,7 +16,6 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.change_vision.jude.api.inf.model.IAttribute
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -26,12 +25,11 @@ class GeneratorUtils {
     @Accessors private IStateMachine statemachine
     @Accessors List<IClass> classes
     @Accessors HashMap<IClass, IStateMachine> statemachines
-    
-    new(){
+
+    new() {
         api = AstahAPI.getAstahAPI()
         projectAccessor = api.getProjectAccessor()
         projectRoot = projectAccessor.getProject() // exist project?
-        
         // Collect classes and statemachines.
         classes = new ArrayList<IClass>()
         statemachines = new HashMap<IClass, IStateMachine>()
@@ -42,82 +40,91 @@ class GeneratorUtils {
             }
         }
     }
-    def getAstahProjectName(){
+
+    def getAstahProjectName() {
         projectRoot.name
     }
-    
+
     // for class diagram utility
-    def getName(){
+    def getName() {
         iclass.name
     }
-    
-    def getInstanceName(){
+
+    def getInstanceName() {
         iclass.name.toFirstLower
     }
-    
-    def getInstanceName(IClass c){
+
+    def getInstanceName(IClass c) {
         c.name.toFirstLower
     }
-    def toFirstUpperCase(String str){
+
+    def toFirstUpperCase(String str) {
         str.toFirstUpper
     }
-    def toFirstLowerCase(String str){
+
+    def toFirstLowerCase(String str) {
         str.toFirstLower
     }
 
-    def getAllReferenceClasses(){
+    def getAllReferenceClasses() {
         iclass.attributes.map[e|e.type].filter[e|classes.contains(e)]
     }
-       
-    // for statemachine utility
+
+    // for state machine utility
     private ArrayList<IState> allStates
-    def getStates(){
-        if(statemachine==null){return null}
+
+    def getStates() {
+        if (statemachine === null) {
+            return null
+        }
         allStates = new ArrayList
         getStates(statemachine)
         return allStates
     }
-    
-    private def void getStates(IStateMachine m){
+
+    private def void getStates(IStateMachine m) {
         val substates = m.vertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
         allStates.addAll(substates)
         substates.forEach[sub|getStates(sub)]
     }
-    
-    private def void getStates(IState state){
+
+    private def void getStates(IState state) {
         val substates = state.subvertexes.filter[s|!(s instanceof IPseudostate || s instanceof IFinalState)] as IState[]
         allStates.addAll(substates)
         substates.forEach[sub|getStates(sub)]
     }
-    
-    def getEvents(){
-        statemachine?.transitions.map[t|t.event].filter[e|e.trim.length>1].toSet
+
+    def getEvents() {
+        statemachine?.transitions.map[t|t.event].filter[e|e.trim.length > 1].toSet
     }
 
-    def getEvents(IClass c){
-    	val _statemachine = statemachines.get(c)
-        _statemachine?.transitions?.filter[it.event!=null && it.event.trim.length>1 && it.event.trim!="true"].map[it.event].toSet
+    def getEvents(IClass c) {
+        val _statemachine = statemachines.get(c)
+        _statemachine?.transitions?.filter[it.event !== null && it.event.trim.length > 1 && it.event.trim != "true"].map [
+            it.event
+        ].toSet
     }
 
-	def getAllEvents(){
-		statemachines.values.map[s|s.transitions.toList].flatten.map[t|t.event].filter[e|e.trim.length>1].toSet
-	}
-    
-    def getInitialState(){
+    def getAllEvents() {
+        statemachines.values.map[s|s.transitions.toList].flatten.map[t|t.event].filter[e|e.trim.length > 1].toSet
+    }
+
+    def getInitialState() {
         var initialPseudo = statemachine?.vertexes?.filter(IPseudostate).filter[s|s.isInitialPseudostate].get(0)
         return initialPseudo?.outgoings.get(0).target
     }
-    def ITransition[] getAllParentTransitions(IState state){
-        if(state.container instanceof IState){
+
+    def ITransition[] getAllParentTransitions(IState state) {
+        if (state.container instanceof IState) {
             return state.outgoings + (getAllParentTransitions(state.container as IState) as ITransition[]);
-        }else{
+        } else {
             return state.outgoings
         }
     }
-    
-    def generateStateTable(){
+
+    def generateStateTable() {
         var table = new HashMap<String, HashMap<String, IVertex>>
-        for(o : states){
+        for (o : states) {
             val s = o as IState
             val eventToNextState = new HashMap<String, IVertex>
             table.put(s.name, eventToNextState)
@@ -125,49 +132,52 @@ class GeneratorUtils {
         }
         return table
     }
-    
+
     // for global generate
-    def getClasses(){
+    def getClasses() {
         return this.classes
     }
-    
-    def getFrame(){
+
+    def getFrame() {
         return projectAccessor.viewManager.mainFrame
     }
-    
-    def stereotypeFilter(List<IClass> classes, String stereotype){
+
+    def stereotypeFilter(List<IClass> classes, String stereotype) {
         return classes.filter[c|c.stereotypes.contains(stereotype)]
     }
-    def stereotypeNotFilter(List<IClass> classes, String stereotype){
+
+    def stereotypeNotFilter(List<IClass> classes, String stereotype) {
         return classes.filter[c|!c.stereotypes.contains(stereotype)]
     }
-    
-    private def void recursiveClassCollect(IModel model, List<IClass> classes){
-        classes.addAll(model.ownedElements.filter(IClass))
-        model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]        
-    }
-    private def void recursiveClassCollect(IPackage model, List<IClass> classes){
+
+    private def void recursiveClassCollect(IModel model, List<IClass> classes) {
         classes.addAll(model.ownedElements.filter(IClass))
         model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
     }
-        
+
+    private def void recursiveClassCollect(IPackage model, List<IClass> classes) {
+        classes.addAll(model.ownedElements.filter(IClass))
+        model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
+    }
+
     def static void main(String[] args) {
         val utils = new GeneratorUtils
 //        utils.test
-        for(c : utils.classes){
+        for (c : utils.classes) {
             utils.iclass = c
             utils.statemachine = utils.statemachines.get(c)
-            utils.allReferenceClasses.forEach[r|println(" reference:"+r.name)]
-            if(utils.statemachine!=null){
-            var table = utils.generateStateTable()
-            table.forEach[state, map|
-                println(state);
-                map.forEach[event, next| println(" "+event+"->"+next)]
-            ]}
+            utils.allReferenceClasses.forEach[r|println(" reference:" + r.name)]
+            if (utils.statemachine !== null) {
+                var table = utils.generateStateTable()
+                table.forEach [ state, map |
+                    println(state);
+                    map.forEach[event, next|println(" " + event + "->" + next)]
+                ]
+            }
         }
     }
-    
-    def test(){
+
+    def test() {
         var api = AstahAPI.getAstahAPI();
         var pa = api.getProjectAccessor();
         pa.open("Create2.asta");

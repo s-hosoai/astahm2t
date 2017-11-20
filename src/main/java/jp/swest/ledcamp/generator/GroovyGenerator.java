@@ -35,27 +35,22 @@ public class GroovyGenerator implements ITemplateEngine {
     final GeneratorUtils utils = ((GeneratorUtils) _get);
     final IClass iClass = utils.getIclass();
     try {
-      File _file = templateFile.toFile();
-      final Template template = this.engine.createTemplate(_file);
+      final Template template = this.engine.createTemplate(templateFile.toFile());
       final Writable generatedCode = template.make(map);
-      File _file_1 = output.toFile();
-      FileWriter _fileWriter = new FileWriter(_file_1);
-      final Function1<FileWriter, Writer> _function = new Function1<FileWriter, Writer>() {
-        @Override
-        public Writer apply(final FileWriter it) {
-          try {
-            return generatedCode.writeTo(it);
-          } catch (Throwable _e) {
-            throw Exceptions.sneakyThrow(_e);
-          }
+      File _file = output.toFile();
+      FileWriter _fileWriter = new FileWriter(_file);
+      final Function1<FileWriter, Writer> _function = (FileWriter it) -> {
+        try {
+          return generatedCode.writeTo(it);
+        } catch (Throwable _e) {
+          throw Exceptions.sneakyThrow(_e);
         }
       };
       Using.<FileWriter, Writer>using(_fileWriter, _function);
     } catch (final Throwable _t) {
       if (_t instanceof Exception) {
         final Exception e = (Exception)_t;
-        GenerationException _instance = GenerationException.getInstance();
-        _instance.addException(e);
+        GenerationException.getInstance().addException(e);
         boolean _matched = false;
         if (Objects.equal(e, MissingPropertyException.class)) {
           _matched=true;

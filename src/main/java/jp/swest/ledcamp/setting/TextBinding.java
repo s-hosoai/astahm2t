@@ -3,7 +3,6 @@ package jp.swest.ledcamp.setting;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 import jp.swest.ledcamp.xtendhelper.Consumer;
 
 @SuppressWarnings("all")
@@ -13,8 +12,7 @@ public class TextBinding implements DocumentListener {
   private JTextField field;
   
   public TextBinding(final JTextField field, final Consumer<String> setterFunction) {
-    Document _document = field.getDocument();
-    _document.addDocumentListener(this);
+    field.getDocument().addDocumentListener(this);
     this.field = field;
     this.setterFunction = setterFunction;
   }
@@ -25,13 +23,11 @@ public class TextBinding implements DocumentListener {
   
   @Override
   public void insertUpdate(final DocumentEvent e) {
-    String _text = this.field.getText();
-    this.setterFunction.accespt(_text);
+    this.setterFunction.accespt(this.field.getText());
   }
   
   @Override
   public void removeUpdate(final DocumentEvent e) {
-    String _text = this.field.getText();
-    this.setterFunction.accespt(_text);
+    this.setterFunction.accespt(this.field.getText());
   }
 }

@@ -14,7 +14,7 @@ class VelocityGenerator implements ITemplateEngine {
         p.setProperty("file.resource.loader.path", templatePath.parent.toAbsolutePath.toString)
         Velocity.init(p)
         val ctx = new VelocityContext()
-        mapping.forEach[k,v|ctx.put(k,v)]
+        mapping.forEach[k, v|ctx.put(k, v)]
 
         var template = Velocity.getTemplate(templatePath.fileName.toString)
         var writer = new FileWriter(output.toFile)

@@ -2,24 +2,24 @@ package jp.swest.ledcamp.xtendhelper
 
 import java.io.Closeable
 
-class Using{
-    def static <T extends Closeable, R> R using(T resource, (T)=>R proc){
+class Using {
+    def static <T extends Closeable, R> R using(T resource, (T)=>R proc) {
         var Throwable throwable = null
-        try{
+        try {
             return proc.apply(resource)
-        }catch(Throwable t){
+        } catch (Throwable t) {
             throwable = t
             throw t
-        }finally{
-            if(throwable == null){
+        } finally {
+            if (throwable === null) {
                 resource.close
-            }else{
-                try{
+            } else {
+                try {
                     resource.close
-                }catch(Throwable unused){
+                } catch (Throwable unused) {
                     // ignore because throwable is present
                 }
-            }    
+            }
         }
     }
 }

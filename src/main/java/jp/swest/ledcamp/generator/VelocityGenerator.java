@@ -19,22 +19,14 @@ public class VelocityGenerator implements ITemplateEngine {
     try {
       Properties p = new Properties();
       p.setProperty("input.encoding", "UTF-8");
-      Path _parent = templatePath.getParent();
-      Path _absolutePath = _parent.toAbsolutePath();
-      String _string = _absolutePath.toString();
-      p.setProperty("file.resource.loader.path", _string);
+      p.setProperty("file.resource.loader.path", templatePath.getParent().toAbsolutePath().toString());
       Velocity.init(p);
       final VelocityContext ctx = new VelocityContext();
-      final BiConsumer<String, Object> _function = new BiConsumer<String, Object>() {
-        @Override
-        public void accept(final String k, final Object v) {
-          ctx.put(k, v);
-        }
+      final BiConsumer<String, Object> _function = (String k, Object v) -> {
+        ctx.put(k, v);
       };
       mapping.forEach(_function);
-      Path _fileName = templatePath.getFileName();
-      String _string_1 = _fileName.toString();
-      Template template = Velocity.getTemplate(_string_1);
+      Template template = Velocity.getTemplate(templatePath.getFileName().toString());
       File _file = output.toFile();
       FileWriter writer = new FileWriter(_file);
       template.merge(ctx, writer);
