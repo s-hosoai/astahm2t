@@ -6,6 +6,7 @@ import com.change_vision.jude.api.inf.model.IClass;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IFinalState;
 import com.change_vision.jude.api.inf.model.IModel;
+import com.change_vision.jude.api.inf.model.INamedElement;
 import com.change_vision.jude.api.inf.model.IPackage;
 import com.change_vision.jude.api.inf.model.IPseudostate;
 import com.change_vision.jude.api.inf.model.IState;
@@ -66,7 +67,9 @@ public class GeneratorUtils {
       this.classes = _arrayList;
       HashMap<IClass, IStateMachine> _hashMap = new HashMap<IClass, IStateMachine>();
       this.statemachines = _hashMap;
-      Iterable<IClass> _filter = Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(this.projectRoot.getOwnedElements())), IClass.class);
+//      Iterable<IClass> _filter = Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(this.projectRoot.getOwnedElements())), IClass.class);  // old code
+      List<IClass> _filter = new ArrayList<IClass>();    // new code
+      getAllClasses(this.projectRoot,_filter);  // new code
       for (final IClass iClass : _filter) {
         {
           this.classes.add(iClass);
@@ -256,6 +259,16 @@ public class GeneratorUtils {
   
   public List<IClass> getClasses() {
     return this.classes;
+  }
+    
+  private void getAllClasses(INamedElement element, List<IClass> classList){
+    if (element instanceof IPackage) {
+      for(INamedElement ownedNamedElement : ((IPackage) element).getOwnedElements()) {
+        getAllClasses(ownedNamedElement, classList);
+      }
+    } else if (element instanceof IClass) {
+      classList.add((IClass) element);
+    }
   }
   
   public JFrame getFrame() {
