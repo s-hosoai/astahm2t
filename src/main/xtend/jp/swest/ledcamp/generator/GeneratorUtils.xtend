@@ -16,6 +16,7 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
+import com.change_vision.jude.api.inf.model.INamedElement
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -33,10 +34,15 @@ class GeneratorUtils {
         // Collect classes and statemachines.
         classes = new ArrayList<IClass>()
         statemachines = new HashMap<IClass, IStateMachine>()
-        for (iClass : projectRoot.getOwnedElements().filter(IClass)) {
-            classes.add(iClass)
-            for (diagram : iClass.getDiagrams().filter(IStateMachineDiagram)) {
-                statemachines.put(iClass, diagram.getStateMachine())
+        getAllClassAndStatemachines(projectRoot, classes)
+    }
+
+    def void getAllClassAndStatemachines(INamedElement element, List<IClass> classes){
+        switch(element){
+            IPackage : {element.ownedElements.forEach[getAllClassAndStatemachines(it, classes)]}
+            IClass : {
+                classes.add(element)
+                classes.map[it.diagrams.toList].flatten.filter(IStateMachineDiagram).forEach[statemachines.put(element, it.stateMachine)]
             }
         }
     }
@@ -110,8 +116,8 @@ class GeneratorUtils {
     }
 
     def getInitialState() {
-        var initialPseudo = statemachine?.vertexes?.filter(IPseudostate).filter[s|s.isInitialPseudostate].get(0)
-        return initialPseudo?.outgoings.get(0).target
+        var initialPseudo = statemachine?.vertexes?.filter(IPseudostate)?.filter[s|s.isInitialPseudostate]?.get(0)
+        return initialPseudo?.outgoings?.get(0)?.target
     }
 
     def ITransition[] getAllParentTransitions(IState state) {
