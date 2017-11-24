@@ -16,7 +16,6 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import org.eclipse.xtend.lib.annotations.Accessors
-import com.change_vision.jude.api.inf.model.INamedElement
 
 class GeneratorUtils {
     @Accessors private AstahAPI api
@@ -34,15 +33,10 @@ class GeneratorUtils {
         // Collect classes and statemachines.
         classes = new ArrayList<IClass>()
         statemachines = new HashMap<IClass, IStateMachine>()
-        getAllClassAndStatemachines(projectRoot, classes)
-    }
-
-    def void getAllClassAndStatemachines(INamedElement element, List<IClass> classes){
-        switch(element){
-            IPackage : {element.ownedElements.forEach[getAllClassAndStatemachines(it, classes)]}
-            IClass : {
-                classes.add(element)
-                classes.map[it.diagrams.toList].flatten.filter(IStateMachineDiagram).forEach[statemachines.put(element, it.stateMachine)]
+        for (iClass : projectRoot.getOwnedElements().filter(IClass)) {
+            classes.add(iClass)
+            for (diagram : iClass.getDiagrams().filter(IStateMachineDiagram)) {
+                statemachines.put(iClass, diagram.getStateMachine())
             }
         }
     }
@@ -116,8 +110,8 @@ class GeneratorUtils {
     }
 
     def getInitialState() {
-        var initialPseudo = statemachine?.vertexes?.filter(IPseudostate)?.filter[s|s.isInitialPseudostate]?.get(0)
-        return initialPseudo?.outgoings?.get(0)?.target
+        var initialPseudo = statemachine?.vertexes?.filter(IPseudostate).filter[s|s.isInitialPseudostate].get(0)
+        return initialPseudo?.outgoings.get(0).target
     }
 
     def ITransition[] getAllParentTransitions(IState state) {
@@ -154,5 +148,40 @@ class GeneratorUtils {
 
     def stereotypeNotFilter(List<IClass> classes, String stereotype) {
         return classes.filter[c|!c.stereotypes.contains(stereotype)]
+    }
+
+    private def void recursiveClassCollect(IModel model, List<IClass> classes) {
+        classes.addAll(model.ownedElements.filter(IClass))
+        model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
+    }
+
+    private def void recursiveClassCollect(IPackage model, List<IClass> classes) {
+        classes.addAll(model.ownedElements.filter(IClass))
+        model.ownedElements.filter(IPackage).forEach[p|recursiveClassCollect(p, classes)]
+    }
+
+    def static void main(String[] args) {
+        val utils = new GeneratorUtils
+//        utils.test
+        for (c : utils.classes) {
+            utils.iclass = c
+            utils.statemachine = utils.statemachines.get(c)
+            utils.allReferenceClasses.forEach[r|println(" reference:" + r.name)]
+            if (utils.statemachine !== null) {
+                var table = utils.generateStateTable()
+                table.forEach [ state, map |
+                    println(state);
+                    map.forEach[event, next|println(" " + event + "->" + next)]
+                ]
+            }
+        }
+    }
+
+    def test() {
+        var api = AstahAPI.getAstahAPI();
+        var pa = api.getProjectAccessor();
+        pa.open("Create2.asta");
+        recursiveClassCollect(pa.project, classes)
+        classes.stereotypeNotFilter("library").forEach[c|println(c)]
     }
 }
