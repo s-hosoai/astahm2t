@@ -3,6 +3,7 @@ package jp.swest.ledcamp.generator;
 import com.change_vision.jude.api.inf.AstahAPI;
 import com.change_vision.jude.api.inf.model.IAttribute;
 import com.change_vision.jude.api.inf.model.IClass;
+import com.change_vision.jude.api.inf.model.IDiagram;
 import com.change_vision.jude.api.inf.model.IElement;
 import com.change_vision.jude.api.inf.model.IFinalState;
 import com.change_vision.jude.api.inf.model.IModel;
@@ -21,7 +22,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javax.swing.JFrame;
 import org.eclipse.xtend.lib.annotations.Accessors;
@@ -29,7 +29,6 @@ import org.eclipse.xtext.xbase.lib.CollectionExtensions;
 import org.eclipse.xtext.xbase.lib.Conversions;
 import org.eclipse.xtext.xbase.lib.Exceptions;
 import org.eclipse.xtext.xbase.lib.Functions.Function1;
-import org.eclipse.xtext.xbase.lib.InputOutput;
 import org.eclipse.xtext.xbase.lib.IterableExtensions;
 import org.eclipse.xtext.xbase.lib.ListExtensions;
 import org.eclipse.xtext.xbase.lib.Pure;
@@ -67,20 +66,33 @@ public class GeneratorUtils {
       this.classes = _arrayList;
       HashMap<IClass, IStateMachine> _hashMap = new HashMap<IClass, IStateMachine>();
       this.statemachines = _hashMap;
-//      Iterable<IClass> _filter = Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(this.projectRoot.getOwnedElements())), IClass.class);  // old code
-      List<IClass> _filter = new ArrayList<IClass>();    // new code
-      getAllClasses(this.projectRoot,_filter);  // new code
-      for (final IClass iClass : _filter) {
-        {
-          this.classes.add(iClass);
-          Iterable<IStateMachineDiagram> _filter_1 = Iterables.<IStateMachineDiagram>filter(((Iterable<?>)Conversions.doWrapArray(iClass.getDiagrams())), IStateMachineDiagram.class);
-          for (final IStateMachineDiagram diagram : _filter_1) {
-            this.statemachines.put(iClass, diagram.getStateMachine());
-          }
-        }
-      }
+      this.getAllClassAndStatemachines(this.projectRoot, this.classes);
     } catch (Throwable _e) {
       throw Exceptions.sneakyThrow(_e);
+    }
+  }
+  
+  public void getAllClassAndStatemachines(final INamedElement element, final List<IClass> classes) {
+    boolean _matched = false;
+    if (element instanceof IPackage) {
+      _matched=true;
+      final Consumer<INamedElement> _function = (INamedElement it) -> {
+        this.getAllClassAndStatemachines(it, classes);
+      };
+      ((List<INamedElement>)Conversions.doWrapArray(((IPackage)element).getOwnedElements())).forEach(_function);
+    }
+    if (!_matched) {
+      if (element instanceof IClass) {
+        _matched=true;
+        classes.add(((IClass)element));
+        final Function1<IClass, List<IDiagram>> _function = (IClass it) -> {
+          return IterableExtensions.<IDiagram>toList(((Iterable<IDiagram>)Conversions.doWrapArray(it.getDiagrams())));
+        };
+        final Consumer<IStateMachineDiagram> _function_1 = (IStateMachineDiagram it) -> {
+          this.statemachines.put(((IClass)element), it.getStateMachine());
+        };
+        Iterables.<IStateMachineDiagram>filter(Iterables.<IDiagram>concat(ListExtensions.<IClass, List<IDiagram>>map(classes, _function)), IStateMachineDiagram.class).forEach(_function_1);
+      }
     }
   }
   
@@ -217,15 +229,31 @@ public class GeneratorUtils {
     if (((Iterable<?>)Conversions.doWrapArray(_vertexes))!=null) {
       _filter=Iterables.<IPseudostate>filter(((Iterable<?>)Conversions.doWrapArray(_vertexes)), IPseudostate.class);
     }
-    final Function1<IPseudostate, Boolean> _function = (IPseudostate s) -> {
-      return Boolean.valueOf(s.isInitialPseudostate());
-    };
-    IPseudostate initialPseudo = ((IPseudostate[])Conversions.unwrapArray(IterableExtensions.<IPseudostate>filter(_filter, _function), IPseudostate.class))[0];
+    Iterable<IPseudostate> _filter_1 = null;
+    if (_filter!=null) {
+      final Function1<IPseudostate, Boolean> _function = (IPseudostate s) -> {
+        return Boolean.valueOf(s.isInitialPseudostate());
+      };
+      _filter_1=IterableExtensions.<IPseudostate>filter(_filter, _function);
+    }
+    IPseudostate _get = null;
+    if (((IPseudostate[])Conversions.unwrapArray(_filter_1, IPseudostate.class))!=null) {
+      _get=((IPseudostate[])Conversions.unwrapArray(_filter_1, IPseudostate.class))[0];
+    }
+    IPseudostate initialPseudo = _get;
     ITransition[] _outgoings = null;
     if (initialPseudo!=null) {
       _outgoings=initialPseudo.getOutgoings();
     }
-    return _outgoings[0].getTarget();
+    ITransition _get_1 = null;
+    if (_outgoings!=null) {
+      _get_1=_outgoings[0];
+    }
+    IVertex _target = null;
+    if (_get_1!=null) {
+      _target=_get_1.getTarget();
+    }
+    return _target;
   }
   
   public ITransition[] getAllParentTransitions(final IState state) {
@@ -260,16 +288,6 @@ public class GeneratorUtils {
   public List<IClass> getClasses() {
     return this.classes;
   }
-    
-  private void getAllClasses(INamedElement element, List<IClass> classList){
-    if (element instanceof IPackage) {
-      for(INamedElement ownedNamedElement : ((IPackage) element).getOwnedElements()) {
-        getAllClasses(ownedNamedElement, classList);
-      }
-    } else if (element instanceof IClass) {
-      classList.add((IClass) element);
-    }
-  }
   
   public JFrame getFrame() {
     try {
@@ -292,64 +310,6 @@ public class GeneratorUtils {
       return Boolean.valueOf((!_contains));
     };
     return IterableExtensions.<IClass>filter(classes, _function);
-  }
-  
-  private void recursiveClassCollect(final IModel model, final List<IClass> classes) {
-    Iterables.<IClass>addAll(classes, Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IClass.class));
-    final Consumer<IPackage> _function = (IPackage p) -> {
-      this.recursiveClassCollect(p, classes);
-    };
-    Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IPackage.class).forEach(_function);
-  }
-  
-  private void recursiveClassCollect(final IPackage model, final List<IClass> classes) {
-    Iterables.<IClass>addAll(classes, Iterables.<IClass>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IClass.class));
-    final Consumer<IPackage> _function = (IPackage p) -> {
-      this.recursiveClassCollect(p, classes);
-    };
-    Iterables.<IPackage>filter(((Iterable<?>)Conversions.doWrapArray(model.getOwnedElements())), IPackage.class).forEach(_function);
-  }
-  
-  public static void main(final String[] args) {
-    final GeneratorUtils utils = new GeneratorUtils();
-    for (final IClass c : utils.classes) {
-      {
-        utils.iclass = c;
-        utils.statemachine = utils.statemachines.get(c);
-        final Consumer<IClass> _function = (IClass r) -> {
-          String _name = r.getName();
-          String _plus = (" reference:" + _name);
-          InputOutput.<String>println(_plus);
-        };
-        utils.getAllReferenceClasses().forEach(_function);
-        if ((utils.statemachine != null)) {
-          HashMap<String, HashMap<String, IVertex>> table = utils.generateStateTable();
-          final BiConsumer<String, HashMap<String, IVertex>> _function_1 = (String state, HashMap<String, IVertex> map) -> {
-            InputOutput.<String>println(state);
-            final BiConsumer<String, IVertex> _function_2 = (String event, IVertex next) -> {
-              InputOutput.<String>println((((" " + event) + "->") + next));
-            };
-            map.forEach(_function_2);
-          };
-          table.forEach(_function_1);
-        }
-      }
-    }
-  }
-  
-  public void test() {
-    try {
-      AstahAPI api = AstahAPI.getAstahAPI();
-      ProjectAccessor pa = api.getProjectAccessor();
-      pa.open("Create2.asta");
-      this.recursiveClassCollect(pa.getProject(), this.classes);
-      final Consumer<IClass> _function = (IClass c) -> {
-        InputOutput.<IClass>println(c);
-      };
-      this.stereotypeNotFilter(this.classes, "library").forEach(_function);
-    } catch (Throwable _e) {
-      throw Exceptions.sneakyThrow(_e);
-    }
   }
   
   @Pure
