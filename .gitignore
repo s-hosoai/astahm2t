@@ -5,3 +5,4 @@
 *.xtextbin
 *.xtendbin
 .gitignore
+*._trace
