@@ -5,29 +5,31 @@
 <% def getStateName(state){u.name+"::"+state.name}%>\
 <% def getEventName(event){u.name+"_"}%>\
 <% def replaceAct(act){
-	if(act=~"setNextTimeout\\((\\d+)(,.+)?\\)"){
-		"timer->setNextTimeout("+Matcher.getLastMatcher().group(1)+","+u.name+"_Timeout)"
-	}else{act.trim();}}%>\
+    if(act=~"setNextTimeout\\((\\d+)(,.+)?\\)"){
+        "timer->setNextTimeout("+Matcher.getLastMatcher().group(1)+","+u.name+"_Timeout)"
+    }else{act.trim();}}%>\
 #include "${u.name}.h"
 ${u.name}::${u.name}(){
 <% if(u.statemachine){%>\
-	${stateInstance}=${u.initialState};
+    ${stateInstance}=${u.initialState};
 <%}%>\
 <% for(reference in u.getAllReferenceClasses()){%>\
 <% if (reference.name=="iRobotCreate2") {%>\
-	create2 = ${reference.name}::getInstance();
+    create2 = ${reference.name}::getInstance();
 <%}else{%>\
-	${u.toFirstLowerCase(reference.name)} = ${reference.name}::getInstance();
+    ${u.toFirstLowerCase(reference.name)} = ${reference.name}::getInstance();
 <%}%>\
 <%}%>\
+<% if(u.statemachine){%>\
 <% if(u.initialState.entry.trim()!=""){%>\
 <% for(entryAct in u.initialState.entry.normalize().split("\n")){%>\
-	${replaceAct(entryAct)};	// initial entry action
+    ${replaceAct(entryAct)};    // initial entry action
 <%}%>\
 <%}%>\
 <% if(u.initialState.doActivity.trim()!=""){%>\
 <% for(doAct in u.initialState.doActivity.normalize().split("\n")){%>\
-	${replaceAct(doAct)};	// initial do action
+    ${replaceAct(doAct)};   // initial do action
+<%}%>\
 <%}%>\
 <%}%>\
 }
@@ -35,81 +37,81 @@ ${u.name}::~${u.name}(){}
 
 <% if(u.statemachine){%>\
 void ${u.name}::transition(Event event){
-	switch(${stateInstance}){
+    switch(${stateInstance}){
 <% for(state in u.states){%>\
-	case ${getStateName(state)}:
+    case ${getStateName(state)}:
 <% if(state.getSubvertexes().length!=0 && state.getSubvertexes().find{it instanceof IPseudostate}!=null){%>\
-		${stateInstance} = ${getStateName(state.getSubvertexes().find{it instanceof IPseudostate}.outgoings[0].target)};
-		break;
+        ${stateInstance} = ${getStateName(state.getSubvertexes().find{it instanceof IPseudostate}.outgoings[0].target)};
+        break;
 <%}else{%>\
 <% for(t in state.outgoings){%>\
-		if(<%if(t.guard.trim()!="") {out<<"("+t.guard+") && "}%><%if(t.event.trim()=="true"||t.event.trim()==""){%>true<% }else if(t.event.trim().toLowerCase()=="timeout"){%>${u.name}_Timeout==event<%} else {%>${t.event.trim()}==event<%}%>){
+        if(<%if(t.guard.trim()!="") {out<<"("+t.guard+") && "}%><%if(t.event.trim()=="true"||t.event.trim()==""){%>true<% }else if(t.event.trim().toLowerCase()=="timeout"){%>${u.name}_Timeout==event<%} else {%>${t.event.trim()}==event<%}%>){
 <% if(state.exit.trim()!="") {%>\
 <% for(exitAct in state.exit.normalize().split("\n")){%>\
-			${replaceAct(exitAct)};		//  exit action;
+            ${replaceAct(exitAct)};     //  exit action;
 <%}%>\
 <%}%>\
 <% if(t.action.trim()!="") {%>\
 <% for(transAct in t.action.normalize().split("\n")){%>\
-			${replaceAct(transAct)};	// transition action
+            ${replaceAct(transAct)};    // transition action
 <%}%>\
 <%}%>\
-			${stateInstance} = ${getStateName(t.target)};
+            ${stateInstance} = ${getStateName(t.target)};
 <% if(t.target.entry.trim()!=""){%>\
 <% for(entryAct in t.target.entry.normalize().split("\n")){%>\
-			${replaceAct(entryAct)};	// entry action
+            ${replaceAct(entryAct)};    // entry action
 <%}%>\
 <%}%>\
 <% if(state.doActivity.trim()!=""){%>\
 <% for(doAct in state.doActivity.normalize().split("\n")){%>\
-			${replaceAct(doAct)};		// do action
+            ${replaceAct(doAct)};       // do action
 <%}%>\
 <%}%>\
-		}
+        }
 <% if(state.container instanceof IState){%>\
 <% for(p in state.container.outgoings){%>\
-		if(<%if(p.guard.trim()!="") {out<<"("+p.guard+") && "}%><%if(p.event.trim()=="true"||p.event.trim()==""){%>true <% } else {%>${p.event}==event<%}%>){
+        if(<%if(p.guard.trim()!="") {out<<"("+p.guard+") && "}%><%if(p.event.trim()=="true"||p.event.trim()==""){%>true <% } else {%>${p.event}==event<%}%>){
 <% if(state.exit.trim()!="") {%>\
 <% for(exitAct in state.exit.normalize().split("\n")){%>\
-			${replaceAct(exitAct)};		// exit action
+            ${replaceAct(exitAct)};     // exit action
 <%}%>\
 <%}%>\
 <% if(p.action.trim()!="") {%>\
-			// transition action
+            // transition action
 <% for(transAct in p.action.normalize().split("\n")){%>\
-			${replaceAct(transAct)};	// trans act
+            ${replaceAct(transAct)};    // trans act
 <%}%>\
 <%}%>\
-			${stateInstance} = ${getStateName(p.target)};
+            ${stateInstance} = ${getStateName(p.target)};
 <% if(p.target.entry.trim()!=""){%>\
-			// ${getStateName(p.target)} state : entry action;
+            // ${getStateName(p.target)} state : entry action;
 <% for(entryAct in p.target.entry.normalize().split("\n")){%>\
-			${replaceAct(entryAct)};	// entry act
+            ${replaceAct(entryAct)};    // entry act
 <%}%>\
 <%}%>\
 <% if(state.doActivity.trim()!=""){%>\
-			// ${getStateName(p.target)} state : do action;
+            // ${getStateName(p.target)} state : do action;
 <% for(doAct in state.doActivity.normalize().split("\n")){%>\
-			${replaceAct(doAct)};		// do act
+            ${replaceAct(doAct)};       // do act
 <%}%>\
 <%}%>\
-		}
+        }
 <%}%>\
 <%}%>\
 <%}%>\
-		break;
+        break;
 <%}%>\
 <%}%>\
-	default:
-		break;
-	}
+    default:
+        break;
+    }
 }
 <%}%>\
 
 <% for(op in u.iclass.operations){%>\
 ${op.returnType.name} ${u.name}::${op.name}(<%=op.parameters.collect{it.typeExpression+" "+it.name}.join(", ")%>){
 <% for(body in op.definition.split("\n")){%>\
-	${body}
+    ${body}
 <%}%>\
 }
 <%}%>\
