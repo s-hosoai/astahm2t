@@ -85,13 +85,10 @@ public class GeneratorUtils {
       if (element instanceof IClass) {
         _matched=true;
         classes.add(((IClass)element));
-        final Function1<IClass, List<IDiagram>> _function = (IClass it) -> {
-          return IterableExtensions.<IDiagram>toList(((Iterable<IDiagram>)Conversions.doWrapArray(it.getDiagrams())));
-        };
-        final Consumer<IStateMachineDiagram> _function_1 = (IStateMachineDiagram it) -> {
+        final Consumer<IStateMachineDiagram> _function = (IStateMachineDiagram it) -> {
           this.statemachines.put(((IClass)element), it.getStateMachine());
         };
-        Iterables.<IStateMachineDiagram>filter(Iterables.<IDiagram>concat(ListExtensions.<IClass, List<IDiagram>>map(classes, _function)), IStateMachineDiagram.class).forEach(_function_1);
+        Iterables.<IStateMachineDiagram>filter(IterableExtensions.<IDiagram>toList(((Iterable<IDiagram>)Conversions.doWrapArray(((IClass)element).getDiagrams()))), IStateMachineDiagram.class).forEach(_function);
       }
     }
   }

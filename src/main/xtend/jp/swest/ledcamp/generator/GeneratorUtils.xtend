@@ -42,7 +42,9 @@ class GeneratorUtils {
             IPackage : {element.ownedElements.forEach[getAllClassAndStatemachines(it, classes)]}
             IClass : {
                 classes.add(element)
-                classes.map[it.diagrams.toList].flatten.filter(IStateMachineDiagram).forEach[statemachines.put(element, it.stateMachine)]
+                element.diagrams.toList
+                    .filter(IStateMachineDiagram)
+                    .forEach[statemachines.put(element, it.stateMachine)]
             }
         }
     }
