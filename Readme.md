@@ -13,7 +13,7 @@ GroovyのSimpleTemplateEngineを利用してコード生成を行います．
 ## インストール
 ### プラグインのインストール
  - [Latest Release](https://github.com/s-hosoai/astahm2t/releases)から最新版をダウンロード
- - ヘルプ＞プラグイン一覧
+ - プラグイン > インストール済みプラグイン
   + ＋インストール
   + →プラグインファイルを選択 (astahm2t/target/～.jar）
   + →ついでに，astah SDKフォルダの/astah-plugin-SDK-1.2/bundles/console-1.0.1.jarも
